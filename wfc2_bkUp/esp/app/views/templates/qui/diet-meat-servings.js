@@ -1,0 +1,8 @@
+define(['handlebars'], function(Handlebars) {return Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
+  this.compilerInfo = [4,'>= 1.0.0'];
+helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
+  
+
+
+  return "<div id=\"member-pool\"></div>\n<div id=\"noteveryday\" class=\"member-node\">\n  <div class=\"member-controls\">\n    <span class=\"changer less icon icon-minus\"></span>\n    <span class=\"name\">No todos los días</span>\n    <span class=\"changer more icon icon-plus\"></span>\n  </div>\n  <div class=\"member-counter\"></div>\n</div>\n<div id=\"onceaday\" class=\"member-node\">\n  <div class=\"member-controls\">\n    <span class=\"changer less icon icon-minus\"></span>\n    <span class=\"name\">Una vez al día</span>\n    <span class=\"changer more icon icon-plus\"></span>\n  </div>\n  <div class=\"member-counter\"></div>\n</div>\n<div id=\"twiceaday\" class=\"member-node\">\n  <div class=\"member-controls\">\n    <span class=\"changer less icon icon-minus\"></span>\n    <span class=\"name\">Dos veces al día</span>\n    <span class=\"changer more icon icon-plus\"></span>\n  </div>\n  <div class=\"member-counter\"></div>\n</div>\n<div id=\"everymeal\" class=\"member-node\">\n  <div class=\"member-controls\">\n    <span class=\"changer less icon icon-minus\"></span>\n    <span class=\"name\">En todas las comidas</span>\n    <span class=\"changer more icon icon-plus\"></span>\n  </div>\n  <div class=\"member-counter\"></div>\n</div>\n\n<div>\n  <div class=\"prev-btn pill-button ball\"><span class=\"icon icon-chevron-left\"></span></div>\n  <div class=\"next-btn pill-button\"><span>SIGUIENTE</span><span class=\"icon icon-chevron-right\"></span></div>\n</div>\n";
+  });});

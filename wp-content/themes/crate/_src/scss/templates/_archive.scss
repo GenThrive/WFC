@@ -1,0 +1,149 @@
+// Archive Styles
+
+.pagination-links {
+	margin: 4rem auto;
+	display: table;
+	> .page-numbers {
+		margin: 0 auto;
+		display: flex;
+		flex-direction: row;
+		flex-wrap: wrap;
+		align-items: flex-start;
+		justify-content: flex-start;
+		li {
+			margin: 1rem;
+		}
+		a,
+		span:not(.dots) {
+			border: none;
+			outline: none;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			border-radius: 50%;
+			padding: 1rem;
+			color: $white;
+			width: 5rem;
+			height: 5rem;
+		}
+		span.current {
+			background-color: $light-blue;
+			font-weight: 600;
+		}
+		a {
+			background-color: $blue;
+			transition: background-color $transition-speed ease;
+			&:hover,
+			&:focus {
+				background-color: $light-blue;
+			}
+		}
+	}
+}
+
+.category-nav {
+	margin: 0 auto 3.2rem;
+	@include media ('>phone') {
+		display: table;
+	}
+	ul {
+		list-style: none;
+		margin: 0;
+		@include media ('>phone') {
+			display: inline-flex;
+			flex-wrap: wrap;
+			justify-content: flex-start;
+			align-items: stretch;
+		}
+	}
+	li {
+		width: 100%;
+		text-align: center;
+		@include media ('>phone') {
+			width: auto;
+		}
+		&.current a {
+			background-color: $white;
+			color: $blue;
+		}
+		a {
+			border: 1px solid $light-blue;
+			padding: 1rem 2rem;
+			background-color: $light-blue;
+			color: $white;
+			transition: background 200ms ease-in-out;
+			display: block;
+			@include media ('>phone') {
+				border-width: 1px 0px;
+			}
+			&:hover,
+			&:focus {
+				background-color: $blue;
+				color: $white;
+			}
+		}
+		@include media ('>phone') {
+			&:first-child a {
+				border-width: 1px 0px 1px 1px;
+				border-top-left-radius: 50px;
+				border-bottom-left-radius: 50px;
+			}
+			&:last-child a {
+				border-width: 1px 1px 1px 0px;
+				border-top-right-radius: 50px;
+				border-bottom-right-radius: 50px;
+			}
+		}
+	}
+}
+
+.posts-grid {
+
+	&.archive-posts {
+		display: flex;
+		flex-direction: row;
+		flex-wrap: wrap;
+		justify-content: flex-start;
+		align-items: stretch;
+	}
+
+	.post {
+		background-color: $white;
+		width: 100%;
+		flex: 100%;
+		padding: 4rem 2.5rem;
+		margin-bottom: 2rem;
+		@include media ('>=tablet') {
+			width: 32%;
+			flex: 0 0 32%;
+		}
+	}
+	.title {
+		margin-top: 0;
+		margin-bottom: 0;
+		font-weight: 700;
+		font-size: $font-size-xxl;
+		a {
+			color: $dark-blue;
+			&:hover,
+			&:active,
+			&focus {
+				color: $light-blue;
+			}
+		}
+	}
+	.meta {
+		margin: 1rem 0;
+	}
+	.date {
+		color: $bluegreen;
+		font-size: $font-size-lg;
+		font-weight: 400;
+	}
+	.excerpt {
+		font-weight: 400;
+		p {
+			margin: 0;
+		}
+	}
+}

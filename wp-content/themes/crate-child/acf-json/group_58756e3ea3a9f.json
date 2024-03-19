@@ -1,0 +1,78 @@
+{
+    "key": "group_58756e3ea3a9f",
+    "title": "Article Details",
+    "fields": [
+        {
+            "key": "field_58756e59e0678",
+            "label": "Source",
+            "name": "article_source",
+            "type": "text",
+            "instructions": "The publication this article came from, if applicable.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "50",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "",
+            "maxlength": "",
+            "placeholder": "",
+            "prepend": "",
+            "append": ""
+        },
+        {
+            "key": "field_58756e9de0679",
+            "label": "Author",
+            "name": "article_author",
+            "type": "text",
+            "instructions": "The name of the article author, if not from this site.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "50",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "",
+            "maxlength": "",
+            "placeholder": "",
+            "prepend": "",
+            "append": ""
+        },
+        {
+            "key": "field_58756ec4e067a",
+            "label": "External URL",
+            "name": "article_url",
+            "type": "url",
+            "instructions": "Original URL where article appears, if applicable.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "",
+            "placeholder": "http(s):\/\/"
+        }
+    ],
+    "location": [
+        [
+            {
+                "param": "post_type",
+                "operator": "==",
+                "value": "post"
+            }
+        ]
+    ],
+    "menu_order": 0,
+    "position": "acf_after_title",
+    "style": "default",
+    "label_placement": "top",
+    "instruction_placement": "label",
+    "hide_on_screen": "",
+    "active": 1,
+    "description": "",
+    "modified": 1569610863
+}

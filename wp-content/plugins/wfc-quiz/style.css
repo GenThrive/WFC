@@ -1,0 +1,708 @@
+#wfcquiz {
+  font-family: sans-serif;
+  /* padding-right: 35px; */
+  font-family: 'Source Sans Pro',sans-serif;
+}
+
+.quizContainer{
+  margin-bottom: 6%;
+  display: flex;
+  justify-content: center;
+  min-width: 80%;
+}
+
+.qsForm {
+  min-width: 100%;
+  justify-content: center;
+}
+ 
+ .noselect {
+  -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+     -khtml-user-select: none; /* Konqueror HTML */
+       -moz-user-select: none; /* Firefox */
+        -ms-user-select: none; /* Internet Explorer/Edge */
+            user-select: none; /* Non-prefixed version, currently
+                                  supported by Chrome and Opera */
+}
+.quizrow {
+  display: flex;
+  line-height: normal !important;
+  margin-bottom: 10px;
+}
+
+.column {
+  flex: 20%;
+}
+.column {
+  flex: 80%;
+}
+.movable {
+  margin:8px;
+  padding:3px;
+  width:60px;
+  background-color:rgb(227, 227, 227);
+  cursor: pointer;
+  height: 42px;
+  border: 3px solid;
+  border-radius: 13px;
+}
+.movable td {
+  height: 80px;
+  width: 95px;
+  text-align: center;
+  margin-top: 38%;
+  padding-top: 20%;
+}
+
+.nmovable {
+  padding:3px;
+  display: flex;
+  align-items: center;
+  min-height: 60px;
+  margin-bottom: 15px;
+}
+
+.nmovable img {
+  max-height: 50px;
+  min-width: 70px;
+}
+
+.nmovable label {
+  margin-left:15px;
+  display: flex;
+  justify-content: center;
+  color: #606162;
+  font-size: 19px;
+}
+
+/*review this and delete later*/
+.flex2 {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.itemx {
+  position: relative;
+  margin-right: 9px;
+  margin-bottom: 15px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-width: 80px;
+  max-width: 80px;
+  min-height: 60px;
+  color: #606162;
+  font-size: 19px;
+}
+
+.file {
+  background-color: #f4efe1;
+  cursor: pointer;
+}
+
+.rowDnD {
+  padding-left: 3%;
+  margin-top:6%;
+  margin-bottom: 6%;
+}
+/*ends delete later*/
+
+.slider1 {
+  -webkit-appearance: none;
+  width: 95%;
+  height: 20px;
+  background: #f4efe1;
+  outline: none;
+  opacity: 0.7;
+  -webkit-transition: .2s;
+  transition: opacity .2s;
+  border-radius: 25px;
+  margin-bottom: 0% !important;
+  border:0;
+  box-shadow: none;
+
+}
+
+.slider1:hover {
+  opacity: 1;
+}
+
+.slider1::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 34px;
+  height: 48px;
+  cursor: pointer;
+  background: #0d8ac5;
+  border-radius: 0%;
+  background: url('https://www.watercalculator.org/wp-content/uploads/2021/10/Droplet.png');
+  background-size: 34px 47px;
+  background-repeat: no-repeat;
+  border:none;
+  box-shadow: none;
+}
+
+.slider1::-moz-range-thumb {
+  width: 34px;
+  height: 48px;
+  cursor: pointer;
+  background: #0d8ac5;
+  border-radius: 0%;
+  background: url('https://www.watercalculator.org/wp-content/uploads/2021/10/Droplet.png');
+  background-size: 34px 47px;
+  background-repeat: no-repeat;
+  border:none;
+  box-shadow: none;
+}
+
+.sliderGallons {
+  height: 36px;
+  width: 95%;
+  display: flex;
+  justify-content: space-between;
+}
+
+.galMarker{
+  font-size: 20px;
+}
+
+.galText {
+  text-align: center;
+  line-height: 1.2;
+}
+
+.box.flex {
+  display: flex;
+  justify-content: center;
+  margin-left: auto;
+  margin-right: auto;
+  align-content: center;
+}
+
+.divQst {
+  display: flex;
+  justify-content: center;
+  background: white;
+}
+
+.frmContainer {
+  /* margin-bottom: 1%; */
+  display: flex;
+  min-width: 90%;
+  justify-content: center;
+}
+
+.qTitle {
+  color: #003f69;
+  font-size: 25px;
+  padding-left: 3%;
+  margin-bottom: 1%;
+  margin-top:3%
+}
+
+.qNumber {
+  color: #07518C;
+  padding-left: 3%;
+  font-style: italic;
+  margin-bottom: 20px;
+}
+
+.qNumber b {
+  font-weight: 900;
+}
+
+.qsIntro {
+  display: flex;
+  flex-flow: column;
+  max-width: 85%;
+  margin-left: auto;
+  margin-right: auto;
+  /* padding-top: 7%; */
+  padding-bottom: 1%;
+} 
+
+#colImageHome {
+  max-width: 34%;
+}
+
+.qsIntro button {
+  min-width: 180px;
+  min-height: 45px;
+  max-width: 20%;
+  background: #badfeb;
+  letter-spacing: 0px;
+}
+
+.qsIntro h3 {
+  font-size: 28px;
+  color: #003f69;
+  min-width: 100%;
+  font-weight: 600;
+}
+.qsIntro p {
+  color: #003f69;
+  font-weight: bold;
+  max-width: 90%;
+  padding-bottom: 3%;
+  font-weight:bolder;
+}
+
+.qsIntro .quizrow {
+  margin-left:16%;
+}
+
+.qsIntro #introStartBtnRow {
+  margin-left: 0%;
+}
+
+.pChoose {
+  font-style: italic;
+  margin-top: 1px;
+  margin-bottom:10px
+}
+
+.qsContainer {
+  background-color: white;
+  min-width: 75%;
+}
+
+.qsFinal {
+  background-color: white;
+  /* padding-top: 2%; */
+  padding-bottom: 2%;
+}
+
+.qsAnswers {
+  padding-left: 3%;
+  color: #606162;
+}
+
+.qsAnswers p {
+  color: #24bcb6;
+}
+
+.qsAnswers input {
+  margin-bottom: 3%;
+  margin-right: 2%;
+}
+
+.qsAnswers input[type="radio"] {
+  height: 20px;
+  width: 20px;
+}
+
+.qsAnswers input[type="checkbox"] {
+  min-height: 20px;
+  min-width: 20px;
+}
+
+.qsAnswers .quizrow input {
+  background-color: blue;
+}
+
+.qsAnswers label {
+  margin-top: 2%;
+}
+
+.qsButtons {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-bottom: 3%;
+}
+
+.qfsScore h3 {
+  padding-left: 7%;
+  font-size: 33px;
+  color: #003f69;
+  margin-bottom: 0px;
+}
+
+.qfsScore p {
+  margin-bottom: 10px;
+}
+
+.qfsScore span {
+  padding-left: 6%;
+  color: #003f69;
+  font-weight: bold;
+  background: #badfeb;
+  display: inline-block;
+  padding: 1%;
+  margin-left: 7%;
+  border-radius: 31px;
+  box-shadow: 1px 6px #003f69;
+  min-height: 35px;
+  min-width: 33%;
+  text-align: center;
+  padding-bottom: 1.8%;
+}
+
+.qfsScore span b {
+  font-size: 33px;
+}
+
+.qsFinalScore {
+  max-width: 90%;
+  margin-left: auto;
+  margin-right: auto;
+  padding-top: 2%;
+}
+
+.qsFS1 {
+  display: flex;
+  justify-content: space-between;
+  line-height: 24px;
+}
+
+.qsFinalScore.qsFS2 {
+  display: flex;
+}
+
+.qsFS2 .qfsTop {
+  font-style: italic;
+  color: #606162;
+}
+
+.qsFS2 .qfsBottom {
+  font-weight: bold;
+  color: #003f69;
+}
+
+.qsFinalScore label {
+  display: flex;
+}
+
+.qsFinalScore div {
+  margin: 2%;
+  background-color: #f4efe1;
+}
+
+.qsFinalScore div.revPage {
+  margin: 2%;
+  background-color: white;
+}
+
+.qsFinalScore button {
+  width: 130px;
+  letter-spacing: 0px;
+}
+
+.qsFinalScore .revPage button {
+  width: 200px;
+  letter-spacing: 0px;
+  min-height: 44px;
+}
+
+.qsFinal p {
+  padding-left: 2%;
+  margin-left: 5%;;
+  color: #24bcb6;
+  font-weight: bold;
+  font-style: italic;
+}
+
+.qsFinalLearnMore {
+  margin-top: auto !important;
+  margin-bottom: auto !important;
+}
+
+.btn {
+  font-size: 13.3px;
+  line-height: normal;
+  padding: 1%;
+  margin: 1%;
+  background-color: #003f69;
+  font-weight: bold;
+  border: 0px solid #07518C;
+  color: white;
+  min-width: 80px;
+  min-height: 35px;
+  border-radius: 25px;
+  box-shadow: 1px 5px #C6C8C9;
+  text-transform: uppercase;
+  font-weight: normal;
+  letter-spacing: 1px;
+  cursor: pointer;
+  }
+
+.btn:hover {
+  background-color: #388dd3;
+  color: white;
+}
+
+.btn.btnIntro {
+  color: #003f69;
+  font-weight: bold;
+  box-shadow: 1px 6px #003f69;
+  font-size: 19px;
+  margin: 0%;
+}
+
+#imgHome{
+  max-height: 65%;
+  padding-top: 5%;
+}
+
+.qsTest {
+  display: flex;
+  justify-content: center;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.qsIntroP {
+  line-height: 25px !important;
+}
+
+.btn1{
+  font-size: 13.3px;
+  line-height: normal;
+  padding: 1%;
+  margin: 1%;
+  background-color: #bababa;
+  font-weight: bold;
+  border: 0px solid #cecece;
+  color: white;
+  min-width: 80px;
+  min-height: 35px;
+  border-radius: 25px;
+  box-shadow: 1px 5px #C6C8C9;
+  text-transform: uppercase;
+  font-weight: normal;
+  letter-spacing: 1px;
+  cursor: not-allowed;
+}
+
+.containerMq {
+  display: block;
+  position: relative;
+  padding-left: 35px;
+  margin-bottom: 16px;
+  cursor: pointer;
+  font-size: 19px;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+/* Hide the browser's default checkbox */
+.containerMq input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
+}
+
+.containerMq input[type="checkbox"] {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
+}
+
+/* Create a custom checkbox */
+.checkmark {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 25px;
+  width: 25px;
+  background-color: #F4EFE1;
+}
+
+/* On mouse-over, add a grey background color */
+.containerMq:hover input ~ .checkmark {
+  background-color: #ccc;
+}
+
+/* When the checkbox is checked, add a blue background */
+.containerMq input:checked ~ .checkmark {
+  background-color: #2196F3;
+}
+
+/* Create the checkmark/indicator (hidden when not checked) */
+.checkmark:after {
+  content: "";
+  position: absolute;
+  display: none;
+}
+
+/* Show the checkmark when checked */
+.containerMq input:checked ~ .checkmark:after {
+  display: block;
+}
+
+/* Style the checkmark/indicator */
+.containerMq .checkmark:after {
+  left: 9px;
+  top: 5px;
+  width: 7px;
+  height: 12px;
+  border: solid white;
+  border-width: 0 3px 3px 0;
+  -webkit-transform: rotate(45deg);
+  -ms-transform: rotate(45deg);
+  transform: rotate(45deg);
+}
+
+
+.containerRdb {
+  display: block;
+  position: relative;
+  padding-left: 35px;
+  margin-bottom: 15px;
+  cursor: pointer;
+  font-size: 19px;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+/* Hide the browser's default radio button */
+.containerRdb input {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+}
+
+/* Create a custom radio button */
+.radioBtn {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 25px;
+  width: 25px;
+  background-color: #F4EFE1;
+  border-radius: 50%;
+}
+
+/* On mouse-over, add a grey background color */
+.containerRdb:hover input ~ .radioBtn{
+  background-color: #ccc;
+}
+
+/* When the radio button is checked, add a blue background */
+.containerRdb input:checked ~ .radioBtn {
+  background-color: #2196F3;
+}
+
+/* Create the indicator (the dot/circle - hidden when not checked) */
+.radioBtn:after {
+  content: "";
+  position: absolute;
+  display: none;
+}
+
+/* Show the indicator (dot/circle) when checked */
+.containerRdb input:checked ~ .radioBtn:after {
+  display: block;
+}
+
+/* Style the indicator (dot/circle) */
+.containerRdb .radioBtn:after {
+  top: 7px;
+  left: 7px;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: white;
+}
+
+.sliderGallons label {
+  margin-top: 0px;
+}
+
+.tALeft {
+  text-align: left;
+}
+
+.tARight {
+  text-align: right;
+}
+
+.tACenter {
+  text-align: center;
+}
+
+@media only screen and (max-width: 768px) {
+  .qsIntro{
+    flex-flow: column;
+    max-width: 90%;
+  }
+  .qsIntro img {
+    max-width: 80%;
+    padding-top: 15%;
+  }
+  .qsIntro.column {
+    max-width: 100%;
+  }
+
+  .qsFS1 {
+    display: flex;
+    flex-flow: column;
+    padding: 2%;
+    margin-bottom: 4% !important;
+  }
+}
+
+@media only screen and (max-width: 720px) {
+  #wfcquiz {
+    padding-right: 0;
+  }
+
+  .qsIntro .quizrow {
+    width: 100%;
+  }
+  .qsIntro p {
+    width: 100%;
+  }
+  .radioBtn {
+    top:2px
+  }
+  .checkmark {
+    top:2px
+  }
+  #imgHome {
+    display: none;
+  }
+  #colImageHome {
+    display: none;
+  }
+  .galText {
+    font-size: 16px;
+  }
+  .tARight {
+    font-size: 16px;
+  }
+  .qsIntro .quizrow {
+    margin-left:0%;
+  }
+  .rowDnD {
+    width: 100%;
+    margin-left: 0;
+    margin-right: 0;
+  }
+  .quizContainer {
+    margin-bottom: 12%;
+  }
+  .nmovable img {
+    max-height:40px;
+    min-width:50px
+  }
+}
+
+.slidecontainer {
+  /* margin-top: 6%; */
+}
+
+.qfsScore {
+  max-width: 98%;
+}

@@ -1,0 +1,347 @@
+.page-content {
+	.search-form {
+		max-width: 54rem;
+		margin-bottom: 6rem;
+		display: flex;
+		flex-direction: row;
+		justify-content: space-between;
+		> label {
+			flex: 1;
+		}
+	}
+	.search-submit {
+		flex: none;
+		margin-left: 2rem;
+		@extend .button;
+	}
+}
+
+.entry-content {
+	h1,
+	h2,
+	h3,
+	h4,
+	h5,
+	h6,
+	p {
+		word-break: break-word;
+	}
+	@include media( '<tablet' ) {
+		h2 {
+			font-size: $font-size-xxl;
+		}
+	}
+}
+
+// hero images on "Page with Hero" template
+.featured-image-hero {
+	margin-top: 0;
+
+	@include media( '>desktop' ) {
+
+		img {
+			max-height: 75vh;		// Override as needed
+			object-fit: cover;	// NB: Won't work in IE <= 11. You can also use `object-position` to dictate how it crops.
+			// Need IE11 support? Consider a polyfill like https://github.com/constancecchen/object-fit-polyfill or manually coding a bg image URL.
+		}
+
+	}
+}
+
+.hero {
+	background-color: $tan;
+	position: relative;
+	text-align: center;
+	> *:not(.hero-wave) {
+		background-color: $dark-aqua;
+	}
+	.icon-wrap {
+		padding-top: 2rem;
+		background-color: $dark-aqua;
+		+ .title {
+			padding-top: 2rem;
+		}
+	}
+	.icon {
+		display: block;
+		background-color: $white;
+		width: 12rem;
+		height: 6rem;
+		margin: 0 auto;
+		background-size: 90% auto;
+		background-repeat: no-repeat;
+		background-position: center;
+	}
+	.post-nav {
+		position: absolute;
+		top: 50%;
+		transform: translateY(-50%);
+		display: inline-flex;
+		justify-content: center;
+		align-items: center;
+		width: 3.6rem;
+		height: 3.6rem;
+		border: 1px solid $white;
+		transition: background 200ms ease;
+		&:hover,
+		&:focus {
+			background-color: $white;
+			color: $light-bluegreen;
+		}
+		a {
+			display: block;
+			position: absolute;
+			left: 0;
+			top: 0;
+			z-index: 1;
+			width: 100%;
+			height: 100%;
+			text-indent: 5rem;
+			overflow: hidden;
+			text-overflow: none;
+			white-space: nowrap;
+		}
+		&:after {
+			transform: translateY(-4px);
+			display: block;
+			font-size: 4rem;
+			line-height: 1;
+			font-weight: 300;
+		}
+	}
+	.prev-post {
+		left: 2rem;
+		&:after {
+			content: '\2039';
+		}
+	}
+	.next-post {
+		right: 2rem;
+		&:after {
+			content: '\203A';
+		}
+	}
+	.post-meta {
+		font-size: $font-size-xs;
+		font-weight: 600;
+		color: $white;
+		padding: 0 2rem 2.4rem;
+	}
+	.post-categories {
+		padding-right: 1rem;
+		a {
+			text-transform: lowercase;
+			color: $lighter-blue;
+			&:hover,
+			&:focus {
+				color: $light-bluegreen;
+			}
+		}
+	}
+	.title {
+		background-color: $dark-aqua;
+		text-align: center;
+		color: $white;
+		font-size: 2.5rem;
+		font-weight: 700;
+		padding: 2.4rem 7rem;
+		margin: 0;
+		span {
+			max-width: 70rem;
+			margin: 0 auto;
+			display: block;
+		}
+		@include media( '>=tablet' ) {
+			font-size: 5rem;
+			padding: 4.6rem 2rem;
+		}
+	}
+	.hero-wave {
+		position: relative;
+		top: 0;
+		left: 0;
+		z-index: 1;
+		width: 100%;
+		height: 24px;
+		background-image: url( ../images/hero-bg.png );
+		background-repeat: no-repeat;
+		background-size: cover;
+		background-position: top center;
+	}
+}
+
+.wp-block-image {
+	+ h3 {
+		color: $dark-blue;
+		font-weight: 600;
+	}
+}
+
+// Cornerstone Element Styles
+#cs-content figure {
+	@include media( '<=600px' ) {
+		max-width: 100% !important;
+		margin-left: auto;
+		margin-right: auto;
+	}
+}
+.sdm_download_button_box_default {
+	margin: 0;
+}
+.sdm_download_button_box_default .sdm_download_link a {
+	background: none !important;
+	font-size: 2rem !important;
+	color: $light-blue !important;
+	border: none !important;
+	margin: 0;
+	box-shadow: none !important;
+	text-shadow: none !important;
+	font-weight: 600;
+	font-family: inherit;
+	&:hover {
+		color: $lighter-blue !important;
+	}
+}
+.x-text {
+	@include media( '<=600px' ) {
+		width: auto !important;
+	}
+	table {
+		overflow-x: scroll;
+		margin-bottom: 4rem;
+		@include media( '<=600px' ) {
+			width: 100% !important;
+		}
+	}
+}
+#cs-content {
+	margin-bottom: 4rem;
+	.x-column .h-custom-headline {
+		margin-top: 0;
+	}
+}
+body #cs-content .x-creative-cta {
+	@extend .button;
+	background-color: $blue !important;
+	padding: 1.6rem 4.8rem !important;
+	border-bottom: none !important;
+	font-size: 2.6rem !important;
+	margin: 2rem auto;
+	display: table;
+	&:hover {
+		background-color: $light-blue !important;
+	}
+	> * {
+		font-size: 2.6rem !important;
+	}
+}
+body #cs-content .x-btn {
+	margin: 2rem 0;
+	transition: background 200ms ease-in-out;
+	border: none;
+	font-size: $font-size-xl;
+	font-family: $body-font;
+	line-height: 1;
+	font-weight: 600;
+	text-decoration: none;
+	outline: none;
+	padding: $default-button-padding;
+	display: inline-block;
+	border-radius: 50px;
+	box-shadow: 2px 4px 0px transparentize( $blue, 0.8);
+	background-color: $button-background-color;
+	&:hover,
+	&:focus {
+		color: white;
+		background-color: $button-background-color-hover !important;
+		cursor: pointer;
+		box-shadow: 2px 4px 0px transparentize( $blue, 0.8) !important;
+		border: none;
+		margin-bottom: 2rem !important;
+	}
+	.x-icon {
+		display: none !important;
+	}
+	&.x-btn-block {
+		width: auto;
+	}
+}
+
+// IE Styles -_-
+.entry .entry-content .wp-block-image.size-post-grid {
+	amp-img {
+		width: 175px;
+		height: 175px;
+	}
+}
+
+.entry-content {
+	ul:not([class]) {
+		padding-left: 2rem;
+		position: relative;
+		li:before {
+			display: inline-block;
+			position: absolute;
+			left: 0;
+			transform: translateY(1.25rem);
+		}
+	}
+	ul:not([class]) {
+		li:before {
+			content: '';
+			display: block;
+			width: 1rem;
+			height: 1rem;
+			background-color: $default-text-color;
+			border-radius: 50%;
+		}
+	}
+	ol {
+		list-style-position: inside;
+	}
+}
+
+.has-4-items {
+	.wp-block-column {
+		@include media( '<=785px' ) {
+			flex-basis: 100%;
+		}
+	}
+}
+
+.breadcrumbs + .content-area {
+	.entry-content {
+		padding-top: 0;
+	}
+}
+
+.entry .entry-content > .wp-block-related-posts:last-of-type {
+	margin-bottom: 0;
+}
+
+.content-area {
+	overflow-x: hidden;
+}
+
+// ! 404 Styles
+.error404 {
+	.no-results {
+		text-align: center;
+	}
+	.search-form {
+		margin-left: auto;
+		margin-right: auto;
+	}
+}
+
+// Translation Button
+.translation-wrap {
+	position: fixed;
+	z-index: 10;
+	right: 2rem;
+	bottom: 6rem;
+	.button {
+		font-size: 1.8rem;
+		padding: 1.6rem 2rem;
+	}
+}

@@ -1,0 +1,36 @@
+// Applies block styles to editor editor-styles-wrapper
+
+.editor-styles-wrapper {
+	font-family: $body-font !important;
+	line-height: $body-line-height;
+	color: $default-text-color;
+
+	@import "blocks";
+
+	// Backend specific styles
+	.wp-block {
+		max-width: 100%;
+	}
+	.editor-writing-flow {
+		margin: 32px auto;
+		font-size: $default-font-size;
+	}
+	.editor-block-preview .editor-block-preview__content{
+		font-family: $body-font;
+	}
+	.editor-block-preview .editor-block-preview__content>div{
+		font-family: $body-font;
+	}
+	.editor-default-block-appender textarea.editor-default-block-appender__content{
+		font-family: $body-font;
+		font-size: $default-font-size;
+		color: $default-text-color;
+	}
+	.editor-post-title__block .editor-post-title__input{
+		font-family: $heading-font;
+		color: $default-text-color;
+		font-size: $font-size-xxxl;
+		font-weight: 700;
+		text-align: center;
+	}
+}

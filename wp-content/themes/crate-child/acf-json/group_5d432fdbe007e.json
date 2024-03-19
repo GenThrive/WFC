@@ -1,0 +1,181 @@
+{
+    "key": "group_5d432fdbe007e",
+    "title": "Related Posts",
+    "fields": [
+        {
+            "key": "field_5dc5c1088017f",
+            "label": "Disable Read More under Related Posts",
+            "name": "disable_read_more",
+            "type": "true_false",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": [
+                [
+                    {
+                        "field": "field_5dc5c0c88017e",
+                        "operator": "==",
+                        "value": "1"
+                    }
+                ]
+            ],
+            "wrapper": {
+                "width": "50",
+                "class": "",
+                "id": ""
+            },
+            "message": "",
+            "default_value": 0,
+            "ui": 0,
+            "ui_on_text": "",
+            "ui_off_text": ""
+        },
+        {
+            "key": "field_5dfb8f7488526",
+            "label": "Related Post Method",
+            "name": "related_post_method",
+            "type": "radio",
+            "instructions": "How would you like the related posts to be populated?",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "choices": {
+                "category": "By Categories",
+                "tag": "By Tags",
+                "manual": "By Post Selection"
+            },
+            "allow_null": 0,
+            "other_choice": 0,
+            "default_value": "category",
+            "layout": "horizontal",
+            "return_format": "value",
+            "save_other_choice": 0
+        },
+        {
+            "key": "field_5d43300466d5c",
+            "label": "Related Posts Categories",
+            "name": "related_posts_categories",
+            "type": "taxonomy",
+            "instructions": "If you add a related posts block to the page, please select categories to be used here:",
+            "required": 0,
+            "conditional_logic": [
+                [
+                    {
+                        "field": "field_5dfb8f7488526",
+                        "operator": "==",
+                        "value": "category"
+                    }
+                ]
+            ],
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "taxonomy": "category",
+            "field_type": "multi_select",
+            "allow_null": 0,
+            "add_term": 0,
+            "save_terms": 0,
+            "load_terms": 0,
+            "return_format": "id",
+            "multiple": 0
+        },
+        {
+            "key": "field_5dfb8e6388524",
+            "label": "Related Posts Tags",
+            "name": "related_posts_tags",
+            "type": "taxonomy",
+            "instructions": "If you add a related posts block to the page, please select tags to be used here:",
+            "required": 0,
+            "conditional_logic": [
+                [
+                    {
+                        "field": "field_5dfb8f7488526",
+                        "operator": "==",
+                        "value": "tag"
+                    }
+                ]
+            ],
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "taxonomy": "post_tag",
+            "field_type": "multi_select",
+            "allow_null": 0,
+            "add_term": 0,
+            "save_terms": 0,
+            "load_terms": 0,
+            "return_format": "id",
+            "multiple": 0
+        },
+        {
+            "key": "field_5dfb8eee88525",
+            "label": "Related Posts Selection",
+            "name": "related_posts_selection",
+            "type": "relationship",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": [
+                [
+                    {
+                        "field": "field_5dfb8f7488526",
+                        "operator": "==",
+                        "value": "manual"
+                    }
+                ]
+            ],
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "post_type": [
+                "post",
+                "news_brief",
+                "footprint"
+            ],
+            "taxonomy": "",
+            "filters": [
+                "search",
+                "post_type"
+            ],
+            "elements": [
+                "featured_image"
+            ],
+            "min": 3,
+            "max": 3,
+            "return_format": "id"
+        }
+    ],
+    "location": [
+        [
+            {
+                "param": "post_type",
+                "operator": "==",
+                "value": "page"
+            },
+            {
+                "param": "page_template",
+                "operator": "!=",
+                "value": "page-template-news.php"
+            }
+        ]
+    ],
+    "menu_order": 0,
+    "position": "normal",
+    "style": "default",
+    "label_placement": "top",
+    "instruction_placement": "label",
+    "hide_on_screen": [
+        "the_content"
+    ],
+    "active": 1,
+    "description": "",
+    "modified": 1576767805
+}

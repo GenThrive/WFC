@@ -1,0 +1,8 @@
+@import "node_modules/include-media/dist/_include-media.scss";
+@import "variables";
+
+html.wp-toolbar {
+	font-size: 62.5%; // sets base size for rem unit
+}
+
+@import "blocks/editor";

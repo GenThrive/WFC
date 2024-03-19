@@ -1,0 +1,294 @@
+//
+// Base
+//
+// What you will find here:
+// - General HTML element styles
+// - Global styles
+// - Typography
+
+
+// ---------------- General HTML element styles
+
+html {
+	font-size: 62.5%;	// Makes 1rem = 10px
+	box-sizing: border-box;
+	line-height: 1.6;
+}
+
+// Apply box-sizing: border-box to everything.
+* {
+	&,
+	&::before,
+	&::after {
+		box-sizing: inherit;
+	}
+}
+
+body {
+	font-family: $body-font;
+	font-size: $default-font-size;
+	font-weight: 300;
+	margin: 0;
+	background: $default-background-color;
+	color: $default-text-color;
+	height: 100%;
+}
+
+.site-main {
+	background-color: $white;
+}
+
+#body-wrapper {
+	display: flex;
+	flex-direction: column;
+	min-height: calc( 100vh - 55px ); // height of header
+	@include media ('>=tablet') {
+		min-height: calc( 100vh - 126px ); // height of header
+	}
+	.admin-bar & {
+		min-height: calc( 100vh - 32px );
+		@include media( 'screen', '<=782px' ) {
+			min-height: calc( 100vh - 46px );
+		}
+	}
+}
+
+div.site-content {
+	flex: 1 0 auto;
+}
+
+a {
+	text-decoration: none;
+	font-weight: 600;
+	color: $default-link-color;
+	&:hover,
+	&:focus,
+	&:active {
+		color: $default-link-color-hover;
+	}
+}
+
+// extend content to full width for wrapped elements
+.row-full {
+	width: 100vw;
+	position: relative;
+	margin-left: -50vw;
+	height: 100px;
+	margin-top: 100px;
+	left: 50%;
+}
+
+// ---------------- Global styles
+
+nav a {
+	text-decoration: none;
+}
+
+p {
+	margin: $default-text-margin;
+}
+
+// ---------------- Typography
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+	font-family: $heading-font;
+	margin: 0;
+	font-weight: 400;
+	line-height: 1;
+	margin: 3.7rem 0;
+	a {
+		color: $teal;
+		&:hover,
+		&:active,
+		&:focus {
+			color: $light-blue;
+		}
+	}
+}
+
+h3, h4, h5, h6 {
+	color: $alt-black;
+}
+
+h1 {
+	font-size: $font-size-xxxl;
+	font-weight: 700;
+	color: $blue;
+}
+
+h2 {
+
+}
+
+h3 {
+	font-size: $font-size-xl;
+}
+
+strong {
+	font-weight: 600;
+}
+
+.entry-source {
+	font-size: 0.9em;
+	font-style: italic;
+	color: $secondary-color;
+}
+
+figcaption {
+	font-size: 1.3rem;
+	font-style: italic;
+	margin: 0.4rem 0;
+}
+
+button {
+	text-align: center;
+	overflow: visible;
+	border: 0;
+	font: inherit;
+	-webkit-font-smoothing: inherit;
+	letter-spacing: inherit;
+	background: none;
+	cursor: pointer;
+	&:focus {
+		outline: dotted;
+	}
+}
+
+.button {
+	text-align: center;
+	display: inline-block;
+	font-size: $font-size-xl;
+	font-family: $body-font;
+	background-color: $button-background-color;
+	color: $button-text-color;
+	transition: background 200ms ease-in-out;
+	border: none;
+	line-height: 1;
+	padding: $default-button-padding;
+	font-weight: 600;
+	text-decoration: none;
+	border-radius: 50px;
+	box-shadow: 2px 4px 0px transparentize( $blue, 0.8);
+
+	&:hover,
+	&:focus {
+		background-color: $button-background-color-hover;
+		color: $button-text-color-hover;
+	}
+
+	&:focus {
+		outline: dotted;
+	}
+	&.button-alt {
+		background-color: $white;
+		color: $blue;
+		box-shadow: 2px 4px 0px transparentize( #dbd7ca, 0.2 );
+		&:hover,
+		&:focus {
+			background-color: $light-blue;
+			color: $white;
+			outline-color: $blue;
+		}
+	}
+	&.button-arrow {
+		position: relative;
+		> span {
+			position: absolute;
+			top: 50%;
+			right: 2rem;
+			transform: translateY(calc(-50% - 4px));
+			font-size: 4rem;
+			line-height: 1;
+			font-weight: 300;
+		}
+	}
+}
+
+hr {
+	border: 1px solid $light-blue;
+}
+
+ol,
+ul {
+	padding: 0;
+	margin: 0 0 4.3rem 3.3rem;
+	list-style: none;
+	li {
+		line-height: 1.8;
+	}
+}
+
+ol {
+	counter-reset: list-counter;
+	li {
+		counter-increment: list-counter;
+		&:before {
+			content: counter(list-counter) ". ";
+			color: $blue;
+			font-weight: 700;
+		}
+	}
+}
+
+
+// Breadcrumb styles
+.breadcrumbs {
+	width: calc(100% - 2rem - 2rem);
+	max-width: $max-page-width;
+	margin: 3.2rem auto 5rem;
+	font-size: $font-size-sm;
+	font-weight: 400;
+	a {
+		color: $dark-aqua;
+	}
+	ul {
+		margin: 0;
+		list-style: none;
+		display: flex;
+		flex-direction: row;
+		flex-wrap: wrap;
+
+		.breadcrumb-separator {
+			margin: 0 6px;
+		}
+	}
+}
+
+// Icons
+.icon {
+	display: inline-block;
+}
+
+// Table Styles
+table {
+	border-collapse: collapse;
+	width: 100%;
+	border-spacing: 0;
+	background-color: transparent;
+}
+table th,
+table thead,
+table td {
+	padding: 1rem 1.2rem;
+	line-height: 1.3;
+	text-align: left;
+	vertical-align: middle;
+}
+table th,
+table thead {
+	td {
+		border-top: none;
+	}
+}
+table td {
+	border-top: 1px solid $light;
+	line-height: 1.4;
+	> p:last-child {
+		margin-bottom: 0;
+	}
+}

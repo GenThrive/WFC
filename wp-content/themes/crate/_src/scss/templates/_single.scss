@@ -1,0 +1,107 @@
+.single {
+
+	// featured images on single post pages
+	.featured-image {
+		margin: 1rem 0;
+		padding: 0 0 0 0;
+		display: block;
+
+		// float the image left on larger screens
+		@include media('>tablet') {
+			float: left;
+			margin-right: 1.5rem;
+		}
+
+	}
+
+}
+
+// Taxonomy terms list, in entry footer by default.
+.post-terms {
+	clear: both;
+	font-weight: bold;
+	font-size: 90%;
+	margin: 2rem 0;
+	a {
+		display: inline-block;
+		font-weight: normal;
+		margin: 0.4rem 0.4rem;
+		padding: $pager-link-padding;
+		border-radius: $border-radius;
+		background-color: $light;
+		text-decoration: none;
+		transition: all $transition-speed ease;
+		&:hover {
+			color: $light;
+			background-color: $default-link-color;
+		}
+		@include button-active();
+	}
+}
+
+.single .entry-content {
+	max-width: 70rem;
+	margin-left: auto;
+	margin-right: auto;
+	padding-bottom: 4rem;
+
+	#cs-content .x-container.width {
+		width: 100%;
+	}
+}
+
+.entry-content {
+	padding: 4rem 0 0;
+
+	&.has-thumbnail > #cs-content > .x-section.bg-image {
+		display: none;
+	}
+	ol,
+	ul {
+		li {
+			+ li {
+				margin-top: 1rem;
+			}
+		}
+	}
+	.p-featured {
+		font-size: $font-size-xl;
+		> p {
+			font-size: $font-size-xl;
+			margin: 0 0 5rem;
+		}
+		> h3 {
+			font-size: $font-size-xxl;
+		}
+	}
+}
+
+amp-img.banner-image > img {
+	object-fit: cover !important;
+}
+
+.banner {
+	@extend %push-fullwidth;
+	background-size: auto;
+	background-position: 50% 50%;
+	background-repeat: no-repeat;
+	overflow: hidden;
+	padding: 1rem 0;
+	.banner-image {
+		display: block;
+		margin: 0 auto;
+		@include media('>=tablet') {
+			display: none;
+		}
+	}
+	@include media('>=tablet') {
+		min-height: 45rem;
+	}
+	@include media('<tablet') {
+		background: none !important;
+	}
+	body[class^="amp-mode"] & {
+		background-size: cover;
+		padding: 0;
+	}
+}

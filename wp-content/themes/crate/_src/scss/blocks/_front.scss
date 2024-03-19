@@ -1,0 +1,5 @@
+// Applies block styles to frontend entry-content
+.entry .entry-content,
+.entry .entry-summary {
+	@import "blocks";
+}

@@ -1,0 +1,174 @@
+//
+// Variables
+//
+// 01. Colors
+// 02. Grid and layout
+// 03. Decorative details
+// 04. Form layout options
+// 05. Font Variables
+
+// ---------------- 01. Colors
+
+// Colors used:
+$white:     #fff;
+$black:     #000;
+$alt-black: #2C2D2E ;
+$dark:      #2f2f2f;
+$light:     #eee;
+$gray:      #49505c; // #5e6676
+
+// The following are from the open color project.
+// Change, add or delete as needed. Then be sure to re-define the branding
+// and elements sections below.
+
+$red:             #fa5252;
+$orange:          #fd7e14;
+$gold:            #fab005;
+$yellow:          #ffd43b;
+$mint:            #82c91e;
+$green:	          #0ca678;
+$purple:          #7950f2;
+$grape:           #be4bdb;
+$pink:            #e64980;
+$tan:             #f4efe1;
+
+$lighter-blue:    #44c4f5;
+$light-blue:      #0d8ac5;
+$blue:            #003f69;
+$alt-blue:        #05518c;
+$dark-blue:       #07518c;
+$bluegreen:       #779da1;
+$light-bluegreen: #73d1d0;
+$dark-aqua:       #2F779E;
+$teal:            #24bcb6;
+$light-teal:      #28bcb5;
+$alt-light-blue:  #0d8bc5;
+
+
+// Define branding
+$primary-color:            $blue;
+$secondary-color:          $mint;
+$default-background-color: $tan;
+$default-text-color:       $gray;
+$text-color-light:         $light;
+$default-link-color:       $light-blue;
+$default-link-color-hover: $lighter-blue;
+$inverse-background-color: $dark;
+$inverse-text-color:       $white;
+$inverse-link-color:       $yellow;
+$inverse-link-color-hover: $gold;
+$footer-background-color:  linear-gradient(to bottom, #d9efe8 0%,#addcf9 100%);
+$header-background-color:  $tan;
+
+
+// Define elements
+
+// Primary / Default button:
+$button-background-color:       $blue;
+$button-background-color-hover: $light-blue;
+$button-text-color:             $white;
+$button-text-color-hover:       $white;
+$default-button-padding:        1.6rem 4.8rem;
+
+// Pagination elements, defined in _archive.scss
+$pager-item-margin:           0.5rem;	// space between items
+$pager-link-background-color: $default-link-color;
+$pager-link-text-color:       $inverse-link-color;
+$pager-link-padding:          0.8rem 2rem;
+$pager-current-background-color: transparent;
+$pager-current-text-color:    $primary-color;
+$pager-link-hover-background-color: $secondary-color;
+
+
+// ---------------- 02. Grid, layout & breakpoints
+
+// Layout & grid
+$max-page-width:     1200px; // use class "container" around your content for this to work.
+$page-padding:       2rem;   // Sets calculated width around .container
+$block-spacing-unit: 2rem;   // Sets unit used for block padding and margins
+$gutter-width:       30px;   // used in sections
+$sticky-footer:      true;   // change to "false" to remove and footer will just follow the content size.
+$grid-border-color:  $dark;  // border color for grid elements
+
+// Sets up susy on a 12-column grid with gutters 25% as wide as the columns. In theory this can give us 80px wide columns with 20px gutters for a width of 1180px.
+$susy: (
+	'columns': (1 1 1 1 1 1 1 1 1 1 1 1),
+	'gutters': 0.25,
+);
+
+// Breakpoints
+// (concept borrowed from http://tapps.us/breakpoint-article )
+
+// Define breakpoints
+$breakpoint-small:    420px;  // iPhone 6s is 414px so this gets nearly all phones
+$breakpoint-medium:   900px;  // Above 900px seems like it's pretty big for a tablet, no?
+$breakpoint-large:   1024px;  // We're really pretty damn sure to be on a desktop here...
+$breakpoint-x-large: 1600px;  // This is basically hitting desktop screens, not laptops. I think.
+
+// Breakpoint groupings by devices (used by the mixins in _utilities)
+// Used by include-media, see http://include-media.com/
+$breakpoints: (phone: $breakpoint-small, tablet: $breakpoint-medium, desktop: $breakpoint-large, wide: $breakpoint-x-large );
+
+
+// Header layout
+$logo_below_utility: false; // if set to true, the stripe for the utility nav will be full-width
+$logo_above_primary: false; // if set to true, the primary nav will extend full-width below the logo instead of being adjacent
+
+
+// ---------------- 03. Decorative details
+
+$border-radius: 4px;
+$transition-speed: 300ms;
+
+
+// ---------------- 04. Form layout options
+
+$label-color: $dark;
+$label-font-size: 1.8rem;
+
+$input-padding-y: 1.2rem;
+$input-padding-x: 1.2rem;
+
+$input-border-color: #ccc;
+$input-bg-color: #f6f6f6;
+$input-color: #333;
+
+$input-focus-border-color: #bbb;
+$input-focus-bg-color: $white;
+$input-focus-color: $dark;
+
+$input-error-color: #f00;
+$input-required-color: #f00;
+$input-accent-color: #09f;
+
+$gf-input-margin-y: 2.2rem;
+$gf-input-margin-x: 2rem;
+$gf-multi-input-margin-y: 0.8rem;
+
+$gf-primary-label-margin: 0.6rem;
+$gf-secondary-label-margin: 0.4rem;
+
+$gf-input-min-width: 18rem;
+
+// ---------------- 05. Font Variables
+$base-font-size: 10px;
+$default-font-size: 2rem;
+$font-size-ratio: 0.6; // used to calculate font-size for block elements
+$font-size-xs: 1.5rem;
+$font-size-sm: 1.8rem;
+$font-size-md: $default-font-size;
+$font-size-lg: 2.2rem;
+$font-size-xl: 2.6rem;
+$font-size-xxl: 3rem;
+$font-size-xxxl: 4.2rem;
+$heading-font: 'Source Sans Pro', sans-serif;
+$heading-line-height: 1.6;
+$body-font: 'Source Sans Pro', sans-serif;
+$alt-font: 'Open Sans Condensed', sans-serif;
+$body-line-height: 1.8;
+$pre-line-height: 1.2; // line height for pre tag
+$blockquote-font: 'Helvetica Nue', sans-serif;
+$blockquote-font-size: $font-size-lg;
+$default-text-bottom-margin: 3.6;
+$default-text-margin: 0 0 $default-text-bottom-margin + rem;
+$default-text-pullup-margin: -$default-text-bottom-margin/2 + rem;

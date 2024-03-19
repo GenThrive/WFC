@@ -1,0 +1,275 @@
+/**
+ * Use a placeholder selector to style all text-based inputs simultaneously.
+ */
+input[type="email"],
+input[type="number"],
+input[type="password"],
+input[type="search"],
+input[type="tel"],
+input[type="text"],
+input[type="url"],
+select,
+textarea {
+	@extend %text-input;
+}
+
+
+/**
+ * General form + form input styles.
+ */
+
+.gform_body {
+	ul,
+	li {
+		list-style: none;
+		padding: 0;
+	}
+}
+
+.gfield {
+	margin: $gf-input-margin-y 0;
+}
+
+.gfield_label {
+	// Note: it may be useful to @extend %label-block using other selectors as
+	// well, such as `.comment-form label`.
+	@extend %label-block;
+
+	.gfield_hide_label & {
+		@include scut-hide-visually;
+	}
+}
+
+.gfield_description {
+	margin: $gf-secondary-label-margin 0 0;
+}
+
+.gfield_required {
+	color: $input-required-color;
+}
+
+.gform_wrapper {
+
+	// Form-wide error messages.
+	.validation_error {
+		color: $input-error-color;
+	}
+
+	// Error messages for individual fields.
+	.validation_message {
+		color: $input-error-color;
+	}
+}
+
+.gform_footer {
+	// Set a bottom margin on form footers (which contain submit buttons), so
+	// that submit buttons aren't closer to other content on the page than they
+	// are to the form above them.
+	margin: 0 0 $gf-input-margin-y;
+}
+
+%label-block {
+	display: block;
+	margin: $gf-primary-label-margin 0;
+	font-size: $label-font-size;
+	font-weight: 700;
+	color: $label-color;
+}
+
+%text-input {
+	appearance: none;
+	box-sizing: border-box;
+	padding: $input-padding-y $input-padding-x;
+	width: 100%;
+	border: 1px solid $input-border-color;
+	border-radius: 0;
+	line-height: 1.25;
+	background-color: $input-bg-color;
+	color: $input-color;
+	box-shadow: none;
+	transition: border-color 0.2s ease, background-color 0.2s ease;
+
+	&::placeholder {
+		color: $input-color;
+		opacity: 0.5;
+		// line-height: normal;
+	}
+
+	&:focus {
+		border-color: $input-focus-border-color;
+		background-color: $input-focus-bg-color;
+	}
+
+	.gfield_error & {
+		border-color: $input-error-color;
+	}
+}
+
+
+/**
+ * Input type-specific styles (selects, radios/checkboxes).
+ */
+
+// Single-item selects: add a triangle and extra padding on right side.
+select:not([multiple]) {
+	// Add SVG background image.
+	@extend .icon-dropdown-arrow;
+	// Override size set by .icon-... background image class.
+	width: 100%;
+	height: auto;
+	// Position image near right edge and add padding so text doesn't overlap it.
+	background-position: right $input-padding-x center;
+	background-repeat: no-repeat;
+	// Right-hand padding = normal padding + triangle image width.
+	padding-right: $input-padding-x + 1.1rem;
+}
+
+.gfield_radio,
+.gfield_checkbox {
+
+	> li {
+		margin: $gf-multi-input-margin-y 0;
+	}
+
+	label {
+		color: $label-color;
+	}
+}
+
+.gfield input[type="radio"] {
+	// GF puts white space between checkboxes and their labels, but doesn't do
+	// the same for radio buttons. Adding a 4px margin helps make checkbox fields
+	// and radio button fields line up better with one another.
+	margin-right: 0.4rem;
+}
+
+
+/**
+ * AJAX spinners.
+ */
+
+.gform_ajax_spinner {
+	display: inline-block;
+	vertical-align: middle;
+	margin-left: 10px;
+}
+
+
+//-----------------------------------------------------------------------------
+// Multi-field inputs.
+//-----------------------------------------------------------------------------
+
+.ginput_complex,
+.clear-multi {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: top;
+	// Cancel out the bottom margin of the final row of fields, so that margins
+	// are only *between* rows of fields.
+	margin: 0 ( -$gf-input-margin-x / 2 ) ( -$gf-multi-input-margin-y );
+
+	> span,
+	> div {
+		padding: 0 ( $gf-input-margin-x / 2 );
+		margin: 0 0 $gf-multi-input-margin-y;
+		flex: 0 1 auto;
+
+		&:not(.ginput_container_time) {
+			// Fill available horizontal space, and wrap to a new line if there isn't
+			// enough room for this input (with the exception of time input fields,
+			// which can and should be super narrow).
+			flex-grow: 1;
+			width: $gf-input-min-width;
+		}
+	}
+
+	.ginput_full {
+		width: 100%;
+	}
+
+	label {
+		display: inline;
+
+		&:before {
+			@include pseudo(block, relative);
+			margin: $gf-secondary-label-margin 0 0;
+		}
+	}
+
+	.gf_clear {
+		// We're not using floats for layout, so don't bother with this 'clear'
+		// foolishness.
+		display: none;
+	}
+}
+
+
+//-----------------------------------------------------------------------------
+// List inputs (tables of fields with +/- buttons).
+//-----------------------------------------------------------------------------
+
+.gfield_list_container {
+	width: 100%;
+	padding: 0;
+	border-collapse: collapse;
+
+	th {
+		padding: 0 0 $gf-primary-label-margin;
+	}
+
+	td {
+		padding: 0;
+	}
+
+	th,
+	td {
+		&:not(:last-child) {
+			padding-right: $gf-input-margin-x;
+		}
+	}
+
+	.gfield_list_icons {
+		width: 3.7rem; // Room for 16x16px images with white space between them.
+		text-align: center;
+		vertical-align: middle;
+
+		img {
+			display: inline-block;
+		}
+	}
+
+	.gfield_list_group:not(:last-child) {
+
+		td {
+			padding-bottom: $gf-input-margin-y;
+		}
+	}
+}
+
+
+//-----------------------------------------------------------------------------
+// Time inputs.
+//-----------------------------------------------------------------------------
+
+.ginput_container_time {
+	%text-input {
+		// Arbitrary narrow width. This should be enough for 2 digits or letters.
+		width: 8rem;
+	}
+}
+
+.gfield_time_hour {
+	// The : in 'HH : MM' is wrapped in an <i> tag that comes BEFORE the main
+	// label for the hour field. Why? Who knows. But we'll try to put it in a
+	// sensible place.
+	position: relative;
+
+	i {
+		position: absolute;
+		bottom: 0;
+		// 3rem from left edge of the gfield's border-box (its left padding should
+		// be $gf-input-margin-x / 2.
+		left: ( $gf-input-margin-x / 2 ) + 3rem;
+		font-style: normal;
+	}
+}

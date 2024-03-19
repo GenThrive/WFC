@@ -1,0 +1,26 @@
+{
+	"name": "wp-composer-dependencies",
+	"description": "Theme and plugin dependencies for the site http://wordpress.ben.cshp.co",
+	"repositories": [
+		{
+			"type": "composer",
+			"url": "https://wpackagist.org"
+		}
+	],
+	"extra": {
+		"installer-paths": {
+			"assets/themes/{$name}/": [
+				"type:wordpress-theme"
+			],
+			"assets/plugins/{$name}/": [
+				"type:wordpress-plugin"
+			],
+			"assets/mu-plugins/{$name}/": [
+				"type:wordpress-muplugin"
+			]
+		}
+	},
+	"require": {
+		"wpackagist-plugin/wordfence": "*"
+	}
+}

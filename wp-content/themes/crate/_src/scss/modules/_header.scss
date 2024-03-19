@@ -1,0 +1,534 @@
+/**
+ * Styles specific to the site header
+ */
+
+ body {
+	 padding-top: 5.5rem;
+	@include media ('>=tablet') {
+		padding-top: 12.5rem;
+	}
+ }
+
+.site-header {
+	padding: 1rem 0;
+	background-color: $header-background-color;
+	@include media ('>=tablet') {
+		padding: 3.5rem 0 4rem;
+	}
+}
+
+/**
+ * Header styles borrowed from:
+ * https://amp-wp.org/documentation/playbooks/toggling-hamburger-menus/
+ */
+.site-header {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	z-index: 10;
+	.admin-bar & {
+		top: 3.2rem;
+		@include media ('<783px') {
+			top: 4.6rem;
+		}
+	}
+	.wrap {
+		max-width: $max-page-width;
+		margin: 0 auto;
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		flex-wrap: wrap;
+	}
+}
+.site-branding {
+	margin-left: 2rem;
+	@include media ('>=1200px') {
+		margin-left: 0;
+	}
+}
+.site-branding,
+.site-branding .logo {
+	width: 14.6rem;
+	height: 2.5rem;
+	@include media ('>=1200px') {
+		width: 22rem;
+		height: 3.8rem;
+	}
+}
+
+.site-title {
+	margin: 0;
+}
+
+.site-title__link {
+	display: flex;
+	align-items: center;
+	height: 2.5rem;
+	color: $black;
+	text-decoration: none;
+	@include media ('>=1200px') {
+		height: 3.8rem;
+	}
+}
+
+.menu-toggle {
+	padding: 0.9rem 1.1rem;
+	@include media ('>=tablet') {
+		display: none;
+	}
+}
+
+.menu-toggle__icon {
+	display: block;
+	width: 21px;
+	height: 17px;
+	position: relative;
+	transform: rotate(0deg);
+	transition: .5s ease-in-out;
+	cursor: pointer;
+}
+
+.menu-toggle__icon {
+	display: block;
+	width: 21px;
+	height: 17px;
+	position: relative;
+	transform: rotate(0deg);
+	transition: .5s ease-in-out;
+	cursor: pointer;
+
+	span {
+		display: block;
+		position: absolute;
+		height: 2px;
+		width: 50%;
+		background: $dark-blue;
+		opacity: 1;
+		transform: rotate(0deg);
+		transition: .25s ease-in-out;
+		&:nth-child(even) {
+			left: 50%
+		}
+		&:nth-child(odd) {
+			left: 0;
+		}
+		&:nth-child(1),
+		&:nth-child(2) {
+			top: 0;
+		}
+		&:nth-child(3),
+		&:nth-child(4) {
+			top: 0.68rem;
+		}
+		&:nth-child(5),
+		&:nth-child(6) {
+			top: 1.36rem;
+		}
+	}
+}
+
+.toggled-on {
+
+	@include media ('<tablet') {
+
+		.main-navigation {
+			height: calc( 100vh - 5.5rem );
+			.primary-menu-container {
+				display: block;
+			}
+		}
+
+		.menu-toggle__icon span {
+			background: $dark-blue;
+			&:nth-child(1),
+			&:nth-child(6) {
+				transform: rotate(45deg)
+			}
+			&:nth-child(2),
+			&:nth-child(5) {
+				transform: rotate(-45deg)
+			}
+			&:nth-child(1) {
+				left: 1.75px;
+				top: 3.02222px
+			}
+			&:nth-child(2) {
+				left: calc(50% - 1.75px);
+				top: 3.02222px
+			}
+			&:nth-child(3) {
+				left: -50%;
+				opacity: 0
+			}
+			&:nth-child(4) {
+				left: 100%;
+				opacity: 0
+			}
+			&:nth-child(5) {
+				left: 1.75px;
+				top: 10.95556px
+			}
+			&:nth-child(6) {
+				left: calc(50% - 1.75px);
+				top: 10.95556px
+			}
+		}
+	}
+}
+
+/**
+ * Main Navigation
+ */
+.main-navigation {
+	width: 100%;
+	display: flex;
+	flex-wrap: wrap;
+
+	.primary-menu-container {
+		width: 100%;
+		> .menu {
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			justify-content: center;
+			padding: 0 2rem;
+			width: 100%;
+			height: 100%;
+			margin: 0;
+			> li {
+				margin: 1rem 0;
+			}
+			.has-button {
+				a {
+					background-color: $blue;
+					transition: background-color 200ms ease-in-out;
+					color: $white;
+					line-height: 1;
+					padding: 1.6rem 2rem;
+					display: inline-block;
+					border-radius: 50px;
+					box-shadow: 2px 4px 0px transparentize( $dark-blue, 0.8);
+					&:hover,
+					&:focus {
+						background-color: $light-blue;
+					}
+				}
+			}
+		}
+	}
+
+	.primary-menu-container,
+	.button {
+		display: none;
+		@include media ('>=tablet') {
+			display: block;
+		}
+	}
+
+	ul {
+		list-style: none;
+		a {
+			font-size: 2.2rem;
+			padding: 0;
+			text-transform: uppercase;
+		}
+	}
+
+	.menu a {
+		display: block;
+		line-height: 1.16;
+		color: $dark-blue;
+		text-decoration: none;
+		font-family: $alt-font;
+		text-align: center;
+		&:hover,
+		&:focus {
+			color: $light-blue;
+		}
+	}
+	.menu .current-menu-item > a {
+		color: $dark-blue;
+		font-weight: 700;
+		cursor: default;
+		&:hover,
+		&:focus {
+			color: $dark-blue;
+		}
+	}
+
+	.menu-item-has-children {
+		position: relative
+	}
+	.dropdown-toggle {
+		display: block;
+		position: absolute;
+		top: 0;
+		right: 0;
+		width: 40px;
+		height: 62px
+	}
+
+	// Mobile Only
+	@include media ('<tablet') {
+		.sub-menu {
+			> li {
+				margin: 1rem 0;
+			}
+			> li:first-child {
+				margin-top: 2rem;
+			}
+			> li:last-child {
+				margin-bottom: 2rem;
+			}
+			a {
+				max-width: 20rem;
+				display: table;
+				margin: 0 auto;
+			}
+		}
+		.menu > li {
+			width: 100%;
+			position: relative;
+			> a {
+				display: table;
+				margin: 0 auto;
+			}
+			&.has-button {
+				width: auto;
+			}
+		}
+		.menu > li > .sub-menu > li > a {
+			font-size: 1.6rem;
+		}
+		.menu > li > .sub-menu > li > .sub-menu > li > a {
+			font-size: 1.4rem;
+		}
+		.menu > li > .sub-menu {
+			max-height: 0;
+			overflow: hidden;
+			transition: max-height 400ms ease;
+		}
+		.menu > li:hover,
+		.menu > li:focus {
+			> .sub-menu {
+				@include media ('>=tablet') {
+					max-height: 100vh;
+				}
+			}
+		}
+	}
+
+	// Tablet up styles
+	@include media ('>=tablet') {
+
+		width: auto;
+
+		.primary-menu-container > .menu {
+			flex-direction: row;
+			padding: 0;
+			> li {
+				margin: 0;
+				+ li {
+					margin-left: 0.9rem; // list item spacing
+				}
+			}
+			.has-button {
+				margin-left: 1.8rem;
+			}
+		}
+
+		.dropdown-toggle {
+			display: none;
+		}
+		.menu-item-has-children {
+			position: relative;
+			.dropdown-toggle {
+				position: absolute;
+				top: 0;
+				right: 0;
+			}
+		}
+
+		ul {
+			list-style: none;
+			a {
+				display: block;
+				font-size: 1.8rem;
+				color: $dark-blue;
+				text-decoration: none;
+				padding: 1rem 0.8rem;
+				&:hover,
+				&:focus {
+					color: $light-blue;
+				}
+			}
+			.current-menu-item > a {
+				font-weight: 700;
+				cursor: default;
+				&:hover,
+				&:focus {
+					color: $dark-blue;
+				}
+			}
+		}
+		.menu {
+			display: flex;
+		}
+
+		li {
+			position: relative;
+			&:hover {
+				> .sub-menu {
+					pointer-events: all;
+					opacity: 1;
+					z-index: 0;
+				}
+			}
+		}
+
+		.sub-menu {
+			position: absolute;
+			top: 100%;
+			left: 0;
+			padding: 5px 0;
+			min-width: 255px;
+			opacity: 0;
+			background: $white;
+			pointer-events: none;
+			z-index: -1;
+			transition: opacity 240ms cubic-bezier(.215, .61, .355, 1);
+			border-width: 0 1px 1px 1px;
+			border-style: solid;
+			border-color: rgba(221, 221, 221, .5);
+			box-shadow: none;
+
+			a {
+				font-size: 1.6rem;
+				padding: 1rem;
+				text-align: left;
+			}
+			.sub-menu {
+				top: -5px;
+				left: 100%;
+				border-width: 1px;
+				box-shadow: none;
+			}
+		}
+
+	}
+
+	// Tablet to 1200px
+	@include media ('>=tablet', '<1200px') {
+		margin-right: 2rem;
+
+		.primary-menu-container > .menu {
+			> li {
+				+ li {
+					margin-left: 0.4rem; // list item spacing
+				}
+			}
+			.button a {
+				padding: 1rem 1.5rem;
+			}
+		}
+		ul {
+			a {
+				padding: 1rem 0.4rem;
+				font-size: 1.4rem;
+			}
+		}
+	}
+
+}
+/** End Main Navigation */
+
+// Search Styles
+#search-container {
+	.admin-bar & {
+		.search-toggle.toggled-on {
+			top: calc( 32px + 2rem );
+		}
+	}
+	.searchform {
+		display: none;
+		width: auto;
+		margin: 0 auto;
+		.search-submit {
+			@extend .button;
+		}
+	}
+	&.toggled-on {
+		position: fixed;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		background-color: transparentize( $white, 0.1 );
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		justify-content: center;
+		.searchform {
+			display: block;
+		}
+		.search-toggle {
+			position: fixed;
+			top: 2rem;
+			right: 2rem;
+		}
+		.search-form {
+			display: flex;
+			flex-direction: row;
+			flex-wrap: nowrap;
+			label {
+				flex: auto;
+				max-width: 30rem;
+				input {
+					height: 5.8rem;
+				}
+			}
+			.search-submit {
+				flex: 0;
+				margin-left: 1rem;
+			}
+		}
+	}
+}
+
+.search-toggle {
+	@include media ('<924px') {
+		position: absolute;
+		top: 1.2rem;
+		right: 5rem;
+	}
+	.close {
+		display: none;
+	}
+	.search,
+	.close {
+		use {
+			fill: $dark-blue;
+		}
+		&:hover use {
+			fill: $light-blue;
+		}
+	}
+	&.toggled-on {
+		.close {
+			display: block;
+		}
+	}
+	&:focus {
+		outline: none;
+		use {
+			fill: $light-blue;
+		}
+	}
+}
+
+
+
+
+

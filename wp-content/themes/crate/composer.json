@@ -1,0 +1,26 @@
+{
+	"name": "wp-composer-dependencies",
+	"description": "Theme and plugin dependencies for the site http://water-calculator.danny.cshp.co",
+	"require": {
+		"wpackagist-plugin/post-thumbnail-editor": "*"
+	},
+	"repositories": [
+		{
+			"type": "composer",
+			"url": "https://wpackagist.org"
+		}
+	],
+	"extra": {
+		"installer-paths": {
+			"wp-content/themes/{$name}/": [
+				"type:wordpress-theme"
+			],
+			"wp-content/plugins/{$name}/": [
+				"type:wordpress-plugin"
+			],
+			"wp-content/mu-plugins/{$name}/": [
+				"type:wordpress-muplugin"
+			]
+		}
+	}
+}

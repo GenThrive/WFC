@@ -1,0 +1,9 @@
+# Default WordPress robots.txt
+# Plus a small crawl delay to mitigate risk the risk of a site
+# being deluged with multiple requests per second
+User-agent: *
+Disallow: /cms/wp-admin/
+Disallow: /wp-admin/
+Allow: /cms/wp-admin/admin-ajax.php
+Allow: /wp-admin/admin-ajax.php
+crawl-delay: 1
