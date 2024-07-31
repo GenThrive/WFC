@@ -104,7 +104,7 @@
 		<div class="copyright">
 			<p>
 				<span><?php crate_copyright_text(); ?></span>
-				<a href="<?php echo esc_url( 'https://gracecommunicationsfoundation.org/' ); ?>" title="<?php esc_attr_e( 'GRACE Communications Foundation', 'crate' ); ?>" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'GRACE Communications Foundation', 'crate' ); ?></a><span>. <?php esc_html_e( 'All Rights Reserved', 'crate' ); ?>.</span>
+				<a href="<?php echo esc_url( 'https://ecorise.org/' ); ?>" title="<?php esc_attr_e( 'EcoRise', 'crate' ); ?>" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'EcoRise', 'crate' ); ?></a><span>. <?php esc_html_e( 'All Rights Reserved', 'crate' ); ?>.</span>
 			</p>
 		</div>
 
