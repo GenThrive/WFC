@@ -25,3 +25,4 @@ jobs:
           sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no ${{secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} << EOF
           cd ${{ secrets.SERVER_DEPLOY_PATH }}
           git clone https://github.com/GenThrive/WFC.git .
+          EOF
