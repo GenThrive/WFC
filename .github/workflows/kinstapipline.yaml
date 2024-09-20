@@ -19,8 +19,9 @@ jobs:
           known_hosts: ${{ secrets.SSH_HOST }}
 
       - name: Deploy to server
+        env:
+          SSH_PASSWORD: ${{ secrets.SSH_PASSWORD }}
         run: |
-          ssh -o StrictHostKeyChecking=accept-new ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} << EOF
-            cd ${{ secrets.SERVER_WP_PATH }}
-            git clone git@github.com:GenThrive/WFC.git .
-          EOF
+          sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no ${{secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} << EOF
+          cd ${{ secrets.SERVER_DEPLOY_PATH }}
+          git clone https://github.com/GenThrive/WFC.git .
