@@ -1,4 +1,4 @@
-name: Deploy to WordPress Server
+name: CRON Job for Maintenance WordPress Server
 
 on:
   #Run every night at 10:00 PM
