@@ -1,9 +1,9 @@
 name: Deploy to WordPress Server
 
 on:
-  push:
-    branches:
-      - main # or your default branch name
+  #Run every night at 10:00 PM
+  schedule:
+    - cron: "0 22 * * *"
 
 jobs:
   deploy:
@@ -17,5 +17,7 @@ jobs:
         run: |
           sshpass -p "$SSH_PASSWORD" ssh -p 14644 -o StrictHostKeyChecking=no ${{secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} << EOF
           cd ${{ secrets.SERVER_WP_PATH }}
-          git pull origin main
+          git add .
+          git commit -m "Automated deployment" 
+          git push origin main
           EOF
