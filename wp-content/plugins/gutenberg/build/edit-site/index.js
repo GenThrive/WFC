@@ -6151,7 +6151,7 @@ const external_wp_privateApis_namespaceObject = window["wp"]["privateApis"];
 
 const {
   lock,
-  unlock: lock_unlock_unlock
+  unlock
 } = (0,external_wp_privateApis_namespaceObject.__dangerousOptInToUnstableAPIsOnlyForCoreModules)('I acknowledge private features are not for use in themes or plugins and doing so will break in the next version of WordPress.', '@wordpress/edit-site');
 
 ;// CONCATENATED MODULE: ./packages/edit-site/build-module/components/global-styles/hooks.js
@@ -6175,7 +6175,7 @@ const {
 const {
   useGlobalSetting,
   useGlobalStyle
-} = lock_unlock_unlock(external_wp_blockEditor_namespaceObject.privateApis);
+} = unlock(external_wp_blockEditor_namespaceObject.privateApis);
 
 // Enable colord's a11y plugin.
 k([a11y]);
@@ -6231,20 +6231,10 @@ function useSupportedStyles(name, element) {
     supportedPanels
   } = (0,external_wp_data_namespaceObject.useSelect)(select => {
     return {
-      supportedPanels: lock_unlock_unlock(select(external_wp_blocks_namespaceObject.store)).getSupportedStyles(name, element)
+      supportedPanels: unlock(select(external_wp_blocks_namespaceObject.store)).getSupportedStyles(name, element)
     };
   }, [name, element]);
   return supportedPanels;
-}
-
-;// CONCATENATED MODULE: ./packages/edit-site/build-module/utils/clone-deep.js
-/**
- * Makes a copy of an object without storing any references to the original object.
- * @param {Object} object
- * @return {Object} The cloned object.
- */
-function cloneDeep(object) {
-  return !object ? {} : JSON.parse(JSON.stringify(object));
 }
 
 ;// CONCATENATED MODULE: ./packages/edit-site/build-module/utils/set-nested-value.js
@@ -6289,6 +6279,7 @@ function setNestedValue(object, path, value) {
 ;// CONCATENATED MODULE: external "ReactJSXRuntime"
 const external_ReactJSXRuntime_namespaceObject = window["ReactJSXRuntime"];
 ;// CONCATENATED MODULE: ./packages/edit-site/build-module/hooks/push-changes-to-global-styles/index.js
+/* wp:polyfill */
 /**
  * WordPress dependencies
  */
@@ -6312,11 +6303,10 @@ const external_ReactJSXRuntime_namespaceObject = window["ReactJSXRuntime"];
 
 
 
-
 const {
   cleanEmptyObject,
   GlobalStylesContext
-} = lock_unlock_unlock(external_wp_blockEditor_namespaceObject.privateApis);
+} = unlock(external_wp_blockEditor_namespaceObject.privateApis);
 
 // Block Gap is a special case and isn't defined within the blocks
 // style properties config. We'll add it here to allow it to be pushed
@@ -6535,8 +6525,8 @@ function PushChangesToGlobalStylesControl({
       const {
         style: blockStyles
       } = attributes;
-      const newBlockStyles = cloneDeep(blockStyles);
-      const newUserConfig = cloneDeep(userConfig);
+      const newBlockStyles = structuredClone(blockStyles);
+      const newUserConfig = structuredClone(userConfig);
       for (const {
         path,
         value
@@ -6581,6 +6571,7 @@ function PushChangesToGlobalStylesControl({
     }
   }, [__unstableMarkNextChangeAsNotPersistent, attributes, changes, createSuccessNotice, name, setAttributes, setUserConfig, userConfig]);
   return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsxs)(external_wp_components_namespaceObject.BaseControl, {
+    __nextHasNoMarginBottom: true,
     className: "edit-site-push-changes-to-global-styles-control",
     help: (0,external_wp_i18n_namespaceObject.sprintf)(
     // translators: %s: Title of the block e.g. 'Heading'.
@@ -6765,7 +6756,7 @@ const {
   PATTERN_USER_CATEGORY,
   EXCLUDED_PATTERN_SOURCES,
   PATTERN_SYNC_TYPES
-} = lock_unlock_unlock(external_wp_patterns_namespaceObject.privateApis);
+} = unlock(external_wp_patterns_namespaceObject.privateApis);
 
 // Entities that are editable in focus mode.
 const FOCUSABLE_ENTITIES = [TEMPLATE_PART_POST_TYPE, NAVIGATION_POST_TYPE, PATTERN_TYPES.user];
@@ -6803,7 +6794,7 @@ const OPERATOR_IS_NONE = 'isNone';
 
 const {
   interfaceStore
-} = lock_unlock_unlock(external_wp_editor_namespaceObject.privateApis);
+} = unlock(external_wp_editor_namespaceObject.privateApis);
 
 /**
  * Dispatches an action that toggles a feature flag.
@@ -6899,7 +6890,7 @@ const addTemplate = template => async ({
 const removeTemplate = template => ({
   registry
 }) => {
-  return lock_unlock_unlock(registry.dispatch(external_wp_editor_namespaceObject.store)).removeTemplates([template]);
+  return unlock(registry.dispatch(external_wp_editor_namespaceObject.store)).removeTemplates([template]);
 };
 
 /**
@@ -7115,7 +7106,7 @@ function setIsSaveViewOpened(isOpen) {
 const revertTemplate = (template, options) => ({
   registry
 }) => {
-  return lock_unlock_unlock(registry.dispatch(external_wp_editor_namespaceObject.store)).revertTemplate(template, options);
+  return unlock(registry.dispatch(external_wp_editor_namespaceObject.store)).revertTemplate(template, options);
 };
 
 /**
@@ -7522,7 +7513,7 @@ const __experimentalGetInsertionPoint = (0,external_wp_data_namespaceObject.crea
     since: '6.5',
     version: '6.7'
   });
-  return lock_unlock_unlock(select(external_wp_editor_namespaceObject.store)).getInsertionPoint();
+  return unlock(select(external_wp_editor_namespaceObject.store)).getInsertionPoint();
 });
 
 /**
@@ -7701,8 +7692,8 @@ const storeConfig = {
 };
 const store = (0,external_wp_data_namespaceObject.createReduxStore)(STORE_NAME, storeConfig);
 (0,external_wp_data_namespaceObject.register)(store);
-lock_unlock_unlock(store).registerPrivateSelectors(private_selectors_namespaceObject);
-lock_unlock_unlock(store).registerPrivateActions(private_actions_namespaceObject);
+unlock(store).registerPrivateSelectors(private_selectors_namespaceObject);
+unlock(store).registerPrivateActions(private_actions_namespaceObject);
 
 ;// CONCATENATED MODULE: external ["wp","plugins"]
 const external_wp_plugins_namespaceObject = window["wp"]["plugins"];
@@ -7730,7 +7721,10 @@ function CopyButton({
   children
 }) {
   const ref = (0,external_wp_compose_namespaceObject.useCopyToClipboard)(text);
-  return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.Button, {
+  return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.Button
+  // TODO: Switch to `true` (40px size) if possible
+  , {
+    __next40pxDefaultSize: false,
     variant: "secondary",
     ref: ref,
     children: children
@@ -7998,7 +7992,7 @@ function SidebarContent({
 
 const {
   useHistory
-} = lock_unlock_unlock(external_wp_router_namespaceObject.privateApis);
+} = unlock(external_wp_router_namespaceObject.privateApis);
 
 
 
@@ -8012,15 +8006,14 @@ const SiteHub = (0,external_wp_element_namespaceObject.memo)((0,external_wp_elem
   } = (0,external_wp_data_namespaceObject.useSelect)(select => {
     const {
       getSettings
-    } = lock_unlock_unlock(select(store));
+    } = unlock(select(store));
     const {
-      getSite,
-      getUnstableBase // Site index.
+      getEntityRecord
     } = select(external_wp_coreData_namespaceObject.store);
-    const _site = getSite();
+    const _site = getEntityRecord('root', 'site');
     return {
       dashboardLink: getSettings().__experimentalDashboardLink || 'index.php',
-      homeUrl: getUnstableBase()?.home,
+      homeUrl: getEntityRecord('root', '__unstableBase')?.home,
       siteTitle: !_site?.title && !!_site?.url ? (0,external_wp_url_namespaceObject.filterURLForDisplay)(_site?.url) : _site?.title
     };
   }, []);
@@ -8036,7 +8029,10 @@ const SiteHub = (0,external_wp_element_namespaceObject.memo)((0,external_wp_elem
         className: dist_clsx('edit-site-site-hub__view-mode-toggle-container', {
           'has-transparent-background': isTransparent
         }),
-        children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.Button, {
+        children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.Button
+        // TODO: Switch to `true` (40px size) if possible
+        , {
+          __next40pxDefaultSize: false,
           ref: ref,
           href: dashboardLink,
           label: (0,external_wp_i18n_namespaceObject.__)('Go to the Dashboard'),
@@ -8052,18 +8048,27 @@ const SiteHub = (0,external_wp_element_namespaceObject.memo)((0,external_wp_elem
       }), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsxs)(external_wp_components_namespaceObject.__experimentalHStack, {
         children: [/*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)("div", {
           className: "edit-site-site-hub__title",
-          children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.Button, {
+          children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsxs)(external_wp_components_namespaceObject.Button
+          // TODO: Switch to `true` (40px size) if possible
+          , {
+            __next40pxDefaultSize: false,
             variant: "link",
             href: homeUrl,
             target: "_blank",
-            label: (0,external_wp_i18n_namespaceObject.__)('View site (opens in a new tab)'),
-            children: (0,external_wp_htmlEntities_namespaceObject.decodeEntities)(siteTitle)
+            children: [(0,external_wp_htmlEntities_namespaceObject.decodeEntities)(siteTitle), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.VisuallyHidden, {
+              as: "span",
+              children: /* translators: accessibility text */
+              (0,external_wp_i18n_namespaceObject.__)('(opens in a new tab)')
+            })]
           })
         }), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.__experimentalHStack, {
           spacing: 0,
           expanded: false,
           className: "edit-site-site-hub__actions",
-          children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.Button, {
+          children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.Button
+          // TODO: Switch to `true` (40px size) if possible
+          , {
+            __next40pxDefaultSize: false,
             className: "edit-site-site-hub_toggle-command-center",
             icon: library_search,
             onClick: () => openCommandCenter(),
@@ -8088,12 +8093,11 @@ const SiteHubMobile = (0,external_wp_element_namespaceObject.memo)((0,external_w
     siteTitle
   } = (0,external_wp_data_namespaceObject.useSelect)(select => {
     const {
-      getSite,
-      getUnstableBase // Site index.
+      getEntityRecord
     } = select(external_wp_coreData_namespaceObject.store);
-    const _site = getSite();
+    const _site = getEntityRecord('root', 'site');
     return {
-      homeUrl: getUnstableBase()?.home,
+      homeUrl: getEntityRecord('root', '__unstableBase')?.home,
       siteTitle: !_site?.title && !!_site?.url ? (0,external_wp_url_namespaceObject.filterURLForDisplay)(_site?.url) : _site?.title
     };
   }, []);
@@ -8109,7 +8113,10 @@ const SiteHubMobile = (0,external_wp_element_namespaceObject.memo)((0,external_w
         className: dist_clsx('edit-site-site-hub__view-mode-toggle-container', {
           'has-transparent-background': isTransparent
         }),
-        children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.Button, {
+        children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.Button
+        // TODO: Switch to `true` (40px size) if possible
+        , {
+          __next40pxDefaultSize: false,
           ref: ref,
           label: (0,external_wp_i18n_namespaceObject.__)('Go to Site Editor'),
           className: "edit-site-layout__view-mode-toggle",
@@ -8128,7 +8135,10 @@ const SiteHubMobile = (0,external_wp_element_namespaceObject.memo)((0,external_w
       }), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsxs)(external_wp_components_namespaceObject.__experimentalHStack, {
         children: [/*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)("div", {
           className: "edit-site-site-hub__title",
-          children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.Button, {
+          children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.Button
+          // TODO: Switch to `true` (40px size) if possible
+          , {
+            __next40pxDefaultSize: false,
             variant: "link",
             href: homeUrl,
             target: "_blank",
@@ -8139,7 +8149,10 @@ const SiteHubMobile = (0,external_wp_element_namespaceObject.memo)((0,external_w
           spacing: 0,
           expanded: false,
           className: "edit-site-site-hub__actions",
-          children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.Button, {
+          children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.Button
+          // TODO: Switch to `true` (40px size) if possible
+          , {
+            __next40pxDefaultSize: false,
             className: "edit-site-site-hub_toggle-command-center",
             icon: library_search,
             onClick: () => openCommandCenter(),
@@ -8234,10 +8247,10 @@ function ResizableFrame({
   const [isResizing, setIsResizing] = (0,external_wp_element_namespaceObject.useState)(false);
   const [shouldShowHandle, setShouldShowHandle] = (0,external_wp_element_namespaceObject.useState)(false);
   const [resizeRatio, setResizeRatio] = (0,external_wp_element_namespaceObject.useState)(1);
-  const canvasMode = (0,external_wp_data_namespaceObject.useSelect)(select => lock_unlock_unlock(select(store)).getCanvasMode(), []);
+  const canvasMode = (0,external_wp_data_namespaceObject.useSelect)(select => unlock(select(store)).getCanvasMode(), []);
   const {
     setCanvasMode
-  } = lock_unlock_unlock((0,external_wp_data_namespaceObject.useDispatch)(store));
+  } = unlock((0,external_wp_data_namespaceObject.useDispatch)(store));
   const FRAME_TRANSITION = {
     type: 'tween',
     duration: isResizing ? 0 : 0.5
@@ -8480,7 +8493,7 @@ function KeyboardShortcutsGlobal() {
   } = (0,external_wp_data_namespaceObject.useSelect)(external_wp_editor_namespaceObject.store);
   const {
     getCanvasMode
-  } = lock_unlock_unlock((0,external_wp_data_namespaceObject.useSelect)(store));
+  } = unlock((0,external_wp_data_namespaceObject.useSelect)(store));
   const {
     setIsSaveViewOpened
   } = (0,external_wp_data_namespaceObject.useDispatch)(store);
@@ -13017,7 +13030,7 @@ function currentlyPreviewingTheme() {
 
 const {
   useLocation
-} = lock_unlock_unlock(external_wp_router_namespaceObject.privateApis);
+} = unlock(external_wp_router_namespaceObject.privateApis);
 function SaveButton({
   className = 'edit-site-save-button__button',
   variant = 'primary',
@@ -13035,7 +13048,7 @@ function SaveButton({
   } = (0,external_wp_data_namespaceObject.useDispatch)(store);
   const {
     saveDirtyEntities
-  } = lock_unlock_unlock((0,external_wp_data_namespaceObject.useDispatch)(external_wp_editor_namespaceObject.store));
+  } = unlock((0,external_wp_data_namespaceObject.useDispatch)(external_wp_editor_namespaceObject.store));
   const {
     dirtyEntityRecords
   } = (0,external_wp_editor_namespaceObject.useEntitiesSavedStatesIsDirty)();
@@ -13193,7 +13206,7 @@ function SaveHub() {
 
 const {
   useHistory: use_activate_theme_useHistory
-} = lock_unlock_unlock(external_wp_router_namespaceObject.privateApis);
+} = unlock(external_wp_router_namespaceObject.privateApis);
 
 /**
  * This should be refactored to use the REST API, once the REST API can activate themes.
@@ -13281,7 +13294,7 @@ function useActualCurrentTheme() {
 const {
   EntitiesSavedStatesExtensible,
   NavigableRegion
-} = lock_unlock_unlock(external_wp_editor_namespaceObject.privateApis);
+} = unlock(external_wp_editor_namespaceObject.privateApis);
 const EntitiesSavedStatesForPreview = ({
   onClose
 }) => {
@@ -13344,7 +13357,7 @@ function SavePanel() {
     const {
       isSaveViewOpened,
       getCanvasMode
-    } = lock_unlock_unlock(select(store));
+    } = unlock(select(store));
 
     // The currently selected entity to display.
     // Typically template or template part in the site editor.
@@ -13381,7 +13394,10 @@ function SavePanel() {
       className: dist_clsx('edit-site-editor__toggle-save-panel', {
         'screen-reader-text': isSaveViewOpen
       }),
-      children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.Button, {
+      children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.Button
+      // TODO: Switch to `true` (40px size) if possible
+      , {
+        __next40pxDefaultSize: false,
         variant: "secondary",
         className: "edit-site-editor__toggle-save-panel-button",
         onClick: () => setIsSaveViewOpened(true),
@@ -13413,48 +13429,48 @@ function SavePanel() {
 const {
   useLocation: use_sync_canvas_mode_with_url_useLocation,
   useHistory: use_sync_canvas_mode_with_url_useHistory
-} = lock_unlock_unlock(external_wp_router_namespaceObject.privateApis);
+} = unlock(external_wp_router_namespaceObject.privateApis);
 function useSyncCanvasModeWithURL() {
   const history = use_sync_canvas_mode_with_url_useHistory();
   const {
     params
   } = use_sync_canvas_mode_with_url_useLocation();
-  const canvasMode = (0,external_wp_data_namespaceObject.useSelect)(select => lock_unlock_unlock(select(store)).getCanvasMode(), []);
+  const canvasMode = (0,external_wp_data_namespaceObject.useSelect)(select => unlock(select(store)).getCanvasMode(), []);
   const {
     setCanvasMode
-  } = lock_unlock_unlock((0,external_wp_data_namespaceObject.useDispatch)(store));
-  const currentCanvasMode = (0,external_wp_element_namespaceObject.useRef)(canvasMode);
+  } = unlock((0,external_wp_data_namespaceObject.useDispatch)(store));
+  const currentCanvasModeRef = (0,external_wp_element_namespaceObject.useRef)(canvasMode);
   const {
     canvas: canvasInUrl
   } = params;
-  const currentCanvasInUrl = (0,external_wp_element_namespaceObject.useRef)(canvasInUrl);
-  const currentUrlParams = (0,external_wp_element_namespaceObject.useRef)(params);
+  const currentCanvasInUrlRef = (0,external_wp_element_namespaceObject.useRef)(canvasInUrl);
+  const currentUrlParamsRef = (0,external_wp_element_namespaceObject.useRef)(params);
   (0,external_wp_element_namespaceObject.useEffect)(() => {
-    currentUrlParams.current = params;
+    currentUrlParamsRef.current = params;
   }, [params]);
   (0,external_wp_element_namespaceObject.useEffect)(() => {
-    currentCanvasMode.current = canvasMode;
+    currentCanvasModeRef.current = canvasMode;
     if (canvasMode === 'init') {
       return;
     }
-    if (canvasMode === 'edit' && currentCanvasInUrl.current !== canvasMode) {
+    if (canvasMode === 'edit' && currentCanvasInUrlRef.current !== canvasMode) {
       history.push({
-        ...currentUrlParams.current,
+        ...currentUrlParamsRef.current,
         canvas: 'edit'
       });
     }
-    if (canvasMode === 'view' && currentCanvasInUrl.current !== undefined) {
+    if (canvasMode === 'view' && currentCanvasInUrlRef.current !== undefined) {
       history.push({
-        ...currentUrlParams.current,
+        ...currentUrlParamsRef.current,
         canvas: undefined
       });
     }
   }, [canvasMode, history]);
   (0,external_wp_element_namespaceObject.useEffect)(() => {
-    currentCanvasInUrl.current = canvasInUrl;
-    if (canvasInUrl !== 'edit' && currentCanvasMode.current !== 'view') {
+    currentCanvasInUrlRef.current = canvasInUrl;
+    if (canvasInUrl !== 'edit' && currentCanvasModeRef.current !== 'view') {
       setCanvasMode('view');
-    } else if (canvasInUrl === 'edit' && currentCanvasMode.current !== 'edit') {
+    } else if (canvasInUrl === 'edit' && currentCanvasModeRef.current !== 'edit') {
       setCanvasMode('edit');
     }
   }, [canvasInUrl, setCanvasMode]);
@@ -13501,13 +13517,13 @@ function useSyncCanvasModeWithURL() {
 
 const {
   useCommands
-} = lock_unlock_unlock(external_wp_coreCommands_namespaceObject.privateApis);
+} = unlock(external_wp_coreCommands_namespaceObject.privateApis);
 const {
   useGlobalStyle: layout_useGlobalStyle
-} = lock_unlock_unlock(external_wp_blockEditor_namespaceObject.privateApis);
+} = unlock(external_wp_blockEditor_namespaceObject.privateApis);
 const {
   NavigableRegion: layout_NavigableRegion
-} = lock_unlock_unlock(external_wp_editor_namespaceObject.privateApis);
+} = unlock(external_wp_editor_namespaceObject.privateApis);
 const layout_ANIMATION_DURATION = 0.3;
 function Layout({
   route
@@ -13526,7 +13542,7 @@ function Layout({
     } = select(external_wp_keyboardShortcuts_namespaceObject.store);
     const {
       getCanvasMode
-    } = lock_unlock_unlock(select(store));
+    } = unlock(select(store));
     return {
       canvasMode: getCanvasMode(),
       previousShortcut: getAllShortcutKeyCombinations('core/editor/previous-region'),
@@ -13539,7 +13555,6 @@ function Layout({
   });
   const disableMotion = (0,external_wp_compose_namespaceObject.useReducedMotion)();
   const [canvasResizer, canvasSize] = (0,external_wp_compose_namespaceObject.useResizeObserver)();
-  const [fullResizer] = (0,external_wp_compose_namespaceObject.useResizeObserver)();
   const isEditorLoading = useIsSiteEditorLoading();
   const [isResizableFrameOversized, setIsResizableFrameOversized] = (0,external_wp_element_namespaceObject.useState)(false);
   const {
@@ -13568,7 +13583,7 @@ function Layout({
     return null;
   }
   return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsxs)(external_ReactJSXRuntime_namespaceObject.Fragment, {
-    children: [/*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_commands_namespaceObject.CommandMenu, {}), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(register, {}), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(global, {}), fullResizer, /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)("div", {
+    children: [/*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_commands_namespaceObject.CommandMenu, {}), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(register, {}), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(global, {}), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)("div", {
       ...navigateRegionsProps,
       ref: navigateRegionsProps.ref,
       className: dist_clsx('edit-site-layout', navigateRegionsProps.className, {
@@ -13668,7 +13683,9 @@ const styles = /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(ext
   viewBox: "0 0 24 24",
   xmlns: "http://www.w3.org/2000/svg",
   children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_primitives_namespaceObject.Path, {
-    d: "M12 4c-4.4 0-8 3.6-8 8v.1c0 4.1 3.2 7.5 7.2 7.9h.8c4.4 0 8-3.6 8-8s-3.6-8-8-8zm0 15V5c3.9 0 7 3.1 7 7s-3.1 7-7 7z"
+    fillRule: "evenodd",
+    clipRule: "evenodd",
+    d: "M20 12a8 8 0 1 1-16 0 8 8 0 0 1 16 0Zm-1.5 0a6.5 6.5 0 0 1-6.5 6.5v-13a6.5 6.5 0 0 1 6.5 6.5Z"
   })
 });
 /* harmony default export */ const library_styles = (styles);
@@ -13784,22 +13801,22 @@ const external = /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(e
 
 const {
   useGlobalStylesReset
-} = lock_unlock_unlock(external_wp_blockEditor_namespaceObject.privateApis);
+} = unlock(external_wp_blockEditor_namespaceObject.privateApis);
 const {
   useHistory: use_common_commands_useHistory,
   useLocation: use_common_commands_useLocation
-} = lock_unlock_unlock(external_wp_router_namespaceObject.privateApis);
+} = unlock(external_wp_router_namespaceObject.privateApis);
 function useGlobalStylesOpenStylesCommands() {
   const {
     openGeneralSidebar,
     setCanvasMode
-  } = lock_unlock_unlock((0,external_wp_data_namespaceObject.useDispatch)(store));
+  } = unlock((0,external_wp_data_namespaceObject.useDispatch)(store));
   const {
     params
   } = use_common_commands_useLocation();
   const {
     getCanvasMode
-  } = lock_unlock_unlock((0,external_wp_data_namespaceObject.useSelect)(store));
+  } = unlock((0,external_wp_data_namespaceObject.useSelect)(store));
   const history = use_common_commands_useHistory();
   const isBlockBasedTheme = (0,external_wp_data_namespaceObject.useSelect)(select => {
     return select(external_wp_coreData_namespaceObject.store).getCurrentTheme().is_block_theme;
@@ -13838,13 +13855,13 @@ function useGlobalStylesToggleWelcomeGuideCommands() {
   const {
     openGeneralSidebar,
     setCanvasMode
-  } = lock_unlock_unlock((0,external_wp_data_namespaceObject.useDispatch)(store));
+  } = unlock((0,external_wp_data_namespaceObject.useDispatch)(store));
   const {
     params
   } = use_common_commands_useLocation();
   const {
     getCanvasMode
-  } = lock_unlock_unlock((0,external_wp_data_namespaceObject.useSelect)(store));
+  } = unlock((0,external_wp_data_namespaceObject.useSelect)(store));
   const {
     set
   } = (0,external_wp_data_namespaceObject.useDispatch)(external_wp_preferences_namespaceObject.store);
@@ -13916,7 +13933,7 @@ function useGlobalStylesOpenCssCommands() {
     openGeneralSidebar,
     setEditorCanvasContainerView,
     setCanvasMode
-  } = lock_unlock_unlock((0,external_wp_data_namespaceObject.useDispatch)(store));
+  } = unlock((0,external_wp_data_namespaceObject.useDispatch)(store));
   const {
     params
   } = use_common_commands_useLocation();
@@ -13936,7 +13953,7 @@ function useGlobalStylesOpenCssCommands() {
   }, []);
   const {
     getCanvasMode
-  } = lock_unlock_unlock((0,external_wp_data_namespaceObject.useSelect)(store));
+  } = unlock((0,external_wp_data_namespaceObject.useSelect)(store));
   const commands = (0,external_wp_element_namespaceObject.useMemo)(() => {
     if (!canEditCSS) {
       return [];
@@ -13973,10 +13990,10 @@ function useGlobalStylesOpenRevisionsCommands() {
     openGeneralSidebar,
     setEditorCanvasContainerView,
     setCanvasMode
-  } = lock_unlock_unlock((0,external_wp_data_namespaceObject.useDispatch)(store));
+  } = unlock((0,external_wp_data_namespaceObject.useDispatch)(store));
   const {
     getCanvasMode
-  } = lock_unlock_unlock((0,external_wp_data_namespaceObject.useSelect)(store));
+  } = unlock((0,external_wp_data_namespaceObject.useSelect)(store));
   const {
     params
   } = use_common_commands_useLocation();
@@ -14023,10 +14040,8 @@ function useGlobalStylesOpenRevisionsCommands() {
 }
 function useCommonCommands() {
   const homeUrl = (0,external_wp_data_namespaceObject.useSelect)(select => {
-    const {
-      getUnstableBase // Site index.
-    } = select(external_wp_coreData_namespaceObject.store);
-    return getUnstableBase()?.home;
+    // Site index.
+    return select(external_wp_coreData_namespaceObject.store).getEntityRecord('root', '__unstableBase')?.home;
   }, []);
   (0,external_wp_commands_namespaceObject.useCommand)({
     name: 'core/edit-site/view-site',
@@ -14121,13 +14136,13 @@ const trash = /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(exte
  * Check if a template is removable.
  *
  * @param {Object} template The template entity to check.
- * @return {boolean} Whether the template is revertable.
+ * @return {boolean} Whether the template is removable.
  */
 function isTemplateRemovable(template) {
   if (!template) {
     return false;
   }
-  return template.source === TEMPLATE_ORIGINS.custom && !template.has_theme_file;
+  return template.source === TEMPLATE_ORIGINS.custom && !Boolean(template.plugin) && !template.has_theme_file;
 }
 
 ;// CONCATENATED MODULE: ./packages/edit-site/build-module/utils/is-template-revertable.js
@@ -14147,7 +14162,7 @@ function isTemplateRevertable(template) {
     return false;
   }
   /* eslint-disable camelcase */
-  return template?.source === TEMPLATE_ORIGINS.custom && template?.has_theme_file;
+  return template?.source === TEMPLATE_ORIGINS.custom && (Boolean(template?.plugin) || template?.has_theme_file);
   /* eslint-enable camelcase */
 }
 
@@ -14166,7 +14181,7 @@ function isTemplateRevertable(template) {
 
 const {
   useHistory: link_useHistory
-} = lock_unlock_unlock(external_wp_router_namespaceObject.privateApis);
+} = unlock(external_wp_router_namespaceObject.privateApis);
 function useLink(params, state, shouldReplace = false) {
   const history = link_useHistory();
   function onClick(event) {
@@ -14234,7 +14249,7 @@ function Link({
 
 const {
   useHistory: use_edit_mode_commands_useHistory
-} = lock_unlock_unlock(external_wp_router_namespaceObject.privateApis);
+} = unlock(external_wp_router_namespaceObject.privateApis);
 function usePageContentFocusCommands() {
   const {
     record: template
@@ -14248,7 +14263,7 @@ function usePageContentFocusCommands() {
     const {
       isPage: _isPage,
       getCanvasMode
-    } = lock_unlock_unlock(select(store));
+    } = unlock(select(store));
     const {
       getCurrentPostType,
       getCurrentTemplateId
@@ -14395,7 +14410,7 @@ function useEditModeCommands() {
 
 const {
   useLocation: use_init_edited_entity_from_url_useLocation
-} = lock_unlock_unlock(external_wp_router_namespaceObject.privateApis);
+} = unlock(external_wp_router_namespaceObject.privateApis);
 const postTypesWithoutParentTemplate = [TEMPLATE_POST_TYPE, TEMPLATE_PART_POST_TYPE, NAVIGATION_POST_TYPE, PATTERN_TYPES.user];
 const authorizedPostTypes = ['page', 'post'];
 function useResolveEditedEntityAndContext({
@@ -14410,12 +14425,11 @@ function useResolveEditedEntityAndContext({
     frontPageTemplateId
   } = (0,external_wp_data_namespaceObject.useSelect)(select => {
     const {
-      getSite,
-      getUnstableBase,
+      getEntityRecord,
       getEntityRecords
     } = select(external_wp_coreData_namespaceObject.store);
-    const siteData = getSite();
-    const base = getUnstableBase();
+    const siteData = getEntityRecord('root', 'site');
+    const base = getEntityRecord('root', '__unstableBase');
     const templates = getEntityRecords('postType', TEMPLATE_POST_TYPE, {
       per_page: -1
     });
@@ -14446,6 +14460,11 @@ function useResolveEditedEntityAndContext({
     // If we're rendering a post type that doesn't have a template
     // no need to resolve its template.
     if (postTypesWithoutParentTemplate.includes(postType) && postId) {
+      return undefined;
+    }
+
+    // Don't trigger resolution for multi-selected posts.
+    if (postId && postId.includes(',')) {
       return undefined;
     }
     const {
@@ -14582,6 +14601,55 @@ function useInitEditedEntityFromURL() {
   }, [isReady, postType, postId, context, setEditedEntity]);
 }
 
+;// CONCATENATED MODULE: ./packages/icons/build-module/icon/index.js
+/**
+ * WordPress dependencies
+ */
+
+
+/** @typedef {{icon: JSX.Element, size?: number} & import('@wordpress/primitives').SVGProps} IconProps */
+
+/**
+ * Return an SVG icon.
+ *
+ * @param {IconProps}                                 props icon is the SVG component to render
+ *                                                          size is a number specifiying the icon size in pixels
+ *                                                          Other props will be passed to wrapped SVG component
+ * @param {import('react').ForwardedRef<HTMLElement>} ref   The forwarded ref to the SVG element.
+ *
+ * @return {JSX.Element}  Icon component
+ */
+function Icon({
+  icon,
+  size = 24,
+  ...props
+}, ref) {
+  return (0,external_wp_element_namespaceObject.cloneElement)(icon, {
+    width: size,
+    height: size,
+    ...props,
+    ref
+  });
+}
+/* harmony default export */ const build_module_icon = ((0,external_wp_element_namespaceObject.forwardRef)(Icon));
+
+;// CONCATENATED MODULE: ./packages/icons/build-module/library/home-button.js
+/**
+ * WordPress dependencies
+ */
+
+
+const homeButton = /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_primitives_namespaceObject.SVG, {
+  xmlns: "http://www.w3.org/2000/svg",
+  viewBox: "0 0 24 24",
+  children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_primitives_namespaceObject.Path, {
+    fillRule: "evenodd",
+    clipRule: "evenodd",
+    d: "M4.25 7A2.75 2.75 0 0 1 7 4.25h10A2.75 2.75 0 0 1 19.75 7v10A2.75 2.75 0 0 1 17 19.75H7A2.75 2.75 0 0 1 4.25 17V7ZM7 5.75c-.69 0-1.25.56-1.25 1.25v10c0 .69.56 1.25 1.25 1.25h10c.69 0 1.25-.56 1.25-1.25V7c0-.69-.56-1.25-1.25-1.25H7Z"
+  })
+});
+/* harmony default export */ const home_button = (homeButton);
+
 ;// CONCATENATED MODULE: ./packages/edit-site/build-module/components/welcome-guide/image.js
 
 
@@ -14688,7 +14756,7 @@ function WelcomeGuideEditor() {
 
 const {
   interfaceStore: styles_interfaceStore
-} = lock_unlock_unlock(external_wp_editor_namespaceObject.privateApis);
+} = unlock(external_wp_editor_namespaceObject.privateApis);
 function WelcomeGuideStyles() {
   const {
     toggle
@@ -14859,17 +14927,27 @@ function WelcomeGuideTemplate() {
   const {
     toggle
   } = (0,external_wp_data_namespaceObject.useDispatch)(external_wp_preferences_namespaceObject.store);
-  const isVisible = (0,external_wp_data_namespaceObject.useSelect)(select => {
-    const isTemplateActive = !!select(external_wp_preferences_namespaceObject.store).get('core/edit-site', 'welcomeGuideTemplate');
-    const isEditorActive = !!select(external_wp_preferences_namespaceObject.store).get('core/edit-site', 'welcomeGuide');
+  const {
+    isLoaded,
+    record
+  } = useEditedEntityRecord();
+  const isPostTypeTemplate = isLoaded && record.type === 'wp_template';
+  const {
+    isActive,
+    hasPreviousEntity
+  } = (0,external_wp_data_namespaceObject.useSelect)(select => {
     const {
-      isPage
-    } = select(store);
-    const {
-      getCurrentPostType
+      getEditorSettings
     } = select(external_wp_editor_namespaceObject.store);
-    return isTemplateActive && !isEditorActive && isPage() && getCurrentPostType() === 'wp_template';
+    const {
+      get
+    } = select(external_wp_preferences_namespaceObject.store);
+    return {
+      isActive: get('core/edit-site', 'welcomeGuideTemplate'),
+      hasPreviousEntity: !!getEditorSettings().onNavigateToPreviousEntityRecord
+    };
   }, []);
+  const isVisible = isActive && isPostTypeTemplate && hasPreviousEntity;
   if (!isVisible) {
     return null;
   }
@@ -14938,7 +15016,7 @@ function WelcomeGuide() {
 
 const {
   useGlobalStylesOutput
-} = lock_unlock_unlock(external_wp_blockEditor_namespaceObject.privateApis);
+} = unlock(external_wp_blockEditor_namespaceObject.privateApis);
 function useGlobalStylesRenderer() {
   const postType = (0,external_wp_data_namespaceObject.useSelect)(select => {
     return select(store).getEditedPostType();
@@ -14986,10 +15064,10 @@ function GlobalStylesRenderer() {
 
 const {
   Theme
-} = lock_unlock_unlock(external_wp_components_namespaceObject.privateApis);
+} = unlock(external_wp_components_namespaceObject.privateApis);
 const {
   useGlobalStyle: canvas_loader_useGlobalStyle
-} = lock_unlock_unlock(external_wp_blockEditor_namespaceObject.privateApis);
+} = unlock(external_wp_blockEditor_namespaceObject.privateApis);
 function CanvasLoader({
   id
 }) {
@@ -15040,7 +15118,7 @@ function CanvasLoader({
 
 const {
   useHistory: use_navigate_to_entity_record_useHistory
-} = lock_unlock_unlock(external_wp_router_namespaceObject.privateApis);
+} = unlock(external_wp_router_namespaceObject.privateApis);
 function useNavigateToEntityRecord() {
   const history = use_navigate_to_entity_record_useHistory();
   const onNavigateToEntityRecord = (0,external_wp_element_namespaceObject.useCallback)(params => {
@@ -15062,7 +15140,6 @@ function useNavigateToEntityRecord() {
 
 
 
-
 /**
  * Internal dependencies
  */
@@ -15071,12 +15148,9 @@ function useNavigateToEntityRecord() {
 
 
 const {
-  useBlockEditorSettings
-} = lock_unlock_unlock(external_wp_editor_namespaceObject.privateApis);
-const {
   useLocation: use_site_editor_settings_useLocation,
   useHistory: use_site_editor_settings_useHistory
-} = lock_unlock_unlock(external_wp_router_namespaceObject.privateApis);
+} = unlock(external_wp_router_namespaceObject.privateApis);
 function useNavigateToPreviousEntityRecord() {
   const location = use_site_editor_settings_useLocation();
   const previousLocation = (0,external_wp_compose_namespaceObject.usePrevious)(location);
@@ -15104,7 +15178,7 @@ function useSpecificEditorSettings() {
       getEditedPostContext,
       getCanvasMode,
       getSettings
-    } = lock_unlock_unlock(select(store));
+    } = unlock(select(store));
     const _context = getEditedPostContext();
     return {
       canvasMode: getCanvasMode(),
@@ -15129,25 +15203,6 @@ function useSpecificEditorSettings() {
     };
   }, [settings, canvasMode, defaultRenderingMode, onNavigateToEntityRecord, onNavigateToPreviousEntityRecord]);
   return defaultEditorSettings;
-}
-function useSiteEditorSettings() {
-  const defaultEditorSettings = useSpecificEditorSettings();
-  const {
-    postType,
-    postId
-  } = useSelect(select => {
-    const {
-      getEditedPostType,
-      getEditedPostId
-    } = unlock(select(editSiteStore));
-    const usedPostType = getEditedPostType();
-    const usedPostId = getEditedPostId();
-    return {
-      postType: usedPostType,
-      postId: usedPostId
-    };
-  }, []);
-  return useBlockEditorSettings(defaultEditorSettings, postType, postId);
 }
 
 ;// CONCATENATED MODULE: ./packages/edit-site/build-module/components/plugin-template-setting-panel/index.js
@@ -15325,7 +15380,7 @@ function NavigationButtonAsItem(props) {
   });
 }
 function NavigationBackButtonAsItem(props) {
-  return /*#__PURE__*/_jsx(NavigatorToParentButton, {
+  return /*#__PURE__*/_jsx(NavigatorBackButton, {
     as: GenericNavigationButton,
     ...props
   });
@@ -15361,6 +15416,25 @@ const color = /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(exte
   })
 });
 /* harmony default export */ const library_color = (color);
+
+;// CONCATENATED MODULE: ./packages/icons/build-module/library/background.js
+/**
+ * WordPress dependencies
+ */
+
+
+const background = /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_primitives_namespaceObject.SVG, {
+  width: "24",
+  height: "24",
+  fill: "none",
+  xmlns: "http://www.w3.org/2000/svg",
+  children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_primitives_namespaceObject.Path, {
+    fillRule: "evenodd",
+    clipRule: "evenodd",
+    d: "M11.53 4.47a.75.75 0 1 0-1.06 1.06l8 8a.75.75 0 1 0 1.06-1.06l-8-8Zm5 1a.75.75 0 1 0-1.06 1.06l2 2a.75.75 0 1 0 1.06-1.06l-2-2Zm-11.06 10a.75.75 0 0 1 1.06 0l2 2a.75.75 0 1 1-1.06 1.06l-2-2a.75.75 0 0 1 0-1.06Zm.06-5a.75.75 0 0 0-1.06 1.06l8 8a.75.75 0 1 0 1.06-1.06l-8-8Zm-.06-3a.75.75 0 0 1 1.06 0l10 10a.75.75 0 1 1-1.06 1.06l-10-10a.75.75 0 0 1 0-1.06Zm3.06-2a.75.75 0 0 0-1.06 1.06l10 10a.75.75 0 1 0 1.06-1.06l-10-10Z"
+  })
+});
+/* harmony default export */ const library_background = (background);
 
 ;// CONCATENATED MODULE: ./packages/icons/build-module/library/shadow.js
 /**
@@ -15399,11 +15473,17 @@ const {
   useHasTypographyPanel,
   useHasColorPanel,
   useGlobalSetting: root_menu_useGlobalSetting,
-  useSettingsForBlockElement
-} = lock_unlock_unlock(external_wp_blockEditor_namespaceObject.privateApis);
+  useSettingsForBlockElement,
+  useHasBackgroundPanel
+} = unlock(external_wp_blockEditor_namespaceObject.privateApis);
 function RootMenu() {
   const [rawSettings] = root_menu_useGlobalSetting('');
   const settings = useSettingsForBlockElement(rawSettings);
+  /*
+   * Use the raw settings to determine if the background panel should be displayed,
+   * as the background panel is not dependent on the block element settings.
+   */
+  const hasBackgroundPanel = useHasBackgroundPanel(rawSettings);
   const hasTypographyPanel = useHasTypographyPanel(settings);
   const hasColorPanel = useHasColorPanel(settings);
   const hasShadowPanel = true; // useHasShadowPanel( settings );
@@ -15421,6 +15501,11 @@ function RootMenu() {
         path: "/colors",
         "aria-label": (0,external_wp_i18n_namespaceObject.__)('Colors styles'),
         children: (0,external_wp_i18n_namespaceObject.__)('Colors')
+      }), hasBackgroundPanel && /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(NavigationButtonAsItem, {
+        icon: library_background,
+        path: "/background",
+        "aria-label": (0,external_wp_i18n_namespaceObject.__)('Background styles'),
+        children: (0,external_wp_i18n_namespaceObject.__)('Background')
       }), hasShadowPanel && /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(NavigationButtonAsItem, {
         icon: library_shadow,
         path: "/shadows",
@@ -15614,7 +15699,16 @@ function getFontFamilyFromSetting(fontFamilies, setting) {
   return fontFamilies.find(fontFamily => fontFamily.slug === fontFamilySlug);
 }
 function getFontFamilies(themeJson) {
-  const fontFamilies = themeJson?.settings?.typography?.fontFamilies?.theme; // TODO this could not be under theme.
+  const themeFontFamilies = themeJson?.settings?.typography?.fontFamilies?.theme;
+  const customFontFamilies = themeJson?.settings?.typography?.fontFamilies?.custom;
+  let fontFamilies = [];
+  if (themeFontFamilies && customFontFamilies) {
+    fontFamilies = [...themeFontFamilies, ...customFontFamilies];
+  } else if (themeFontFamilies) {
+    fontFamilies = themeFontFamilies;
+  } else if (customFontFamilies) {
+    fontFamilies = customFontFamilies;
+  }
   const bodyFontFamilySetting = themeJson?.styles?.typography?.fontFamily;
   const bodyFontFamily = getFontFamilyFromSetting(fontFamilies, bodyFontFamilySetting);
   const headingFontFamilySetting = themeJson?.styles?.elements?.heading?.typography?.fontFamily;
@@ -15647,10 +15741,10 @@ function getFontFamilies(themeJson) {
 
 const {
   GlobalStylesContext: typography_example_GlobalStylesContext
-} = lock_unlock_unlock(external_wp_blockEditor_namespaceObject.privateApis);
+} = unlock(external_wp_blockEditor_namespaceObject.privateApis);
 const {
   mergeBaseAndUserConfigs
-} = lock_unlock_unlock(external_wp_editor_namespaceObject.privateApis);
+} = unlock(external_wp_editor_namespaceObject.privateApis);
 function PreviewTypography({
   fontSize,
   variation
@@ -15757,7 +15851,7 @@ function HighlightedColors({
 const {
   useGlobalStyle: preview_iframe_useGlobalStyle,
   useGlobalStylesOutput: preview_iframe_useGlobalStylesOutput
-} = lock_unlock_unlock(external_wp_blockEditor_namespaceObject.privateApis);
+} = unlock(external_wp_blockEditor_namespaceObject.privateApis);
 const normalizedWidth = 248;
 const normalizedHeight = 152;
 
@@ -15888,7 +15982,7 @@ function PreviewIframe({
 
 const {
   useGlobalStyle: preview_styles_useGlobalStyle
-} = lock_unlock_unlock(external_wp_blockEditor_namespaceObject.privateApis);
+} = unlock(external_wp_blockEditor_namespaceObject.privateApis);
 const firstFrameVariants = {
   start: {
     scale: 1,
@@ -16055,7 +16149,7 @@ const PreviewStyles = ({
 
 const {
   useGlobalStyle: screen_root_useGlobalStyle
-} = lock_unlock_unlock(external_wp_blockEditor_namespaceObject.privateApis);
+} = unlock(external_wp_blockEditor_namespaceObject.privateApis);
 function ScreenRoot() {
   const [customCSS] = screen_root_useGlobalStyle('css');
   const {
@@ -16077,11 +16171,14 @@ function ScreenRoot() {
   return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsxs)(external_wp_components_namespaceObject.Card, {
     size: "small",
     className: "edit-site-global-styles-screen-root",
+    isRounded: false,
     children: [/*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.CardBody, {
       children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsxs)(external_wp_components_namespaceObject.__experimentalVStack, {
         spacing: 4,
         children: [/*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.Card, {
+          className: "edit-site-global-styles-screen-root__active-style-tile",
           children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.CardMedia, {
+            className: "edit-site-global-styles-screen-root__active-style-tile-preview",
             children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(preview_styles, {})
           })
         }), hasVariations && /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.__experimentalItemGroup, {
@@ -16172,7 +16269,7 @@ const external_wp_a11y_namespaceObject = window["wp"]["a11y"];
 
 const {
   useGlobalStyle: variations_panel_useGlobalStyle
-} = lock_unlock_unlock(external_wp_blockEditor_namespaceObject.privateApis);
+} = unlock(external_wp_blockEditor_namespaceObject.privateApis);
 
 // Only core block styles (source === block) or block styles with a matching
 // theme.json style variation will be configurable via Global Styles.
@@ -16233,14 +16330,7 @@ function ScreenHeader({
         paddingY: 3,
         children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsxs)(external_wp_components_namespaceObject.__experimentalHStack, {
           spacing: 2,
-          children: [/*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.__experimentalNavigatorToParentButton, {
-            style:
-            // TODO: This style override is also used in ToolsPanelHeader.
-            // It should be supported out-of-the-box by Button.
-            {
-              minWidth: 24,
-              padding: 0
-            },
+          children: [/*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.__experimentalNavigatorBackButton, {
             icon: (0,external_wp_i18n_namespaceObject.isRTL)() ? chevron_right : chevron_left,
             size: "small",
             label: (0,external_wp_i18n_namespaceObject.__)('Back'),
@@ -16293,7 +16383,7 @@ const {
   useGlobalSetting: screen_block_list_useGlobalSetting,
   useSettingsForBlockElement: screen_block_list_useSettingsForBlockElement,
   useHasColorPanel: screen_block_list_useHasColorPanel
-} = lock_unlock_unlock(external_wp_blockEditor_namespaceObject.privateApis);
+} = unlock(external_wp_blockEditor_namespaceObject.privateApis);
 function useSortedBlockTypes() {
   const blockItems = (0,external_wp_data_namespaceObject.useSelect)(select => select(external_wp_blocks_namespaceObject.store).getBlockTypes(), []);
   // Ensure core blocks are prioritized in the returned results,
@@ -16529,12 +16619,13 @@ function Subtitle({
 
 
 
-// Initial control values where no block style is set.
+// Initial control values.
 
 
 
 const BACKGROUND_BLOCK_DEFAULT_VALUES = {
-  backgroundSize: 'cover'
+  backgroundSize: 'cover',
+  backgroundPosition: '50% 50%' // used only when backgroundSize is 'contain'.
 };
 function applyFallbackStyle(border) {
   if (!border) {
@@ -16576,7 +16667,7 @@ const {
   useHasFiltersPanel,
   useHasImageSettingsPanel,
   useGlobalStyle: screen_block_useGlobalStyle,
-  useHasBackgroundPanel,
+  useHasBackgroundPanel: screen_block_useHasBackgroundPanel,
   BackgroundPanel: StylesBackgroundPanel,
   BorderPanel: StylesBorderPanel,
   ColorPanel: StylesColorPanel,
@@ -16584,9 +16675,8 @@ const {
   DimensionsPanel: StylesDimensionsPanel,
   FiltersPanel: StylesFiltersPanel,
   ImageSettingsPanel,
-  AdvancedPanel: StylesAdvancedPanel,
-  useGlobalStyleLinks
-} = lock_unlock_unlock(external_wp_blockEditor_namespaceObject.privateApis);
+  AdvancedPanel: StylesAdvancedPanel
+} = unlock(external_wp_blockEditor_namespaceObject.privateApis);
 function ScreenBlock({
   name,
   variation
@@ -16606,7 +16696,6 @@ function ScreenBlock({
   const [rawSettings, setSettings] = screen_block_useGlobalSetting('', name);
   const settings = screen_block_useSettingsForBlockElement(rawSettings, name);
   const blockType = (0,external_wp_blocks_namespaceObject.getBlockType)(name);
-  const _links = useGlobalStyleLinks();
 
   // Only allow `blockGap` support if serialization has not been skipped, to be sure global spacing can be applied.
   if (settings?.spacing?.blockGap && blockType?.supports?.spacing?.blockGap && (blockType?.supports?.spacing?.__experimentalSkipSerialization === true || blockType?.supports?.spacing?.__experimentalSkipSerialization?.some?.(spacingType => spacingType === 'blockGap'))) {
@@ -16623,7 +16712,7 @@ function ScreenBlock({
     settings.dimensions.aspectRatio = false;
   }
   const blockVariations = useBlockVariations(name);
-  const hasBackgroundPanel = useHasBackgroundPanel(settings);
+  const hasBackgroundPanel = screen_block_useHasBackgroundPanel(settings);
   const hasTypographyPanel = screen_block_useHasTypographyPanel(settings);
   const hasColorPanel = screen_block_useHasColorPanel(settings);
   const hasBorderPanel = screen_block_useHasBorderPanel(settings);
@@ -16761,8 +16850,7 @@ function ScreenBlock({
       value: style,
       onChange: setStyle,
       settings: settings,
-      defaultValues: BACKGROUND_BLOCK_DEFAULT_VALUES,
-      themeFileURIs: _links?.['wp:theme-file']
+      defaultValues: BACKGROUND_BLOCK_DEFAULT_VALUES
     }), hasTypographyPanel && /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(StylesTypographyPanel, {
       inheritedValue: inheritedStyle,
       value: style,
@@ -16824,7 +16912,7 @@ function ScreenBlock({
 
 const {
   useGlobalStyle: typography_elements_useGlobalStyle
-} = lock_unlock_unlock(external_wp_blockEditor_namespaceObject.privateApis);
+} = unlock(external_wp_blockEditor_namespaceObject.privateApis);
 function ElementItem({
   parentMenu,
   element,
@@ -16903,206 +16991,10 @@ function TypographyElements() {
 }
 /* harmony default export */ const typography_elements = (TypographyElements);
 
-;// CONCATENATED MODULE: ./packages/edit-site/build-module/components/global-styles/preview-typography.js
+;// CONCATENATED MODULE: ./packages/edit-site/build-module/components/global-styles/font-sizes/font-sizes-count.js
 /**
  * WordPress dependencies
  */
-
-
-/**
- * Internal dependencies
- */
-
-
-
-const StylesPreviewTypography = ({
-  variation,
-  isFocused,
-  withHoverView
-}) => {
-  return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(PreviewIframe, {
-    label: variation.title,
-    isFocused: isFocused,
-    withHoverView: withHoverView,
-    children: ({
-      ratio,
-      key
-    }) => /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.__experimentalHStack, {
-      spacing: 10 * ratio,
-      justify: "center",
-      style: {
-        height: '100%',
-        overflow: 'hidden'
-      },
-      children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(PreviewTypography, {
-        variation: variation,
-        fontSize: 85 * ratio
-      })
-    }, key)
-  });
-};
-/* harmony default export */ const preview_typography = (StylesPreviewTypography);
-
-;// CONCATENATED MODULE: ./packages/edit-site/build-module/hooks/use-theme-style-variations/use-theme-style-variations-by-property.js
-/**
- * WordPress dependencies
- */
-
-
-
-
-
-
-
-/**
- * Internal dependencies
- */
-
-
-const {
-  GlobalStylesContext: use_theme_style_variations_by_property_GlobalStylesContext,
-  areGlobalStyleConfigsEqual
-} = lock_unlock_unlock(external_wp_blockEditor_namespaceObject.privateApis);
-const {
-  mergeBaseAndUserConfigs: use_theme_style_variations_by_property_mergeBaseAndUserConfigs
-} = lock_unlock_unlock(external_wp_editor_namespaceObject.privateApis);
-
-/**
- * Removes all instances of properties from an object.
- *
- * @param {Object}   object     The object to remove the properties from.
- * @param {string[]} properties The properties to remove.
- * @return {Object} The modified object.
- */
-function removePropertiesFromObject(object, properties) {
-  if (!properties?.length) {
-    return object;
-  }
-  if (typeof object !== 'object' || !object || !Object.keys(object).length) {
-    return object;
-  }
-  for (const key in object) {
-    if (properties.includes(key)) {
-      delete object[key];
-    } else if (typeof object[key] === 'object') {
-      removePropertiesFromObject(object[key], properties);
-    }
-  }
-  return object;
-}
-
-/**
- * Checks whether a style variation is empty.
- *
- * @param {Object} variation          A style variation object.
- * @param {string} variation.title    The title of the variation.
- * @param {Object} variation.settings The settings of the variation.
- * @param {Object} variation.styles   The styles of the variation.
- * @return {boolean} Whether the variation is empty.
- */
-function hasThemeVariation({
-  title,
-  settings,
-  styles
-}) {
-  return title === (0,external_wp_i18n_namespaceObject.__)('Default') ||
-  // Always preserve the default variation.
-  Object.keys(settings).length > 0 || Object.keys(styles).length > 0;
-}
-
-/**
- * Fetches the current theme style variations that contain only the specified properties
- * and merges them with the user config.
- *
- * @param {string[]} properties The properties to filter by.
- * @return {Object[]|*} The merged object.
- */
-function useCurrentMergeThemeStyleVariationsWithUserConfig(properties = []) {
-  const {
-    variationsFromTheme
-  } = (0,external_wp_data_namespaceObject.useSelect)(select => {
-    const _variationsFromTheme = select(external_wp_coreData_namespaceObject.store).__experimentalGetCurrentThemeGlobalStylesVariations();
-    return {
-      variationsFromTheme: _variationsFromTheme || []
-    };
-  }, []);
-  const {
-    user: userVariation
-  } = (0,external_wp_element_namespaceObject.useContext)(use_theme_style_variations_by_property_GlobalStylesContext);
-  const propertiesAsString = properties.toString();
-  return (0,external_wp_element_namespaceObject.useMemo)(() => {
-    const clonedUserVariation = cloneDeep(userVariation);
-
-    // Get user variation and remove the settings for the given property.
-    const userVariationWithoutProperties = removePropertiesFromObject(clonedUserVariation, properties);
-    userVariationWithoutProperties.title = (0,external_wp_i18n_namespaceObject.__)('Default');
-    const variationsWithPropertiesAndBase = variationsFromTheme.filter(variation => {
-      return isVariationWithProperties(variation, properties);
-    }).map(variation => {
-      return use_theme_style_variations_by_property_mergeBaseAndUserConfigs(userVariationWithoutProperties, variation);
-    });
-    const variationsByProperties = [userVariationWithoutProperties, ...variationsWithPropertiesAndBase];
-
-    /*
-     * Filter out variations with no settings or styles.
-     */
-    return variationsByProperties?.length ? variationsByProperties.filter(hasThemeVariation) : [];
-  }, [propertiesAsString, userVariation, variationsFromTheme]);
-}
-
-/**
- * Returns a new object, with properties specified in `properties` array.,
- * maintain the original object tree structure.
- * The function is recursive, so it will perform a deep search for the given properties.
- * E.g., the function will return `{ a: { b: { c: { test: 1 } } } }` if the properties are  `[ 'test' ]`.
- *
- * @param {Object}   object     The object to filter
- * @param {string[]} properties The properties to filter by
- * @return {Object} The merged object.
- */
-const filterObjectByProperties = (object, properties) => {
-  if (!object || !properties?.length) {
-    return {};
-  }
-  const newObject = {};
-  Object.keys(object).forEach(key => {
-    if (properties.includes(key)) {
-      newObject[key] = object[key];
-    } else if (typeof object[key] === 'object') {
-      const newFilter = filterObjectByProperties(object[key], properties);
-      if (Object.keys(newFilter).length) {
-        newObject[key] = newFilter;
-      }
-    }
-  });
-  return newObject;
-};
-
-/**
- * Compares a style variation to the same variation filtered by the specified properties.
- * Returns true if the variation contains only the properties specified.
- *
- * @param {Object}   variation  The variation to compare.
- * @param {string[]} properties The properties to compare.
- * @return {boolean} Whether the variation contains only the specified properties.
- */
-function isVariationWithProperties(variation, properties) {
-  const variationWithProperties = filterObjectByProperties(cloneDeep(variation), properties);
-  return areGlobalStyleConfigsEqual(variationWithProperties, variation);
-}
-
-;// CONCATENATED MODULE: ./packages/edit-site/build-module/components/global-styles/variations/variation.js
-/**
- * External dependencies
- */
-
-
-/**
- * WordPress dependencies
- */
-
-
-
 
 
 
@@ -17113,127 +17005,35 @@ function isVariationWithProperties(variation, properties) {
 
 
 
-const {
-  mergeBaseAndUserConfigs: variation_mergeBaseAndUserConfigs
-} = lock_unlock_unlock(external_wp_editor_namespaceObject.privateApis);
-const {
-  GlobalStylesContext: variation_GlobalStylesContext,
-  areGlobalStyleConfigsEqual: variation_areGlobalStyleConfigsEqual
-} = lock_unlock_unlock(external_wp_blockEditor_namespaceObject.privateApis);
-function Variation({
-  variation,
-  children,
-  isPill,
-  properties,
-  showTooltip
-}) {
-  const [isFocused, setIsFocused] = (0,external_wp_element_namespaceObject.useState)(false);
-  const {
-    base,
-    user,
-    setUserConfig
-  } = (0,external_wp_element_namespaceObject.useContext)(variation_GlobalStylesContext);
-  const context = (0,external_wp_element_namespaceObject.useMemo)(() => {
-    let merged = variation_mergeBaseAndUserConfigs(base, variation);
-    if (properties) {
-      merged = filterObjectByProperties(merged, properties);
-    }
-    return {
-      user: variation,
-      base,
-      merged,
-      setUserConfig: () => {}
-    };
-  }, [variation, base, properties]);
-  const selectVariation = () => setUserConfig(variation);
-  const selectOnEnter = event => {
-    if (event.keyCode === external_wp_keycodes_namespaceObject.ENTER) {
-      event.preventDefault();
-      selectVariation();
-    }
-  };
-  const isActive = (0,external_wp_element_namespaceObject.useMemo)(() => variation_areGlobalStyleConfigsEqual(user, variation), [user, variation]);
-  let label = variation?.title;
-  if (variation?.description) {
-    label = (0,external_wp_i18n_namespaceObject.sprintf)( /* translators: %1$s: variation title. %2$s variation description. */
-    (0,external_wp_i18n_namespaceObject.__)('%1$s (%2$s)'), variation?.title, variation?.description);
-  }
-  const content = /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)("div", {
-    className: dist_clsx('edit-site-global-styles-variations_item', {
-      'is-active': isActive
-    }),
-    role: "button",
-    onClick: selectVariation,
-    onKeyDown: selectOnEnter,
-    tabIndex: "0",
-    "aria-label": label,
-    "aria-current": isActive,
-    onFocus: () => setIsFocused(true),
-    onBlur: () => setIsFocused(false),
-    children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)("div", {
-      className: dist_clsx('edit-site-global-styles-variations_item-preview', {
-        'is-pill': isPill
-      }),
-      children: children(isFocused)
-    })
-  });
-  return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(variation_GlobalStylesContext.Provider, {
-    value: context,
-    children: showTooltip ? /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.Tooltip, {
-      text: variation?.title,
-      children: content
-    }) : content
-  });
-}
 
-;// CONCATENATED MODULE: ./packages/edit-site/build-module/components/global-styles/variations/variations-typography.js
-/**
- * WordPress dependencies
- */
-
-
-/**
- * Internal dependencies
- */
-
-
-
-
-
-
-function TypographyVariations({
-  title,
-  gap = 2
-}) {
-  const propertiesToFilter = ['typography'];
-  const typographyVariations = useCurrentMergeThemeStyleVariationsWithUserConfig(propertiesToFilter);
-
-  // Return null if there is only one variation (the default).
-  if (typographyVariations?.length <= 1) {
-    return null;
-  }
+function FontSizes() {
   return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsxs)(external_wp_components_namespaceObject.__experimentalVStack, {
-    spacing: 3,
-    children: [title && /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(subtitle, {
-      level: 3,
-      children: title
-    }), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.__experimentalGrid, {
-      columns: 3,
-      gap: gap,
-      className: "edit-site-global-styles-style-variations-container",
-      children: typographyVariations.map((variation, index) => {
-        return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(Variation, {
-          variation: variation,
-          properties: propertiesToFilter,
-          showTooltip: true,
-          children: () => /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(preview_typography, {
-            variation: variation
-          })
-        }, index);
+    spacing: 2,
+    children: [/*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.__experimentalHStack, {
+      justify: "space-between",
+      children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(subtitle, {
+        level: 3,
+        children: (0,external_wp_i18n_namespaceObject.__)('Font Sizes')
+      })
+    }), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.__experimentalItemGroup, {
+      isBordered: true,
+      isSeparated: true,
+      children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(NavigationButtonAsItem, {
+        path: "/typography/font-sizes/",
+        "aria-label": (0,external_wp_i18n_namespaceObject.__)('Edit font size presets'),
+        children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsxs)(external_wp_components_namespaceObject.__experimentalHStack, {
+          direction: "row",
+          children: [/*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.FlexItem, {
+            children: (0,external_wp_i18n_namespaceObject.__)('Font size presets')
+          }), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(build_module_icon, {
+            icon: (0,external_wp_i18n_namespaceObject.isRTL)() ? chevron_left : chevron_right
+          })]
+        })
       })
     })]
   });
 }
+/* harmony default export */ const font_sizes_count = (FontSizes);
 
 ;// CONCATENATED MODULE: ./packages/edit-site/build-module/components/global-styles/font-library-modal/resolvers.js
 /**
@@ -17349,7 +17149,7 @@ const {
 } = window;
 const {
   kebabCase
-} = lock_unlock_unlock(external_wp_components_namespaceObject.privateApis);
+} = unlock(external_wp_components_namespaceObject.privateApis);
 function setUIValuesNeeded(font, extraValues = {}) {
   if (!font.name && (font.fontFamily || font.slug)) {
     font.name = font.fontFamily || font.slug;
@@ -17725,7 +17525,7 @@ function toggleFont(font, face, initialfonts) {
 
 const {
   useGlobalSetting: context_useGlobalSetting
-} = lock_unlock_unlock(external_wp_blockEditor_namespaceObject.privateApis);
+} = unlock(external_wp_blockEditor_namespaceObject.privateApis);
 
 
 
@@ -17750,7 +17550,6 @@ function FontLibraryProvider({
   const globalStyles = (0,external_wp_coreData_namespaceObject.useEntityRecord)('root', 'globalStyles', globalStylesId);
   const [isInstalling, setIsInstalling] = (0,external_wp_element_namespaceObject.useState)(false);
   const [refreshKey, setRefreshKey] = (0,external_wp_element_namespaceObject.useState)(0);
-  const [notice, setNotice] = (0,external_wp_element_namespaceObject.useState)(null);
   const refreshLibrary = () => {
     setRefreshKey(Date.now());
   };
@@ -17813,8 +17612,6 @@ function FontLibraryProvider({
     }
   }, [modalTabOpen]);
   const handleSetLibraryFontSelected = font => {
-    setNotice(null);
-
     // If font is null, reset the selected font
     if (!font) {
       setLibraryFontSelected(null);
@@ -18093,8 +17890,6 @@ function FontLibraryProvider({
       modalTabOpen,
       setModalTabOpen,
       refreshLibrary,
-      notice,
-      setNotice,
       saveFontFamilies,
       isResolvingLibrary,
       isInstalling,
@@ -18105,6 +17900,245 @@ function FontLibraryProvider({
   });
 }
 /* harmony default export */ const context = (FontLibraryProvider);
+
+;// CONCATENATED MODULE: ./packages/edit-site/build-module/hooks/use-theme-style-variations/use-theme-style-variations-by-property.js
+/* wp:polyfill */
+/**
+ * WordPress dependencies
+ */
+
+
+
+
+
+
+
+/**
+ * Internal dependencies
+ */
+
+const {
+  GlobalStylesContext: use_theme_style_variations_by_property_GlobalStylesContext,
+  areGlobalStyleConfigsEqual
+} = unlock(external_wp_blockEditor_namespaceObject.privateApis);
+const {
+  mergeBaseAndUserConfigs: use_theme_style_variations_by_property_mergeBaseAndUserConfigs
+} = unlock(external_wp_editor_namespaceObject.privateApis);
+
+/**
+ * Removes all instances of properties from an object.
+ *
+ * @param {Object}   object     The object to remove the properties from.
+ * @param {string[]} properties The properties to remove.
+ * @return {Object} The modified object.
+ */
+function removePropertiesFromObject(object, properties) {
+  if (!properties?.length) {
+    return object;
+  }
+  if (typeof object !== 'object' || !object || !Object.keys(object).length) {
+    return object;
+  }
+  for (const key in object) {
+    if (properties.includes(key)) {
+      delete object[key];
+    } else if (typeof object[key] === 'object') {
+      removePropertiesFromObject(object[key], properties);
+    }
+  }
+  return object;
+}
+
+/**
+ * Checks whether a style variation is empty.
+ *
+ * @param {Object} variation          A style variation object.
+ * @param {string} variation.title    The title of the variation.
+ * @param {Object} variation.settings The settings of the variation.
+ * @param {Object} variation.styles   The styles of the variation.
+ * @return {boolean} Whether the variation is empty.
+ */
+function hasThemeVariation({
+  title,
+  settings,
+  styles
+}) {
+  return title === (0,external_wp_i18n_namespaceObject.__)('Default') ||
+  // Always preserve the default variation.
+  Object.keys(settings).length > 0 || Object.keys(styles).length > 0;
+}
+
+/**
+ * Fetches the current theme style variations that contain only the specified properties
+ * and merges them with the user config.
+ *
+ * @param {string[]} properties The properties to filter by.
+ * @return {Object[]|*} The merged object.
+ */
+function useCurrentMergeThemeStyleVariationsWithUserConfig(properties = []) {
+  const {
+    variationsFromTheme
+  } = (0,external_wp_data_namespaceObject.useSelect)(select => {
+    const _variationsFromTheme = select(external_wp_coreData_namespaceObject.store).__experimentalGetCurrentThemeGlobalStylesVariations();
+    return {
+      variationsFromTheme: _variationsFromTheme || []
+    };
+  }, []);
+  const {
+    user: userVariation
+  } = (0,external_wp_element_namespaceObject.useContext)(use_theme_style_variations_by_property_GlobalStylesContext);
+  const propertiesAsString = properties.toString();
+  return (0,external_wp_element_namespaceObject.useMemo)(() => {
+    const clonedUserVariation = structuredClone(userVariation);
+
+    // Get user variation and remove the settings for the given property.
+    const userVariationWithoutProperties = removePropertiesFromObject(clonedUserVariation, properties);
+    userVariationWithoutProperties.title = (0,external_wp_i18n_namespaceObject.__)('Default');
+    const variationsWithPropertiesAndBase = variationsFromTheme.filter(variation => {
+      return isVariationWithProperties(variation, properties);
+    }).map(variation => {
+      return use_theme_style_variations_by_property_mergeBaseAndUserConfigs(userVariationWithoutProperties, variation);
+    });
+    const variationsByProperties = [userVariationWithoutProperties, ...variationsWithPropertiesAndBase];
+
+    /*
+     * Filter out variations with no settings or styles.
+     */
+    return variationsByProperties?.length ? variationsByProperties.filter(hasThemeVariation) : [];
+  }, [propertiesAsString, userVariation, variationsFromTheme]);
+}
+
+/**
+ * Returns a new object, with properties specified in `properties` array.,
+ * maintain the original object tree structure.
+ * The function is recursive, so it will perform a deep search for the given properties.
+ * E.g., the function will return `{ a: { b: { c: { test: 1 } } } }` if the properties are  `[ 'test' ]`.
+ *
+ * @param {Object}   object     The object to filter
+ * @param {string[]} properties The properties to filter by
+ * @return {Object} The merged object.
+ */
+const filterObjectByProperties = (object, properties) => {
+  if (!object || !properties?.length) {
+    return {};
+  }
+  const newObject = {};
+  Object.keys(object).forEach(key => {
+    if (properties.includes(key)) {
+      newObject[key] = object[key];
+    } else if (typeof object[key] === 'object') {
+      const newFilter = filterObjectByProperties(object[key], properties);
+      if (Object.keys(newFilter).length) {
+        newObject[key] = newFilter;
+      }
+    }
+  });
+  return newObject;
+};
+
+/**
+ * Compares a style variation to the same variation filtered by the specified properties.
+ * Returns true if the variation contains only the properties specified.
+ *
+ * @param {Object}   variation  The variation to compare.
+ * @param {string[]} properties The properties to compare.
+ * @return {boolean} Whether the variation contains only the specified properties.
+ */
+function isVariationWithProperties(variation, properties) {
+  const variationWithProperties = filterObjectByProperties(structuredClone(variation), properties);
+  return areGlobalStyleConfigsEqual(variationWithProperties, variation);
+}
+
+;// CONCATENATED MODULE: ./packages/edit-site/build-module/components/global-styles/typeset-button.js
+/**
+ * WordPress dependencies
+ */
+
+
+
+
+
+
+
+
+
+/**
+ * Internal dependencies
+ */
+
+
+
+
+
+
+
+
+const {
+  GlobalStylesContext: typeset_button_GlobalStylesContext
+} = unlock(external_wp_blockEditor_namespaceObject.privateApis);
+const {
+  mergeBaseAndUserConfigs: typeset_button_mergeBaseAndUserConfigs
+} = unlock(external_wp_editor_namespaceObject.privateApis);
+function TypesetButton() {
+  const propertiesToFilter = ['typography'];
+  const typographyVariations = useCurrentMergeThemeStyleVariationsWithUserConfig(propertiesToFilter);
+  const hasTypographyVariations = typographyVariations?.length > 1;
+  const {
+    base,
+    user: userConfig
+  } = (0,external_wp_element_namespaceObject.useContext)(typeset_button_GlobalStylesContext);
+  const config = typeset_button_mergeBaseAndUserConfigs(base, userConfig);
+  const allFontFamilies = getFontFamilies(config);
+  const hasFonts = allFontFamilies.filter(font => font !== null).length > 0;
+  const variations = (0,external_wp_data_namespaceObject.useSelect)(select => {
+    return select(external_wp_coreData_namespaceObject.store).__experimentalGetCurrentThemeGlobalStylesVariations();
+  }, []);
+  const userTypographyConfig = filterObjectByProperties(userConfig, 'typography');
+  const title = (0,external_wp_element_namespaceObject.useMemo)(() => {
+    if (Object.keys(userTypographyConfig).length === 0) {
+      return (0,external_wp_i18n_namespaceObject.__)('Default');
+    }
+    const activeVariation = variations?.find(variation => {
+      return JSON.stringify(filterObjectByProperties(variation, 'typography')) === JSON.stringify(userTypographyConfig);
+    });
+    if (activeVariation) {
+      return activeVariation.title;
+    }
+    return allFontFamilies.map(font => font?.name).join(', ');
+  }, [allFontFamilies, userTypographyConfig, variations]);
+  return hasTypographyVariations && hasFonts && /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsxs)(external_wp_components_namespaceObject.__experimentalVStack, {
+    spacing: 2,
+    children: [/*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.__experimentalHStack, {
+      justify: "space-between",
+      children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(subtitle, {
+        level: 3,
+        children: (0,external_wp_i18n_namespaceObject.__)('Typeset')
+      })
+    }), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.__experimentalItemGroup, {
+      isBordered: true,
+      isSeparated: true,
+      children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(NavigationButtonAsItem, {
+        path: "/typography/typeset",
+        "aria-label": (0,external_wp_i18n_namespaceObject.__)('Typeset'),
+        children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsxs)(external_wp_components_namespaceObject.__experimentalHStack, {
+          direction: "row",
+          children: [/*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.FlexItem, {
+            children: title
+          }), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(build_module_icon, {
+            icon: (0,external_wp_i18n_namespaceObject.isRTL)() ? chevron_left : chevron_right
+          })]
+        })
+      })
+    })]
+  });
+}
+/* harmony default export */ const typeset_button = (({
+  ...props
+}) => /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(context, {
+  children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(TypesetButton, {
+    ...props
+  })
+}));
 
 ;// CONCATENATED MODULE: ./packages/edit-site/build-module/components/global-styles/font-library-modal/font-demo.js
 /**
@@ -18230,6 +18264,7 @@ function FontCard({
   };
   const navigator = (0,external_wp_components_namespaceObject.__experimentalUseNavigator)();
   return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.Button, {
+    __next40pxDefaultSize: true,
     onClick: () => {
       onClick();
       if (navigatorPath) {
@@ -18253,7 +18288,7 @@ function FontCard({
           })
         }), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.FlexItem, {
           children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.Icon, {
-            icon: chevron_right
+            icon: (0,external_wp_i18n_namespaceObject.isRTL)() ? chevron_left : chevron_right
           })
         })]
       })]
@@ -18280,7 +18315,7 @@ function FontCard({
 
 const {
   kebabCase: library_font_variant_kebabCase
-} = lock_unlock_unlock(external_wp_components_namespaceObject.privateApis);
+} = unlock(external_wp_components_namespaceObject.privateApis);
 function LibraryFontVariant({
   face,
   font
@@ -18384,7 +18419,7 @@ function sortFontFaces(faces) {
 
 const {
   useGlobalSetting: installed_fonts_useGlobalSetting
-} = lock_unlock_unlock(external_wp_blockEditor_namespaceObject.privateApis);
+} = unlock(external_wp_blockEditor_namespaceObject.privateApis);
 function InstalledFonts() {
   var _libraryFontSelected$;
   const {
@@ -18396,12 +18431,11 @@ function InstalledFonts() {
     isResolvingLibrary,
     isInstalling,
     saveFontFamilies,
-    getFontFacesActivated,
-    notice,
-    setNotice
+    getFontFacesActivated
   } = (0,external_wp_element_namespaceObject.useContext)(FontLibraryContext);
   const [fontFamilies, setFontFamilies] = installed_fonts_useGlobalSetting('typography.fontFamilies');
   const [isConfirmDeleteOpen, setIsConfirmDeleteOpen] = (0,external_wp_element_namespaceObject.useState)(false);
+  const [notice, setNotice] = (0,external_wp_element_namespaceObject.useState)(false);
   const [baseFontFamilies] = installed_fonts_useGlobalSetting('typography.fontFamilies', undefined, 'base');
   const globalStylesId = (0,external_wp_data_namespaceObject.useSelect)(select => {
     const {
@@ -18432,6 +18466,22 @@ function InstalledFonts() {
   const shouldDisplayDeleteButton = !!libraryFontSelected && libraryFontSelected?.source !== 'theme' && canUserDelete;
   const handleUninstallClick = () => {
     setIsConfirmDeleteOpen(true);
+  };
+  const handleUpdate = async () => {
+    setNotice(null);
+    try {
+      await saveFontFamilies(fontFamilies);
+      setNotice({
+        type: 'success',
+        message: (0,external_wp_i18n_namespaceObject.__)('Font family updated successfully.')
+      });
+    } catch (error) {
+      setNotice({
+        type: 'error',
+        message: (0,external_wp_i18n_namespaceObject.sprintf)( /* translators: %s: error message */
+        (0,external_wp_i18n_namespaceObject.__)('There was an error updating the font family. %s'), error.message)
+      });
+    }
   };
   const getFontFacesToDisplay = font => {
     if (!font) {
@@ -18521,6 +18571,7 @@ function InstalledFonts() {
                     navigatorPath: "/fontFamily",
                     variantsText: getFontCardVariantsText(font),
                     onClick: () => {
+                      setNotice(null);
                       handleSetLibraryFontSelected(font);
                     }
                   })
@@ -18541,6 +18592,7 @@ function InstalledFonts() {
                     navigatorPath: "/fontFamily",
                     variantsText: getFontCardVariantsText(font),
                     onClick: () => {
+                      setNotice(null);
                       handleSetLibraryFontSelected(font);
                     }
                   })
@@ -18559,11 +18611,12 @@ function InstalledFonts() {
             handleSetLibraryFontSelected: handleSetLibraryFontSelected
           }), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsxs)(external_wp_components_namespaceObject.Flex, {
             justify: "flex-start",
-            children: [/*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.__experimentalNavigatorToParentButton, {
-              icon: chevron_left,
+            children: [/*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.__experimentalNavigatorBackButton, {
+              icon: (0,external_wp_i18n_namespaceObject.isRTL)() ? chevron_right : chevron_left,
               size: "small",
               onClick: () => {
                 handleSetLibraryFontSelected(null);
+                setNotice(null);
               },
               label: (0,external_wp_i18n_namespaceObject.__)('Back')
             }), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.__experimentalHeading, {
@@ -18599,25 +18652,32 @@ function InstalledFonts() {
               __nextHasNoMarginBottom: true
             }), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.__experimentalSpacer, {
               margin: 8
-            }), getFontFacesToDisplay(libraryFontSelected).map((face, i) => /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(library_font_variant, {
-              font: libraryFontSelected,
-              face: face
-            }, `face${i}`))]
+            }), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)("ul", {
+              role: "list",
+              className: "font-library-modal__fonts-list",
+              children: getFontFacesToDisplay(libraryFontSelected).map((face, i) => /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)("li", {
+                className: "font-library-modal__fonts-list-item",
+                children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(library_font_variant, {
+                  font: libraryFontSelected,
+                  face: face
+                }, `face${i}`)
+              }, `face${i}`))
+            })]
           })]
         })]
       }), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsxs)(external_wp_components_namespaceObject.__experimentalHStack, {
         justify: "flex-end",
         className: "font-library-modal__footer",
         children: [isInstalling && /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.ProgressBar, {}), shouldDisplayDeleteButton && /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.Button, {
+          __next40pxDefaultSize: true,
           isDestructive: true,
           variant: "tertiary",
           onClick: handleUninstallClick,
           children: (0,external_wp_i18n_namespaceObject.__)('Delete')
         }), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.Button, {
+          __next40pxDefaultSize: true,
           variant: "primary",
-          onClick: () => {
-            saveFontFamilies(fontFamilies);
-          },
+          onClick: handleUpdate,
           disabled: !fontFamiliesHasChanges,
           accessibleWhenDisabled: true,
           children: (0,external_wp_i18n_namespaceObject.__)('Update')
@@ -18649,7 +18709,7 @@ function ConfirmDeleteDialog({
     } catch (error) {
       setNotice({
         type: 'error',
-        message: (0,external_wp_i18n_namespaceObject.__)('There was an error uninstalling the font family. ') + error.message
+        message: (0,external_wp_i18n_namespaceObject.__)('There was an error uninstalling the font family.') + error.message
       });
     }
   };
@@ -18778,7 +18838,7 @@ function GoogleFontsConfirmDialog() {
 
 const {
   kebabCase: collection_font_variant_kebabCase
-} = lock_unlock_unlock(external_wp_components_namespaceObject.privateApis);
+} = unlock(external_wp_components_namespaceObject.privateApis);
 function CollectionFontVariant({
   face,
   font,
@@ -18858,6 +18918,7 @@ function FontCollection({
     return window.localStorage.getItem(LOCAL_STORAGE_ITEM) === 'true';
   };
   const [selectedFont, setSelectedFont] = (0,external_wp_element_namespaceObject.useState)(null);
+  const [notice, setNotice] = (0,external_wp_element_namespaceObject.useState)(false);
   const [fontsToInstall, setFontsToInstall] = (0,external_wp_element_namespaceObject.useState)([]);
   const [page, setPage] = (0,external_wp_element_namespaceObject.useState)(1);
   const [filters, setFilters] = (0,external_wp_element_namespaceObject.useState)({});
@@ -18866,9 +18927,7 @@ function FontCollection({
     collections,
     getFontCollection,
     installFonts,
-    isInstalling,
-    notice,
-    setNotice
+    isInstalling
   } = (0,external_wp_element_namespaceObject.useContext)(FontLibraryContext);
   const selectedCollection = collections.find(collection => collection.slug === slug);
   (0,external_wp_element_namespaceObject.useEffect)(() => {
@@ -18901,8 +18960,7 @@ function FontCollection({
   }, [slug, getFontCollection, setNotice, notice]);
   (0,external_wp_element_namespaceObject.useEffect)(() => {
     setSelectedFont(null);
-    setNotice(null);
-  }, [slug, setNotice]);
+  }, [slug]);
   (0,external_wp_element_namespaceObject.useEffect)(() => {
     // If the selected fonts change, reset the selected fonts to install
     setFontsToInstall([]);
@@ -18950,6 +19008,19 @@ function FontCollection({
   const fontToInstallOutline = getFontsOutline(fontsToInstall);
   const resetFontsToInstall = () => {
     setFontsToInstall([]);
+  };
+  const selectFontCount = fontsToInstall.length > 0 ? fontsToInstall[0]?.fontFace?.length : 0;
+
+  // Check if any fonts are selected.
+  const isIndeterminate = selectFontCount > 0 && selectFontCount !== selectedFont?.fontFace?.length;
+
+  // Check if all fonts are selected.
+  const isSelectAllChecked = selectFontCount === selectedFont?.fontFace?.length;
+
+  // Toggle select all fonts.
+  const toggleSelectAll = () => {
+    const newFonts = isSelectAllChecked ? [] : [selectedFont];
+    setFontsToInstall(newFonts);
   };
   const handleInstall = async () => {
     setNotice(null);
@@ -19054,6 +19125,8 @@ function FontCollection({
               })
             }), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.FlexItem, {
               children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.SelectControl, {
+                __nextHasNoMarginBottom: true,
+                __next40pxDefaultSize: true,
                 label: (0,external_wp_i18n_namespaceObject.__)('Category'),
                 value: filters.category,
                 onChange: handleCategoryFilter,
@@ -19067,9 +19140,9 @@ function FontCollection({
             margin: 4
           }), !!selectedCollection?.font_families?.length && !fonts.length && /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.__experimentalText, {
             children: (0,external_wp_i18n_namespaceObject.__)('No fonts found. Try with a different search term')
-          }), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsxs)("div", {
+          }), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)("div", {
             className: "font-library-modal__fonts-grid__main",
-            children: [/*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)("ul", {
+            children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)("ul", {
               role: "list",
               className: "font-library-modal__fonts-list",
               children: items.map(font => /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)("li", {
@@ -19082,14 +19155,14 @@ function FontCollection({
                   }
                 })
               }, font.font_family_settings.slug))
-            }), ' ']
+            })
           })]
         }), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsxs)(external_wp_components_namespaceObject.__experimentalNavigatorScreen, {
           path: "/fontFamily",
           children: [/*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsxs)(external_wp_components_namespaceObject.Flex, {
             justify: "flex-start",
-            children: [/*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.__experimentalNavigatorToParentButton, {
-              icon: chevron_left,
+            children: [/*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.__experimentalNavigatorBackButton, {
+              icon: (0,external_wp_i18n_namespaceObject.isRTL)() ? chevron_right : chevron_left,
               size: "small",
               onClick: () => {
                 setSelectedFont(null);
@@ -19118,18 +19191,30 @@ function FontCollection({
             children: (0,external_wp_i18n_namespaceObject.__)('Select font variants to install.')
           }), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.__experimentalSpacer, {
             margin: 4
-          }), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsxs)(external_wp_components_namespaceObject.__experimentalVStack, {
+          }), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.CheckboxControl, {
+            className: "font-library-modal__select-all",
+            label: (0,external_wp_i18n_namespaceObject.__)('Select all'),
+            checked: isSelectAllChecked,
+            onChange: toggleSelectAll,
+            indeterminate: isIndeterminate,
+            __nextHasNoMarginBottom: true
+          }), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.__experimentalVStack, {
             spacing: 0,
-            children: [/*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.__experimentalSpacer, {
-              margin: 8
-            }), getSortedFontFaces(selectedFont).map((face, i) => /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(collection_font_variant, {
-              font: selectedFont,
-              face: face,
-              handleToggleVariant: handleToggleVariant,
-              selected: isFontFontFaceInOutline(selectedFont.slug, selectedFont.fontFace ? face : null,
-              // If the font has no fontFace, we want to check if the font is in the outline
-              fontToInstallOutline)
-            }, `face${i}`))]
+            children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)("ul", {
+              role: "list",
+              className: "font-library-modal__fonts-list",
+              children: getSortedFontFaces(selectedFont).map((face, i) => /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)("li", {
+                className: "font-library-modal__fonts-list-item",
+                children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(collection_font_variant, {
+                  font: selectedFont,
+                  face: face,
+                  handleToggleVariant: handleToggleVariant,
+                  selected: isFontFontFaceInOutline(selectedFont.slug, selectedFont.fontFace ? face : null,
+                  // If the font has no fontFace, we want to check if the font is in the outline
+                  fontToInstallOutline)
+                })
+              }, `face${i}`))
+            })
           }), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.__experimentalSpacer, {
             margin: 16
           })]
@@ -19138,6 +19223,7 @@ function FontCollection({
         justify: "flex-end",
         className: "font-library-modal__footer",
         children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.Button, {
+          __next40pxDefaultSize: true,
           variant: "primary",
           onClick: handleInstall,
           isBusy: isInstalling,
@@ -19156,7 +19242,7 @@ function FontCollection({
           disabled: page === 1,
           showTooltip: true,
           accessibleWhenDisabled: true,
-          icon: chevron_left,
+          icon: (0,external_wp_i18n_namespaceObject.isRTL)() ? chevron_right : chevron_left,
           tooltipPosition: "top"
         }), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.__experimentalHStack, {
           justify: "flex-start",
@@ -19186,7 +19272,7 @@ function FontCollection({
           onClick: () => setPage(page + 1),
           disabled: page === totalPages,
           accessibleWhenDisabled: true,
-          icon: chevron_right,
+          icon: (0,external_wp_i18n_namespaceObject.isRTL)() ? chevron_left : chevron_right,
           tooltipPosition: "top"
         })]
       })]
@@ -23076,7 +23162,7 @@ var vmtx$1 = Object.freeze( { __proto__: null, vmtx: vmtx } );
 
 const {
   kebabCase: make_families_from_faces_kebabCase
-} = lock_unlock_unlock(external_wp_components_namespaceObject.privateApis);
+} = unlock(external_wp_components_namespaceObject.privateApis);
 function makeFamiliesFromFaces(fontFaces) {
   const fontFamiliesObject = fontFaces.reduce((acc, item) => {
     if (!acc[item.fontFamily]) {
@@ -23113,11 +23199,10 @@ function makeFamiliesFromFaces(fontFaces) {
 
 function UploadFonts() {
   const {
-    installFonts,
-    notice,
-    setNotice
+    installFonts
   } = (0,external_wp_element_namespaceObject.useContext)(FontLibraryContext);
   const [isUploading, setIsUploading] = (0,external_wp_element_namespaceObject.useState)(false);
+  const [notice, setNotice] = (0,external_wp_element_namespaceObject.useState)(false);
   const handleDropZone = files => {
     handleFilesUpload(files);
   };
@@ -23289,6 +23374,7 @@ function UploadFonts() {
         render: ({
           openFileDialog
         }) => /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.Button, {
+          __next40pxDefaultSize: true,
           className: "font-library-modal__upload-area",
           onClick: openFileDialog,
           children: (0,external_wp_i18n_namespaceObject.__)('Upload font')
@@ -23326,7 +23412,7 @@ function UploadFonts() {
 
 const {
   Tabs
-} = lock_unlock_unlock(external_wp_components_namespaceObject.privateApis);
+} = unlock(external_wp_components_namespaceObject.privateApis);
 const DEFAULT_TAB = {
   id: 'installed-fonts',
   title: (0,external_wp_i18n_namespaceObject._x)('Library', 'Font library')
@@ -23347,8 +23433,7 @@ function FontLibraryModal({
   defaultTabId = 'installed-fonts'
 }) {
   const {
-    collections,
-    setNotice
+    collections
   } = (0,external_wp_element_namespaceObject.useContext)(FontLibraryContext);
   const canUserCreate = (0,external_wp_data_namespaceObject.useSelect)(select => {
     return select(external_wp_coreData_namespaceObject.store).canUser('create', {
@@ -23361,22 +23446,16 @@ function FontLibraryModal({
     tabs.push(UPLOAD_TAB);
     tabs.push(...tabsFromCollections(collections || []));
   }
-
-  // Reset notice when new tab is selected.
-  const onSelect = () => {
-    setNotice(null);
-  };
   return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.Modal, {
     title: (0,external_wp_i18n_namespaceObject.__)('Fonts'),
     onRequestClose: onRequestClose,
     isFullScreen: true,
     className: "font-library-modal",
-    children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)("div", {
-      className: "font-library-modal__tabs",
-      children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsxs)(Tabs, {
-        defaultTabId: defaultTabId,
-        onSelect: onSelect,
-        children: [/*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(Tabs.TabList, {
+    children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsxs)(Tabs, {
+      defaultTabId: defaultTabId,
+      children: [/*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)("div", {
+        className: "font-library-modal__tablist",
+        children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(Tabs.TabList, {
           children: tabs.map(({
             id,
             title
@@ -23384,29 +23463,29 @@ function FontLibraryModal({
             tabId: id,
             children: title
           }, id))
-        }), tabs.map(({
-          id
-        }) => {
-          let contents;
-          switch (id) {
-            case 'upload-fonts':
-              contents = /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(upload_fonts, {});
-              break;
-            case 'installed-fonts':
-              contents = /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(installed_fonts, {});
-              break;
-            default:
-              contents = /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(font_collection, {
-                slug: id
-              });
-          }
-          return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(Tabs.TabPanel, {
-            tabId: id,
-            focusable: false,
-            children: contents
-          }, id);
-        })]
-      })
+        })
+      }), tabs.map(({
+        id
+      }) => {
+        let contents;
+        switch (id) {
+          case 'upload-fonts':
+            contents = /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(upload_fonts, {});
+            break;
+          case 'installed-fonts':
+            contents = /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(installed_fonts, {});
+            break;
+          default:
+            contents = /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(font_collection, {
+              slug: id
+            });
+        }
+        return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(Tabs.TabPanel, {
+          tabId: id,
+          focusable: false,
+          children: contents
+        }, id);
+      })]
     })
   });
 }
@@ -23480,13 +23559,12 @@ function FontFamilyItem({
 
 const {
   useGlobalSetting: font_families_useGlobalSetting
-} = lock_unlock_unlock(external_wp_blockEditor_namespaceObject.privateApis);
+} = unlock(external_wp_blockEditor_namespaceObject.privateApis);
 function FontFamilies() {
   const {
     baseCustomFonts,
     modalTabOpen,
-    setModalTabOpen,
-    setNotice
+    setModalTabOpen
   } = (0,external_wp_element_namespaceObject.useContext)(FontLibraryContext);
   const [fontFamilies] = font_families_useGlobalSetting('typography.fontFamilies');
   const [baseFontFamilies] = font_families_useGlobalSetting('typography.fontFamilies', undefined, 'base');
@@ -23510,6 +23588,7 @@ function FontFamilies() {
           children: /* translators: Heading for a list of fonts provided by the theme. */
           (0,external_wp_i18n_namespaceObject._x)('Theme', 'font source')
         }), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.__experimentalItemGroup, {
+          size: "large",
           isBordered: true,
           isSeparated: true,
           children: themeFonts.map(font => /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(font_family_item, {
@@ -23522,6 +23601,7 @@ function FontFamilies() {
           children: /* translators: Heading for a list of fonts installed by the user. */
           (0,external_wp_i18n_namespaceObject._x)('Custom', 'font source')
         }), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.__experimentalItemGroup, {
+          size: "large",
           isBordered: true,
           isSeparated: true,
           children: customFonts.map(font => /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(font_family_item, {
@@ -23541,8 +23621,6 @@ function FontFamilies() {
         variant: "secondary",
         __next40pxDefaultSize: true,
         onClick: () => {
-          // Reset notice when opening the modal.
-          setNotice(null);
           setModalTabOpen(hasInstalledFonts ? 'installed-fonts' : 'upload-fonts');
         },
         children: hasInstalledFonts ? (0,external_wp_i18n_namespaceObject.__)('Manage fonts') : (0,external_wp_i18n_namespaceObject.__)('Add fonts')
@@ -23557,82 +23635,6 @@ function FontFamilies() {
     ...props
   })
 }));
-
-;// CONCATENATED MODULE: ./packages/icons/build-module/icon/index.js
-/**
- * WordPress dependencies
- */
-
-
-/** @typedef {{icon: JSX.Element, size?: number} & import('@wordpress/primitives').SVGProps} IconProps */
-
-/**
- * Return an SVG icon.
- *
- * @param {IconProps}                                 props icon is the SVG component to render
- *                                                          size is a number specifiying the icon size in pixels
- *                                                          Other props will be passed to wrapped SVG component
- * @param {import('react').ForwardedRef<HTMLElement>} ref   The forwarded ref to the SVG element.
- *
- * @return {JSX.Element}  Icon component
- */
-function Icon({
-  icon,
-  size = 24,
-  ...props
-}, ref) {
-  return (0,external_wp_element_namespaceObject.cloneElement)(icon, {
-    width: size,
-    height: size,
-    ...props,
-    ref
-  });
-}
-/* harmony default export */ const build_module_icon = ((0,external_wp_element_namespaceObject.forwardRef)(Icon));
-
-;// CONCATENATED MODULE: ./packages/edit-site/build-module/components/global-styles/font-sizes/font-sizes-count.js
-/**
- * WordPress dependencies
- */
-
-
-
-
-/**
- * Internal dependencies
- */
-
-
-
-
-function FontSizes() {
-  return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsxs)(external_wp_components_namespaceObject.__experimentalVStack, {
-    spacing: 2,
-    children: [/*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.__experimentalHStack, {
-      justify: "space-between",
-      children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(subtitle, {
-        level: 3,
-        children: (0,external_wp_i18n_namespaceObject.__)('Font Sizes')
-      })
-    }), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.__experimentalItemGroup, {
-      isBordered: true,
-      isSeparated: true,
-      children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(NavigationButtonAsItem, {
-        path: "/typography/font-sizes/",
-        "aria-label": (0,external_wp_i18n_namespaceObject.__)('Edit font size presets'),
-        children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsxs)(external_wp_components_namespaceObject.__experimentalHStack, {
-          direction: "row",
-          children: [/*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.FlexItem, {
-            children: (0,external_wp_i18n_namespaceObject.__)('Font size presets')
-          }), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(build_module_icon, {
-            icon: (0,external_wp_i18n_namespaceObject.isRTL)() ? chevron_left : chevron_right
-          })]
-        })
-      })
-    })]
-  });
-}
-/* harmony default export */ const font_sizes_count = (FontSizes);
 
 ;// CONCATENATED MODULE: ./packages/edit-site/build-module/components/global-styles/screen-typography.js
 /**
@@ -23664,14 +23666,231 @@ function ScreenTypography() {
       className: "edit-site-global-styles-screen",
       children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsxs)(external_wp_components_namespaceObject.__experimentalVStack, {
         spacing: 7,
-        children: [fontLibraryEnabled && /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(font_families, {}), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(typography_elements, {}), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(TypographyVariations, {
-          title: (0,external_wp_i18n_namespaceObject.__)('Presets')
-        }), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(font_sizes_count, {})]
+        children: [/*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(typeset_button, {}), fontLibraryEnabled && /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(font_families, {}), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(typography_elements, {}), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(font_sizes_count, {})]
       })
     })]
   });
 }
 /* harmony default export */ const screen_typography = (ScreenTypography);
+
+;// CONCATENATED MODULE: ./packages/edit-site/build-module/components/global-styles/preview-typography.js
+/**
+ * WordPress dependencies
+ */
+
+
+/**
+ * Internal dependencies
+ */
+
+
+
+const StylesPreviewTypography = ({
+  variation,
+  isFocused,
+  withHoverView
+}) => {
+  return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(PreviewIframe, {
+    label: variation.title,
+    isFocused: isFocused,
+    withHoverView: withHoverView,
+    children: ({
+      ratio,
+      key
+    }) => /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.__experimentalHStack, {
+      spacing: 10 * ratio,
+      justify: "center",
+      style: {
+        height: '100%',
+        overflow: 'hidden'
+      },
+      children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(PreviewTypography, {
+        variation: variation,
+        fontSize: 85 * ratio
+      })
+    }, key)
+  });
+};
+/* harmony default export */ const preview_typography = (StylesPreviewTypography);
+
+;// CONCATENATED MODULE: ./packages/edit-site/build-module/components/global-styles/variations/variation.js
+/**
+ * External dependencies
+ */
+
+
+/**
+ * WordPress dependencies
+ */
+
+
+
+
+
+
+
+/**
+ * Internal dependencies
+ */
+
+
+
+const {
+  mergeBaseAndUserConfigs: variation_mergeBaseAndUserConfigs
+} = unlock(external_wp_editor_namespaceObject.privateApis);
+const {
+  GlobalStylesContext: variation_GlobalStylesContext,
+  areGlobalStyleConfigsEqual: variation_areGlobalStyleConfigsEqual
+} = unlock(external_wp_blockEditor_namespaceObject.privateApis);
+function Variation({
+  variation,
+  children,
+  isPill,
+  properties,
+  showTooltip
+}) {
+  const [isFocused, setIsFocused] = (0,external_wp_element_namespaceObject.useState)(false);
+  const {
+    base,
+    user,
+    setUserConfig
+  } = (0,external_wp_element_namespaceObject.useContext)(variation_GlobalStylesContext);
+  const context = (0,external_wp_element_namespaceObject.useMemo)(() => {
+    let merged = variation_mergeBaseAndUserConfigs(base, variation);
+    if (properties) {
+      merged = filterObjectByProperties(merged, properties);
+    }
+    return {
+      user: variation,
+      base,
+      merged,
+      setUserConfig: () => {}
+    };
+  }, [variation, base, properties]);
+  const selectVariation = () => setUserConfig(variation);
+  const selectOnEnter = event => {
+    if (event.keyCode === external_wp_keycodes_namespaceObject.ENTER) {
+      event.preventDefault();
+      selectVariation();
+    }
+  };
+  const isActive = (0,external_wp_element_namespaceObject.useMemo)(() => variation_areGlobalStyleConfigsEqual(user, variation), [user, variation]);
+  let label = variation?.title;
+  if (variation?.description) {
+    label = (0,external_wp_i18n_namespaceObject.sprintf)( /* translators: %1$s: variation title. %2$s variation description. */
+    (0,external_wp_i18n_namespaceObject.__)('%1$s (%2$s)'), variation?.title, variation?.description);
+  }
+  const content = /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)("div", {
+    className: dist_clsx('edit-site-global-styles-variations_item', {
+      'is-active': isActive
+    }),
+    role: "button",
+    onClick: selectVariation,
+    onKeyDown: selectOnEnter,
+    tabIndex: "0",
+    "aria-label": label,
+    "aria-current": isActive,
+    onFocus: () => setIsFocused(true),
+    onBlur: () => setIsFocused(false),
+    children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)("div", {
+      className: dist_clsx('edit-site-global-styles-variations_item-preview', {
+        'is-pill': isPill
+      }),
+      children: children(isFocused)
+    })
+  });
+  return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(variation_GlobalStylesContext.Provider, {
+    value: context,
+    children: showTooltip ? /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.Tooltip, {
+      text: variation?.title,
+      children: content
+    }) : content
+  });
+}
+
+;// CONCATENATED MODULE: ./packages/edit-site/build-module/components/global-styles/variations/variations-typography.js
+/**
+ * WordPress dependencies
+ */
+
+
+/**
+ * Internal dependencies
+ */
+
+
+
+
+
+
+function TypographyVariations({
+  title,
+  gap = 2
+}) {
+  const propertiesToFilter = ['typography'];
+  const typographyVariations = useCurrentMergeThemeStyleVariationsWithUserConfig(propertiesToFilter);
+
+  // Return null if there is only one variation (the default).
+  if (typographyVariations?.length <= 1) {
+    return null;
+  }
+  return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsxs)(external_wp_components_namespaceObject.__experimentalVStack, {
+    spacing: 3,
+    children: [title && /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(subtitle, {
+      level: 3,
+      children: title
+    }), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.__experimentalGrid, {
+      columns: 3,
+      gap: gap,
+      className: "edit-site-global-styles-style-variations-container",
+      children: typographyVariations.map((variation, index) => {
+        return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(Variation, {
+          variation: variation,
+          properties: propertiesToFilter,
+          showTooltip: true,
+          children: () => /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(preview_typography, {
+            variation: variation
+          })
+        }, index);
+      })
+    })]
+  });
+}
+
+;// CONCATENATED MODULE: ./packages/edit-site/build-module/components/global-styles/screen-typeset.js
+/**
+ * WordPress dependencies
+ */
+
+
+
+
+
+/**
+ * Internal dependencies
+ */
+
+
+
+
+
+
+function ScreenTypeset() {
+  const fontLibraryEnabled = (0,external_wp_data_namespaceObject.useSelect)(select => select(external_wp_editor_namespaceObject.store).getEditorSettings().fontLibraryEnabled, []);
+  return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsxs)(external_ReactJSXRuntime_namespaceObject.Fragment, {
+    children: [/*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(header, {
+      title: (0,external_wp_i18n_namespaceObject.__)('Typesets'),
+      description: (0,external_wp_i18n_namespaceObject.__)('Fonts and typographic styling applied across the site.')
+    }), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)("div", {
+      className: "edit-site-global-styles-screen",
+      children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsxs)(external_wp_components_namespaceObject.__experimentalVStack, {
+        spacing: 7,
+        children: [/*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(TypographyVariations, {}), fontLibraryEnabled && /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(font_families, {})]
+      })
+    })]
+  });
+}
+/* harmony default export */ const screen_typeset = (ScreenTypeset);
 
 ;// CONCATENATED MODULE: ./packages/edit-site/build-module/components/global-styles/typography-panel.js
 /**
@@ -23689,7 +23908,7 @@ const {
   useGlobalSetting: typography_panel_useGlobalSetting,
   useSettingsForBlockElement: typography_panel_useSettingsForBlockElement,
   TypographyPanel: typography_panel_StylesTypographyPanel
-} = lock_unlock_unlock(external_wp_blockEditor_namespaceObject.privateApis);
+} = unlock(external_wp_blockEditor_namespaceObject.privateApis);
 function TypographyPanel({
   element,
   headingLevel
@@ -23731,7 +23950,7 @@ function TypographyPanel({
 
 const {
   useGlobalStyle: typography_preview_useGlobalStyle
-} = lock_unlock_unlock(external_wp_blockEditor_namespaceObject.privateApis);
+} = unlock(external_wp_blockEditor_namespaceObject.privateApis);
 function TypographyPreview({
   name,
   element,
@@ -23838,24 +24057,38 @@ function ScreenTypographyElement({
         __nextHasNoMarginBottom: true,
         children: [/*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.__experimentalToggleGroupControlOption, {
           value: "heading",
+          showTooltip: true,
+          "aria-label": (0,external_wp_i18n_namespaceObject.__)('All headings'),
           label: (0,external_wp_i18n_namespaceObject._x)('All', 'heading levels')
         }), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.__experimentalToggleGroupControlOption, {
           value: "h1",
+          showTooltip: true,
+          "aria-label": (0,external_wp_i18n_namespaceObject.__)('Heading 1'),
           label: (0,external_wp_i18n_namespaceObject.__)('H1')
         }), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.__experimentalToggleGroupControlOption, {
           value: "h2",
+          showTooltip: true,
+          "aria-label": (0,external_wp_i18n_namespaceObject.__)('Heading 2'),
           label: (0,external_wp_i18n_namespaceObject.__)('H2')
         }), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.__experimentalToggleGroupControlOption, {
           value: "h3",
+          showTooltip: true,
+          "aria-label": (0,external_wp_i18n_namespaceObject.__)('Heading 3'),
           label: (0,external_wp_i18n_namespaceObject.__)('H3')
         }), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.__experimentalToggleGroupControlOption, {
           value: "h4",
+          showTooltip: true,
+          "aria-label": (0,external_wp_i18n_namespaceObject.__)('Heading 4'),
           label: (0,external_wp_i18n_namespaceObject.__)('H4')
         }), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.__experimentalToggleGroupControlOption, {
           value: "h5",
+          showTooltip: true,
+          "aria-label": (0,external_wp_i18n_namespaceObject.__)('Heading 5'),
           label: (0,external_wp_i18n_namespaceObject.__)('H5')
         }), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.__experimentalToggleGroupControlOption, {
           value: "h6",
+          showTooltip: true,
+          "aria-label": (0,external_wp_i18n_namespaceObject.__)('Heading 6'),
           label: (0,external_wp_i18n_namespaceObject.__)('H6')
         })]
       })
@@ -23881,7 +24114,7 @@ function ScreenTypographyElement({
 
 const {
   useGlobalStyle: font_size_preview_useGlobalStyle
-} = lock_unlock_unlock(external_wp_blockEditor_namespaceObject.privateApis);
+} = unlock(external_wp_blockEditor_namespaceObject.privateApis);
 function FontSizePreview({
   fontSize
 }) {
@@ -24005,7 +24238,6 @@ function RenameFontSizeDialog({
  * WordPress dependencies
  */
 
-
 /**
  * Internal dependencies
  */
@@ -24013,7 +24245,11 @@ function RenameFontSizeDialog({
 
 
 const DEFAULT_UNITS = ['px', 'em', 'rem', 'vw', 'vh'];
-function SizeControl(props) {
+function SizeControl({
+  // Do not allow manipulation of margin bottom
+  __nextHasNoMarginBottom,
+  ...props
+}) {
   const {
     baseControlProps
   } = (0,external_wp_components_namespaceObject.useBaseControlProps)(props);
@@ -24021,7 +24257,8 @@ function SizeControl(props) {
     value,
     onChange,
     fallbackValue,
-    disabled
+    disabled,
+    label
   } = props;
   const units = (0,external_wp_components_namespaceObject.__experimentalUseCustomUnits)({
     availableUnits: DEFAULT_UNITS
@@ -24040,13 +24277,14 @@ function SizeControl(props) {
   };
   return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.BaseControl, {
     ...baseControlProps,
+    __nextHasNoMarginBottom: true,
     children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsxs)(external_wp_components_namespaceObject.Flex, {
       children: [/*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.FlexItem, {
         isBlock: true,
         children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.__experimentalUnitControl, {
           __next40pxDefaultSize: true,
           __nextHasNoMarginBottom: true,
-          label: (0,external_wp_i18n_namespaceObject.__)('Custom'),
+          label: label,
           hideLabelFromVision: true,
           value: value,
           onChange: handleUnitControlChange,
@@ -24062,7 +24300,7 @@ function SizeControl(props) {
           children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.RangeControl, {
             __next40pxDefaultSize: true,
             __nextHasNoMarginBottom: true,
-            label: (0,external_wp_i18n_namespaceObject.__)('Custom Size'),
+            label: label,
             hideLabelFromVision: true,
             value: valueQuantity,
             initialPosition: fallbackValue,
@@ -24094,24 +24332,22 @@ function SizeControl(props) {
  * Internal dependencies
  */
 
+
+
+
+
+
+
+
+
 const {
-  DropdownMenuV2: DropdownMenu,
-  DropdownMenuItemV2: DropdownMenuItem,
-  DropdownMenuItemLabelV2: DropdownMenuItemLabel
-} = lock_unlock_unlock(external_wp_components_namespaceObject.privateApis);
+  DropdownMenuV2
+} = unlock(external_wp_components_namespaceObject.privateApis);
 const {
   useGlobalSetting: font_size_useGlobalSetting
-} = lock_unlock_unlock(external_wp_blockEditor_namespaceObject.privateApis);
-
-
-
-
-
-
-
-
+} = unlock(external_wp_blockEditor_namespaceObject.privateApis);
 function FontSize() {
-  var _fontSizes$origin, _fontSize$fluid;
+  var _fontSizes$origin;
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = (0,external_wp_element_namespaceObject.useState)(false);
   const [isRenameDialogOpen, setIsRenameDialogOpen] = (0,external_wp_element_namespaceObject.useState)(false);
   const {
@@ -24123,6 +24359,7 @@ function FontSize() {
     goTo
   } = (0,external_wp_components_namespaceObject.__experimentalUseNavigator)();
   const [fontSizes, setFontSizes] = font_size_useGlobalSetting('typography.fontSizes');
+  const [globalFluid] = font_size_useGlobalSetting('typography.fluid');
 
   // Get the font sizes from the origin, default to empty array.
   const sizes = (_fontSizes$origin = fontSizes[origin]) !== null && _fontSizes$origin !== void 0 ? _fontSizes$origin : [];
@@ -24130,8 +24367,8 @@ function FontSize() {
   // Get the font size by slug.
   const fontSize = sizes.find(size => size.slug === slug);
 
-  // Whether fluid is true or an object, set it to true, otherwise false.
-  const isFluid = (_fontSize$fluid = !!fontSize.fluid) !== null && _fontSize$fluid !== void 0 ? _fontSize$fluid : false;
+  // Whether the font size is fluid. If not defined, use the global fluid value of the theme.
+  const isFluid = fontSize.fluid !== undefined ? !!fontSize.fluid : !!globalFluid;
 
   // Whether custom fluid values are used.
   const isCustomFluid = typeof fontSize.fluid === 'object';
@@ -24223,20 +24460,20 @@ function FontSize() {
             marginTop: 3,
             marginBottom: 0,
             paddingX: 4,
-            children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsxs)(DropdownMenu, {
+            children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsxs)(DropdownMenuV2, {
               trigger: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.Button, {
                 size: "small",
                 icon: more_vertical,
                 label: (0,external_wp_i18n_namespaceObject.__)('Font size options')
               }),
-              children: [/*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(DropdownMenuItem, {
+              children: [/*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(DropdownMenuV2.Item, {
                 onClick: toggleRenameDialog,
-                children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(DropdownMenuItemLabel, {
+                children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(DropdownMenuV2.ItemLabel, {
                   children: (0,external_wp_i18n_namespaceObject.__)('Rename')
                 })
-              }), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(DropdownMenuItem, {
+              }), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(DropdownMenuV2.Item, {
                 onClick: toggleDeleteConfirm,
-                children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(DropdownMenuItemLabel, {
+                children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(DropdownMenuV2.ItemLabel, {
                   children: (0,external_wp_i18n_namespaceObject.__)('Delete')
                 })
               })]
@@ -24351,13 +24588,11 @@ function ConfirmResetFontSizesDialog({
  */
 
 const {
-  DropdownMenuV2: font_sizes_DropdownMenu,
-  DropdownMenuItemV2: font_sizes_DropdownMenuItem,
-  DropdownMenuItemLabelV2: font_sizes_DropdownMenuItemLabel
-} = lock_unlock_unlock(external_wp_components_namespaceObject.privateApis);
+  DropdownMenuV2: font_sizes_DropdownMenuV2
+} = unlock(external_wp_components_namespaceObject.privateApis);
 const {
   useGlobalSetting: font_sizes_useGlobalSetting
-} = lock_unlock_unlock(external_wp_blockEditor_namespaceObject.privateApis);
+} = unlock(external_wp_blockEditor_namespaceObject.privateApis);
 
 
 
@@ -24397,15 +24632,15 @@ function FontSizeGroup({
             icon: library_plus,
             size: "small",
             onClick: handleAddFontSize
-          }), !!handleResetFontSizes && /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(font_sizes_DropdownMenu, {
+          }), !!handleResetFontSizes && /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(font_sizes_DropdownMenuV2, {
             trigger: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.Button, {
               size: "small",
               icon: more_vertical,
               label: (0,external_wp_i18n_namespaceObject.__)('Font size presets options')
             }),
-            children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(font_sizes_DropdownMenuItem, {
+            children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(font_sizes_DropdownMenuV2.Item, {
               onClick: toggleResetDialog,
-              children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(font_sizes_DropdownMenuItemLabel, {
+              children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(font_sizes_DropdownMenuV2.ItemLabel, {
                 children: origin === 'custom' ? (0,external_wp_i18n_namespaceObject.__)('Remove font size presets') : (0,external_wp_i18n_namespaceObject.__)('Reset font size presets')
               })
             })
@@ -24553,7 +24788,7 @@ function ColorIndicatorWrapper({
 
 const {
   useGlobalSetting: palette_useGlobalSetting
-} = lock_unlock_unlock(external_wp_blockEditor_namespaceObject.privateApis);
+} = unlock(external_wp_blockEditor_namespaceObject.privateApis);
 const EMPTY_COLORS = [];
 function Palette({
   name
@@ -24597,6 +24832,7 @@ function Palette({
         })
       })
     }), window.__experimentalEnableColorRandomizer && themeColors?.length > 0 && /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.Button, {
+      __next40pxDefaultSize: true,
       variant: "secondary",
       icon: library_shuffle,
       onClick: randomizeThemeColors,
@@ -24628,7 +24864,7 @@ const {
   useGlobalSetting: screen_colors_useGlobalSetting,
   useSettingsForBlockElement: screen_colors_useSettingsForBlockElement,
   ColorPanel: screen_colors_StylesColorPanel
-} = lock_unlock_unlock(external_wp_blockEditor_namespaceObject.privateApis);
+} = unlock(external_wp_blockEditor_namespaceObject.privateApis);
 function ScreenColors() {
   const [style] = screen_colors_useGlobalStyle('', undefined, 'user', {
     shouldDecodeEncode: false
@@ -24668,7 +24904,7 @@ function PresetColors() {
   const {
     paletteColors
   } = useStylesPreviewColors();
-  return paletteColors.slice(0, 5).map(({
+  return paletteColors.slice(0, 4).map(({
     slug,
     color
   }, index) => /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)("div", {
@@ -24795,7 +25031,7 @@ function ColorVariations({
 
 const {
   useGlobalSetting: color_palette_panel_useGlobalSetting
-} = lock_unlock_unlock(external_wp_blockEditor_namespaceObject.privateApis);
+} = unlock(external_wp_blockEditor_namespaceObject.privateApis);
 const mobilePopoverProps = {
   placement: 'bottom-start',
   offset: 8
@@ -24861,7 +25097,7 @@ function ColorPalettePanel({
 
 const {
   useGlobalSetting: gradients_palette_panel_useGlobalSetting
-} = lock_unlock_unlock(external_wp_blockEditor_namespaceObject.privateApis);
+} = unlock(external_wp_blockEditor_namespaceObject.privateApis);
 const gradients_palette_panel_mobilePopoverProps = {
   placement: 'bottom-start',
   offset: 8
@@ -24945,7 +25181,7 @@ function GradientPalettePanel({
 
 const {
   Tabs: screen_color_palette_Tabs
-} = lock_unlock_unlock(external_wp_components_namespaceObject.privateApis);
+} = unlock(external_wp_components_namespaceObject.privateApis);
 function ScreenColorPalette({
   name
 }) {
@@ -24980,6 +25216,90 @@ function ScreenColorPalette({
 }
 /* harmony default export */ const screen_color_palette = (ScreenColorPalette);
 
+;// CONCATENATED MODULE: ./packages/edit-site/build-module/components/global-styles/background-panel.js
+/**
+ * WordPress dependencies
+ */
+
+
+/**
+ * Internal dependencies
+ */
+
+
+// Initial control values where no block style is set.
+
+const BACKGROUND_DEFAULT_VALUES = {
+  backgroundSize: 'auto'
+};
+const {
+  useGlobalStyle: background_panel_useGlobalStyle,
+  useGlobalSetting: background_panel_useGlobalSetting,
+  BackgroundPanel: background_panel_StylesBackgroundPanel
+} = unlock(external_wp_blockEditor_namespaceObject.privateApis);
+
+/**
+ * Checks if there is a current value in the background image block support
+ * attributes.
+ *
+ * @param {Object} style Style attribute.
+ * @return {boolean}     Whether the block has a background image value set.
+ */
+function hasBackgroundImageValue(style) {
+  return !!style?.background?.backgroundImage?.id || !!style?.background?.backgroundImage?.url || typeof style?.background?.backgroundImage === 'string';
+}
+function BackgroundPanel() {
+  const [style] = background_panel_useGlobalStyle('', undefined, 'user', {
+    shouldDecodeEncode: false
+  });
+  const [inheritedStyle, setStyle] = background_panel_useGlobalStyle('', undefined, 'all', {
+    shouldDecodeEncode: false
+  });
+  const [settings] = background_panel_useGlobalSetting('');
+  return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(background_panel_StylesBackgroundPanel, {
+    inheritedValue: inheritedStyle,
+    value: style,
+    onChange: setStyle,
+    settings: settings,
+    defaultValues: BACKGROUND_DEFAULT_VALUES
+  });
+}
+
+;// CONCATENATED MODULE: ./packages/edit-site/build-module/components/global-styles/screen-background.js
+/**
+ * WordPress dependencies
+ */
+
+
+
+
+/**
+ * Internal dependencies
+ */
+
+
+
+
+
+
+const {
+  useHasBackgroundPanel: screen_background_useHasBackgroundPanel,
+  useGlobalSetting: screen_background_useGlobalSetting
+} = unlock(external_wp_blockEditor_namespaceObject.privateApis);
+function ScreenBackground() {
+  const [settings] = screen_background_useGlobalSetting('');
+  const hasBackgroundPanel = screen_background_useHasBackgroundPanel(settings);
+  return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsxs)(external_ReactJSXRuntime_namespaceObject.Fragment, {
+    children: [/*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(header, {
+      title: (0,external_wp_i18n_namespaceObject.__)('Background'),
+      description: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.__experimentalText, {
+        children: (0,external_wp_i18n_namespaceObject.__)('Set styles for the site’s background.')
+      })
+    }), hasBackgroundPanel && /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(BackgroundPanel, {})]
+  });
+}
+/* harmony default export */ const screen_background = (ScreenBackground);
+
 ;// CONCATENATED MODULE: ./packages/edit-site/build-module/components/global-styles/shadows-panel.js
 /**
  * WordPress dependencies
@@ -25002,7 +25322,7 @@ function ScreenColorPalette({
 
 const {
   useGlobalSetting: shadows_panel_useGlobalSetting
-} = lock_unlock_unlock(external_wp_blockEditor_namespaceObject.privateApis);
+} = unlock(external_wp_blockEditor_namespaceObject.privateApis);
 const defaultShadow = '6px 6px 9px rgba(0, 0, 0, 0.2)';
 function ShadowsPanel() {
   const [defaultShadows] = shadows_panel_useGlobalSetting('shadow.presets.default');
@@ -25116,24 +25436,6 @@ const reset_reset = /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx
   })
 });
 /* harmony default export */ const library_reset = (reset_reset);
-
-;// CONCATENATED MODULE: ./packages/icons/build-module/library/settings.js
-/**
- * WordPress dependencies
- */
-
-
-
-const settings_settings = /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsxs)(external_wp_primitives_namespaceObject.SVG, {
-  xmlns: "http://www.w3.org/2000/svg",
-  viewBox: "0 0 24 24",
-  children: [/*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_primitives_namespaceObject.Path, {
-    d: "m19 7.5h-7.628c-.3089-.87389-1.1423-1.5-2.122-1.5-.97966 0-1.81309.62611-2.12197 1.5h-2.12803v1.5h2.12803c.30888.87389 1.14231 1.5 2.12197 1.5.9797 0 1.8131-.62611 2.122-1.5h7.628z"
-  }), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_primitives_namespaceObject.Path, {
-    d: "m19 15h-2.128c-.3089-.8739-1.1423-1.5-2.122-1.5s-1.8131.6261-2.122 1.5h-7.628v1.5h7.628c.3089.8739 1.1423 1.5 2.122 1.5s1.8131-.6261 2.122-1.5h2.128z"
-  })]
-});
-/* harmony default export */ const library_settings = (settings_settings);
 
 ;// CONCATENATED MODULE: ./packages/edit-site/build-module/components/global-styles/shadow-utils.js
 const CUSTOM_VALUE_SETTINGS = {
@@ -25385,12 +25687,10 @@ function shadowObjectToString(shadowObj) {
 
 const {
   useGlobalSetting: shadows_edit_panel_useGlobalSetting
-} = lock_unlock_unlock(external_wp_blockEditor_namespaceObject.privateApis);
+} = unlock(external_wp_blockEditor_namespaceObject.privateApis);
 const {
-  DropdownMenuV2: shadows_edit_panel_DropdownMenu,
-  DropdownMenuItemV2: shadows_edit_panel_DropdownMenuItem,
-  DropdownMenuItemLabelV2: shadows_edit_panel_DropdownMenuItemLabel
-} = lock_unlock_unlock(external_wp_components_namespaceObject.privateApis);
+  DropdownMenuV2: shadows_edit_panel_DropdownMenuV2
+} = unlock(external_wp_components_namespaceObject.privateApis);
 const customShadowMenuItems = [{
   label: (0,external_wp_i18n_namespaceObject.__)('Rename'),
   action: 'rename'
@@ -25470,16 +25770,16 @@ function ShadowsEditPanel() {
           marginTop: 2,
           marginBottom: 0,
           paddingX: 4,
-          children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(shadows_edit_panel_DropdownMenu, {
+          children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(shadows_edit_panel_DropdownMenuV2, {
             trigger: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.Button, {
               size: "small",
               icon: more_vertical,
               label: (0,external_wp_i18n_namespaceObject.__)('Menu')
             }),
-            children: (category === 'custom' ? customShadowMenuItems : presetShadowMenuItems).map(item => /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(shadows_edit_panel_DropdownMenuItem, {
+            children: (category === 'custom' ? customShadowMenuItems : presetShadowMenuItems).map(item => /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(shadows_edit_panel_DropdownMenuV2.Item, {
               onClick: () => onMenuClick(item.action),
               disabled: item.action === 'reset' && selectedShadow.shadow === baseSelectedShadow.shadow,
-              children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(shadows_edit_panel_DropdownMenuItemLabel, {
+              children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(shadows_edit_panel_DropdownMenuV2.ItemLabel, {
                 children: item.label
               })
             }, item.action))
@@ -25519,6 +25819,7 @@ function ShadowsEditPanel() {
           setIsRenameModalVisible(false);
         },
         children: [/*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.__experimentalInputControl, {
+          __next40pxDefaultSize: true,
           autoComplete: "off",
           label: (0,external_wp_i18n_namespaceObject.__)('Name'),
           placeholder: (0,external_wp_i18n_namespaceObject.__)('Shadow name'),
@@ -25532,12 +25833,14 @@ function ShadowsEditPanel() {
           expanded: false,
           children: [/*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.FlexItem, {
             children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.Button, {
+              __next40pxDefaultSize: true,
               variant: "tertiary",
               onClick: () => setIsRenameModalVisible(false),
               children: (0,external_wp_i18n_namespaceObject.__)('Cancel')
             })
           }), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.FlexItem, {
             children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.Button, {
+              __next40pxDefaultSize: true,
               variant: "primary",
               type: "submit",
               children: (0,external_wp_i18n_namespaceObject.__)('Save')
@@ -25666,12 +25969,14 @@ function shadows_edit_panel_ShadowItem({
             flexGrow: 1
           },
           children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.Button, {
+            __next40pxDefaultSize: true,
             icon: library_shadow,
             ...toggleProps,
             children: shadowObj.inset ? (0,external_wp_i18n_namespaceObject.__)('Inner shadow') : (0,external_wp_i18n_namespaceObject.__)('Drop shadow')
           })
         }), canRemove && /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.FlexItem, {
           children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.Button, {
+            __next40pxDefaultSize: true,
             icon: library_reset,
             ...removeButtonProps
           })
@@ -25679,13 +25984,11 @@ function shadows_edit_panel_ShadowItem({
       });
     },
     renderContent: () => /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.__experimentalDropdownContentWrapper, {
-      paddingSize: "none",
-      children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)("div", {
-        className: "edit-site-global-styles__shadow-editor__dropdown-content",
-        children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(ShadowPopover, {
-          shadowObj: shadowObj,
-          onChange: onShadowChange
-        })
+      paddingSize: "medium",
+      className: "edit-site-global-styles__shadow-editor__dropdown-content",
+      children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(ShadowPopover, {
+        shadowObj: shadowObj,
+        onChange: onShadowChange
       })
     })
   });
@@ -25703,110 +26006,67 @@ function ShadowPopover({
     };
     onChange(newShadow);
   };
-  return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)("div", {
+  return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsxs)(external_wp_components_namespaceObject.__experimentalVStack, {
+    spacing: 4,
     className: "edit-site-global-styles__shadow-editor-panel",
-    children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsxs)(external_wp_components_namespaceObject.__experimentalVStack, {
-      spacing: 2,
-      children: [/*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.__experimentalHeading, {
-        level: 5,
-        children: (0,external_wp_i18n_namespaceObject.__)('Shadow')
-      }), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)("div", {
-        className: "edit-site-global-styles__shadow-editor-color-palette",
-        children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.ColorPalette, {
-          clearable: false,
-          enableAlpha: enableAlpha,
-          __experimentalIsRenderedInSidebar: __experimentalIsRenderedInSidebar,
-          value: shadowObj.color,
-          onChange: value => onShadowChange('color', value)
-        })
-      }), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsxs)(external_wp_components_namespaceObject.__experimentalToggleGroupControl, {
-        value: shadowObj.inset ? 'inset' : 'outset',
-        isBlock: true,
-        onChange: value => onShadowChange('inset', value === 'inset'),
-        hideLabelFromVision: true,
-        __next40pxDefaultSize: true,
-        children: [/*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.__experimentalToggleGroupControlOption, {
-          value: "outset",
-          label: (0,external_wp_i18n_namespaceObject.__)('Outset')
-        }), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.__experimentalToggleGroupControlOption, {
-          value: "inset",
-          label: (0,external_wp_i18n_namespaceObject.__)('Inset')
-        })]
-      }), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsxs)(external_wp_components_namespaceObject.__experimentalGrid, {
-        columns: 2,
-        gap: 4,
-        children: [/*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(ShadowInputControl, {
-          label: (0,external_wp_i18n_namespaceObject.__)('X Position'),
-          value: shadowObj.x,
-          hasNegativeRange: true,
-          onChange: value => onShadowChange('x', value)
-        }), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(ShadowInputControl, {
-          label: (0,external_wp_i18n_namespaceObject.__)('Y Position'),
-          value: shadowObj.y,
-          hasNegativeRange: true,
-          onChange: value => onShadowChange('y', value)
-        }), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(ShadowInputControl, {
-          label: (0,external_wp_i18n_namespaceObject.__)('Blur'),
-          value: shadowObj.blur,
-          onChange: value => onShadowChange('blur', value)
-        }), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(ShadowInputControl, {
-          label: (0,external_wp_i18n_namespaceObject.__)('Spread'),
-          value: shadowObj.spread,
-          hasNegativeRange: true,
-          onChange: value => onShadowChange('spread', value)
-        })]
+    children: [/*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.ColorPalette, {
+      clearable: false,
+      enableAlpha: enableAlpha,
+      __experimentalIsRenderedInSidebar: __experimentalIsRenderedInSidebar,
+      value: shadowObj.color,
+      onChange: value => onShadowChange('color', value)
+    }), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsxs)(external_wp_components_namespaceObject.__experimentalToggleGroupControl, {
+      __nextHasNoMarginBottom: true,
+      value: shadowObj.inset ? 'inset' : 'outset',
+      isBlock: true,
+      onChange: value => onShadowChange('inset', value === 'inset'),
+      hideLabelFromVision: true,
+      __next40pxDefaultSize: true,
+      children: [/*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.__experimentalToggleGroupControlOption, {
+        value: "outset",
+        label: (0,external_wp_i18n_namespaceObject.__)('Outset')
+      }), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.__experimentalToggleGroupControlOption, {
+        value: "inset",
+        label: (0,external_wp_i18n_namespaceObject.__)('Inset')
       })]
-    })
+    }), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsxs)(external_wp_components_namespaceObject.__experimentalGrid, {
+      columns: 2,
+      gap: 4,
+      children: [/*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(ShadowInputControl, {
+        label: (0,external_wp_i18n_namespaceObject.__)('X Position'),
+        value: shadowObj.x,
+        onChange: value => onShadowChange('x', value)
+      }), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(ShadowInputControl, {
+        label: (0,external_wp_i18n_namespaceObject.__)('Y Position'),
+        value: shadowObj.y,
+        onChange: value => onShadowChange('y', value)
+      }), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(ShadowInputControl, {
+        label: (0,external_wp_i18n_namespaceObject.__)('Blur'),
+        value: shadowObj.blur,
+        onChange: value => onShadowChange('blur', value)
+      }), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(ShadowInputControl, {
+        label: (0,external_wp_i18n_namespaceObject.__)('Spread'),
+        value: shadowObj.spread,
+        onChange: value => onShadowChange('spread', value)
+      })]
+    })]
   });
 }
 function ShadowInputControl({
   label,
   value,
-  onChange,
-  hasNegativeRange
+  onChange
 }) {
-  var _CUSTOM_VALUE_SETTING, _CUSTOM_VALUE_SETTING2, _CUSTOM_VALUE_SETTING3;
-  const [isCustomInput, setIsCustomInput] = (0,external_wp_element_namespaceObject.useState)(false);
-  const [parsedQuantity, parsedUnit] = (0,external_wp_components_namespaceObject.__experimentalParseQuantityAndUnitFromRawValue)(value);
-  const sliderOnChange = next => {
-    onChange(next !== undefined ? [next, parsedUnit || 'px'].join('') : '0px');
-  };
   const onValueChange = next => {
     const isNumeric = next !== undefined && !isNaN(parseFloat(next));
     const nextValue = isNumeric ? next : '0px';
     onChange(nextValue);
   };
-  return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsxs)(external_wp_components_namespaceObject.__experimentalVStack, {
-    justify: "flex-start",
-    children: [/*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsxs)(external_wp_components_namespaceObject.__experimentalHStack, {
-      justify: "space-between",
-      children: [/*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(subtitle, {
-        children: label
-      }), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.Button, {
-        label: (0,external_wp_i18n_namespaceObject.__)('Use custom size'),
-        icon: library_settings,
-        onClick: () => {
-          setIsCustomInput(!isCustomInput);
-        },
-        isPressed: isCustomInput,
-        size: "small"
-      })]
-    }), isCustomInput ? /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.__experimentalUnitControl, {
-      label: label,
-      hideLabelFromVision: true,
-      __next40pxDefaultSize: true,
-      value: value,
-      onChange: onValueChange
-    }) : /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.RangeControl, {
-      value: parsedQuantity !== null && parsedQuantity !== void 0 ? parsedQuantity : 0,
-      onChange: sliderOnChange,
-      withInputField: false,
-      __next40pxDefaultSize: true,
-      __nextHasNoMarginBottom: true,
-      min: hasNegativeRange ? -((_CUSTOM_VALUE_SETTING = CUSTOM_VALUE_SETTINGS[parsedUnit !== null && parsedUnit !== void 0 ? parsedUnit : 'px']?.max) !== null && _CUSTOM_VALUE_SETTING !== void 0 ? _CUSTOM_VALUE_SETTING : 10) : 0,
-      max: (_CUSTOM_VALUE_SETTING2 = CUSTOM_VALUE_SETTINGS[parsedUnit !== null && parsedUnit !== void 0 ? parsedUnit : 'px']?.max) !== null && _CUSTOM_VALUE_SETTING2 !== void 0 ? _CUSTOM_VALUE_SETTING2 : 10,
-      step: (_CUSTOM_VALUE_SETTING3 = CUSTOM_VALUE_SETTINGS[parsedUnit !== null && parsedUnit !== void 0 ? parsedUnit : 'px']?.step) !== null && _CUSTOM_VALUE_SETTING3 !== void 0 ? _CUSTOM_VALUE_SETTING3 : 0.1
-    })]
+  return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.__experimentalUnitControl, {
+    label: label,
+    __next40pxDefaultSize: true,
+    value: value,
+    onChange: onValueChange
   });
 }
 
@@ -25841,7 +26101,7 @@ const {
   useGlobalSetting: dimensions_panel_useGlobalSetting,
   useSettingsForBlockElement: dimensions_panel_useSettingsForBlockElement,
   DimensionsPanel: dimensions_panel_StylesDimensionsPanel
-} = lock_unlock_unlock(external_wp_blockEditor_namespaceObject.privateApis);
+} = unlock(external_wp_blockEditor_namespaceObject.privateApis);
 const DEFAULT_CONTROLS = {
   contentSize: true,
   wideSize: true,
@@ -25905,58 +26165,6 @@ function DimensionsPanel() {
   });
 }
 
-;// CONCATENATED MODULE: ./packages/edit-site/build-module/components/global-styles/background-panel.js
-/**
- * WordPress dependencies
- */
-
-
-/**
- * Internal dependencies
- */
-
-
-// Initial control values where no block style is set.
-
-const BACKGROUND_DEFAULT_VALUES = {
-  backgroundSize: 'auto'
-};
-const {
-  useGlobalStyle: background_panel_useGlobalStyle,
-  useGlobalSetting: background_panel_useGlobalSetting,
-  useGlobalStyleLinks: background_panel_useGlobalStyleLinks,
-  BackgroundPanel: background_panel_StylesBackgroundPanel
-} = lock_unlock_unlock(external_wp_blockEditor_namespaceObject.privateApis);
-
-/**
- * Checks if there is a current value in the background image block support
- * attributes.
- *
- * @param {Object} style Style attribute.
- * @return {boolean}     Whether the block has a background image value set.
- */
-function hasBackgroundImageValue(style) {
-  return !!style?.background?.backgroundImage?.id || !!style?.background?.backgroundImage?.url || typeof style?.background?.backgroundImage === 'string';
-}
-function BackgroundPanel() {
-  const [style] = background_panel_useGlobalStyle('', undefined, 'user', {
-    shouldDecodeEncode: false
-  });
-  const [inheritedStyle, setStyle] = background_panel_useGlobalStyle('', undefined, 'all', {
-    shouldDecodeEncode: false
-  });
-  const _links = background_panel_useGlobalStyleLinks();
-  const [settings] = background_panel_useGlobalSetting('');
-  return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(background_panel_StylesBackgroundPanel, {
-    inheritedValue: inheritedStyle,
-    value: style,
-    onChange: setStyle,
-    settings: settings,
-    defaultValues: BACKGROUND_DEFAULT_VALUES,
-    themeFileURIs: _links?.['wp:theme-file']
-  });
-}
-
 ;// CONCATENATED MODULE: ./packages/edit-site/build-module/components/global-styles/screen-layout.js
 /**
  * WordPress dependencies
@@ -25973,26 +26181,19 @@ function BackgroundPanel() {
 
 
 
-
 const {
-  useHasBackgroundPanel: screen_layout_useHasBackgroundPanel,
   useHasDimensionsPanel: screen_layout_useHasDimensionsPanel,
   useGlobalSetting: screen_layout_useGlobalSetting,
   useSettingsForBlockElement: screen_layout_useSettingsForBlockElement
-} = lock_unlock_unlock(external_wp_blockEditor_namespaceObject.privateApis);
+} = unlock(external_wp_blockEditor_namespaceObject.privateApis);
 function ScreenLayout() {
   const [rawSettings] = screen_layout_useGlobalSetting('');
   const settings = screen_layout_useSettingsForBlockElement(rawSettings);
   const hasDimensionsPanel = screen_layout_useHasDimensionsPanel(settings);
-  /*
-   * Use the raw settings to determine if the background panel should be displayed,
-   * as the background panel is not dependent on the block element settings.
-   */
-  const hasBackgroundPanel = screen_layout_useHasBackgroundPanel(rawSettings);
   return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsxs)(external_ReactJSXRuntime_namespaceObject.Fragment, {
     children: [/*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(header, {
       title: (0,external_wp_i18n_namespaceObject.__)('Layout')
-    }), hasDimensionsPanel && /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(DimensionsPanel, {}), hasBackgroundPanel && /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(BackgroundPanel, {})]
+    }), hasDimensionsPanel && /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(DimensionsPanel, {})]
   });
 }
 /* harmony default export */ const screen_layout = (ScreenLayout);
@@ -26018,7 +26219,7 @@ function ScreenLayout() {
 
 const {
   GlobalStylesContext: style_variations_container_GlobalStylesContext
-} = lock_unlock_unlock(external_wp_blockEditor_namespaceObject.privateApis);
+} = unlock(external_wp_blockEditor_namespaceObject.privateApis);
 function StyleVariationsContainer({
   gap = 2
 }) {
@@ -26132,7 +26333,7 @@ function SidebarNavigationScreenGlobalStylesContent() {
   } = (0,external_wp_data_namespaceObject.useSelect)(select => {
     const {
       getSettings
-    } = lock_unlock_unlock(select(store));
+    } = unlock(select(store));
     return {
       storedSettings: getSettings()
     };
@@ -26239,7 +26440,7 @@ const closeSmall = /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)
 const {
   EditorContentSlotFill,
   ResizableEditor
-} = lock_unlock_unlock(external_wp_editor_namespaceObject.privateApis);
+} = unlock(external_wp_editor_namespaceObject.privateApis);
 
 /**
  * Returns a translated string for the title of the editor canvas container.
@@ -26248,24 +26449,15 @@ const {
  *
  * @return {Object} Translated string for the view title and associated icon, both defaulting to ''.
  */
-function getEditorCanvasContainerTitleAndIcon(view) {
+function getEditorCanvasContainerTitle(view) {
   switch (view) {
     case 'style-book':
-      return {
-        title: (0,external_wp_i18n_namespaceObject.__)('Style Book'),
-        icon: library_seen
-      };
+      return (0,external_wp_i18n_namespaceObject.__)('Style Book');
     case 'global-styles-revisions':
     case 'global-styles-revisions:style-book':
-      return {
-        title: (0,external_wp_i18n_namespaceObject.__)('Style Revisions'),
-        icon: library_backup
-      };
+      return (0,external_wp_i18n_namespaceObject.__)('Style Revisions');
     default:
-      return {
-        title: '',
-        icon: ''
-      };
+      return '';
   }
 }
 function EditorCanvasContainer({
@@ -26278,7 +26470,7 @@ function EditorCanvasContainer({
     editorCanvasContainerView,
     showListViewByDefault
   } = (0,external_wp_data_namespaceObject.useSelect)(select => {
-    const _editorCanvasContainerView = lock_unlock_unlock(select(store)).getEditorCanvasContainerView();
+    const _editorCanvasContainerView = unlock(select(store)).getEditorCanvasContainerView();
     const _showListViewByDefault = select(external_wp_preferences_namespaceObject.store).get('core', 'showListViewByDefault');
     return {
       editorCanvasContainerView: _editorCanvasContainerView,
@@ -26288,7 +26480,7 @@ function EditorCanvasContainer({
   const [isClosed, setIsClosed] = (0,external_wp_element_namespaceObject.useState)(false);
   const {
     setEditorCanvasContainerView
-  } = lock_unlock_unlock((0,external_wp_data_namespaceObject.useDispatch)(store));
+  } = unlock((0,external_wp_data_namespaceObject.useDispatch)(store));
   const {
     setIsListViewOpened
   } = (0,external_wp_data_namespaceObject.useDispatch)(external_wp_editor_namespaceObject.store);
@@ -26316,9 +26508,7 @@ function EditorCanvasContainer({
   if (isClosed) {
     return null;
   }
-  const {
-    title
-  } = getEditorCanvasContainerTitleAndIcon(editorCanvasContainerView);
+  const title = getEditorCanvasContainerTitle(editorCanvasContainerView);
   const shouldShowCloseButton = onClose || closeButtonLabel;
   return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(EditorContentSlotFill.Fill, {
     children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)("div", {
@@ -26330,7 +26520,10 @@ function EditorCanvasContainer({
           ref: shouldShowCloseButton ? focusOnMountRef : null,
           onKeyDown: closeOnEscape,
           "aria-label": title,
-          children: [shouldShowCloseButton && /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.Button, {
+          children: [shouldShowCloseButton && /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.Button
+          // TODO: Switch to `true` (40px size) if possible
+          , {
+            __next40pxDefaultSize: false,
             className: "edit-site-editor-canvas-container__close-button",
             icon: close_small,
             label: closeButtonLabel || (0,external_wp_i18n_namespaceObject.__)('Close'),
@@ -26379,16 +26572,13 @@ const {
   useGlobalStyle: style_book_useGlobalStyle,
   GlobalStylesContext: style_book_GlobalStylesContext,
   useGlobalStylesOutputWithConfig
-} = lock_unlock_unlock(external_wp_blockEditor_namespaceObject.privateApis);
+} = unlock(external_wp_blockEditor_namespaceObject.privateApis);
 const {
   mergeBaseAndUserConfigs: style_book_mergeBaseAndUserConfigs
-} = lock_unlock_unlock(external_wp_editor_namespaceObject.privateApis);
+} = unlock(external_wp_editor_namespaceObject.privateApis);
 const {
-  CompositeV2: Composite,
-  CompositeItemV2: CompositeItem,
-  useCompositeStoreV2: useCompositeStore,
   Tabs: style_book_Tabs
-} = lock_unlock_unlock(external_wp_components_namespaceObject.privateApis);
+} = unlock(external_wp_components_namespaceObject.privateApis);
 
 // The content area of the Style Book is rendered within an iframe so that global styles
 // are applied to elements within the entire content area. To support elements that are
@@ -26465,30 +26655,7 @@ function isObjectEmpty(object) {
   return !object || Object.keys(object).length === 0;
 }
 function getExamples() {
-  // Use our own example for the Heading block so that we can show multiple
-  // heading levels.
-  const headingsExample = {
-    name: 'core/heading',
-    title: (0,external_wp_i18n_namespaceObject.__)('Headings'),
-    category: 'text',
-    blocks: [(0,external_wp_blocks_namespaceObject.createBlock)('core/heading', {
-      content: (0,external_wp_i18n_namespaceObject.__)('Code Is Poetry'),
-      level: 1
-    }), (0,external_wp_blocks_namespaceObject.createBlock)('core/heading', {
-      content: (0,external_wp_i18n_namespaceObject.__)('Code Is Poetry'),
-      level: 2
-    }), (0,external_wp_blocks_namespaceObject.createBlock)('core/heading', {
-      content: (0,external_wp_i18n_namespaceObject.__)('Code Is Poetry'),
-      level: 3
-    }), (0,external_wp_blocks_namespaceObject.createBlock)('core/heading', {
-      content: (0,external_wp_i18n_namespaceObject.__)('Code Is Poetry'),
-      level: 4
-    }), (0,external_wp_blocks_namespaceObject.createBlock)('core/heading', {
-      content: (0,external_wp_i18n_namespaceObject.__)('Code Is Poetry'),
-      level: 5
-    })]
-  };
-  const otherExamples = (0,external_wp_blocks_namespaceObject.getBlockTypes)().filter(blockType => {
+  const nonHeadingBlockExamples = (0,external_wp_blocks_namespaceObject.getBlockTypes)().filter(blockType => {
     const {
       name,
       example,
@@ -26501,7 +26668,27 @@ function getExamples() {
     category: blockType.category,
     blocks: (0,external_wp_blocks_namespaceObject.getBlockFromExample)(blockType.name, blockType.example)
   }));
-  return [headingsExample, ...otherExamples];
+  const isHeadingBlockRegistered = !!(0,external_wp_blocks_namespaceObject.getBlockType)('core/heading');
+  if (!isHeadingBlockRegistered) {
+    return nonHeadingBlockExamples;
+  }
+
+  // Use our own example for the Heading block so that we can show multiple
+  // heading levels.
+  const headingsExample = {
+    name: 'core/heading',
+    title: (0,external_wp_i18n_namespaceObject.__)('Headings'),
+    category: 'text',
+    blocks: [1, 2, 3, 4, 5, 6].map(level => {
+      return (0,external_wp_blocks_namespaceObject.createBlock)('core/heading', {
+        content: (0,external_wp_i18n_namespaceObject.sprintf)(
+        // translators: %d: heading level e.g: "1", "2", "3"
+        (0,external_wp_i18n_namespaceObject.__)('Heading %d'), level),
+        level
+      });
+    })
+  };
+  return [headingsExample, ...nonHeadingBlockExamples];
 }
 function StyleBook({
   enableResizing = true,
@@ -26667,11 +26854,8 @@ const Examples = (0,external_wp_element_namespaceObject.memo)(({
   isSelected,
   onSelect
 }) => {
-  const compositeStore = useCompositeStore({
-    orientation: 'vertical'
-  });
-  return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(Composite, {
-    store: compositeStore,
+  return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.Composite, {
+    orientation: "vertical",
     className: className,
     "aria-label": label,
     role: "grid",
@@ -26707,7 +26891,7 @@ const Example = ({
     role: "row",
     children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)("div", {
       role: "gridcell",
-      children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsxs)(CompositeItem, {
+      children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsxs)(external_wp_components_namespaceObject.Composite.Item, {
         className: dist_clsx('edit-site-style-book__example', {
           'is-selected': isSelected
         }),
@@ -26760,7 +26944,7 @@ const Example = ({
 const {
   useGlobalStyle: screen_css_useGlobalStyle,
   AdvancedPanel: screen_css_StylesAdvancedPanel
-} = lock_unlock_unlock(external_wp_blockEditor_namespaceObject.privateApis);
+} = unlock(external_wp_blockEditor_namespaceObject.privateApis);
 function ScreenCSS() {
   const description = (0,external_wp_i18n_namespaceObject.__)('Add your own CSS to customize the appearance and layout of your site.');
   const [style] = screen_css_useGlobalStyle('', undefined, 'user', {
@@ -26774,7 +26958,7 @@ function ScreenCSS() {
       title: (0,external_wp_i18n_namespaceObject.__)('CSS'),
       description: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsxs)(external_ReactJSXRuntime_namespaceObject.Fragment, {
         children: [description, /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.ExternalLink, {
-          href: "https://developer.wordpress.org/advanced-administration/wordpress/css/",
+          href: (0,external_wp_i18n_namespaceObject.__)('https://developer.wordpress.org/advanced-administration/wordpress/css/'),
           className: "edit-site-global-styles-screen-css-help-link",
           children: (0,external_wp_i18n_namespaceObject.__)('Learn more about CSS')
         })]
@@ -26815,10 +26999,10 @@ const {
   GlobalStylesContext: revisions_GlobalStylesContext,
   useGlobalStylesOutputWithConfig: revisions_useGlobalStylesOutputWithConfig,
   __unstableBlockStyleVariationOverridesWithConfig
-} = lock_unlock_unlock(external_wp_blockEditor_namespaceObject.privateApis);
+} = unlock(external_wp_blockEditor_namespaceObject.privateApis);
 const {
   mergeBaseAndUserConfigs: revisions_mergeBaseAndUserConfigs
-} = lock_unlock_unlock(external_wp_editor_namespaceObject.privateApis);
+} = unlock(external_wp_editor_namespaceObject.privateApis);
 function revisions_isObjectEmpty(object) {
   return !object || Object.keys(object).length === 0;
 }
@@ -26901,7 +27085,7 @@ const DEFAULT_QUERY = {
 const use_global_styles_revisions_EMPTY_ARRAY = [];
 const {
   GlobalStylesContext: use_global_styles_revisions_GlobalStylesContext
-} = lock_unlock_unlock(external_wp_blockEditor_namespaceObject.privateApis);
+} = unlock(external_wp_blockEditor_namespaceObject.privateApis);
 function useGlobalStylesRevisions({
   query
 } = {}) {
@@ -27032,7 +27216,7 @@ const external_wp_date_namespaceObject = window["wp"]["date"];
 const DAY_IN_MILLISECONDS = 60 * 60 * 1000 * 24;
 const {
   getGlobalStylesChanges
-} = lock_unlock_unlock(external_wp_blockEditor_namespaceObject.privateApis);
+} = unlock(external_wp_blockEditor_namespaceObject.privateApis);
 function ChangesSummary({
   revision,
   previousRevision
@@ -27142,6 +27326,7 @@ function RevisionsButtons({
         }),
         "aria-current": isSelected,
         children: [/*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.Button, {
+          __next40pxDefaultSize: true,
           className: "edit-site-global-styles-screen-revisions__revision-button",
           accessibleWhenDisabled: true,
           disabled: isSelected,
@@ -27191,21 +27376,6 @@ function RevisionsButtons({
 }
 /* harmony default export */ const revisions_buttons = (RevisionsButtons);
 
-;// CONCATENATED MODULE: ./packages/icons/build-module/library/previous.js
-/**
- * WordPress dependencies
- */
-
-
-const previous = /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_primitives_namespaceObject.SVG, {
-  xmlns: "http://www.w3.org/2000/svg",
-  viewBox: "0 0 24 24",
-  children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_primitives_namespaceObject.Path, {
-    d: "M11.6 7l-1.1-1L5 12l5.5 6 1.1-1L7 12l4.6-5zm6 0l-1.1-1-5.5 6 5.5 6 1.1-1-4.6-5 4.6-5z"
-  })
-});
-/* harmony default export */ const library_previous = (previous);
-
 ;// CONCATENATED MODULE: ./packages/icons/build-module/library/next.js
 /**
  * WordPress dependencies
@@ -27220,6 +27390,21 @@ const next = /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(exter
   })
 });
 /* harmony default export */ const library_next = (next);
+
+;// CONCATENATED MODULE: ./packages/icons/build-module/library/previous.js
+/**
+ * WordPress dependencies
+ */
+
+
+const previous = /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_primitives_namespaceObject.SVG, {
+  xmlns: "http://www.w3.org/2000/svg",
+  viewBox: "0 0 24 24",
+  children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_primitives_namespaceObject.Path, {
+    d: "M11.6 7l-1.1-1L5 12l5.5 6 1.1-1L7 12l4.6-5zm6 0l-1.1-1-5.5 6 5.5 6 1.1-1-4.6-5 4.6-5z"
+  })
+});
+/* harmony default export */ const library_previous = (previous);
 
 ;// CONCATENATED MODULE: ./packages/edit-site/build-module/components/pagination/index.js
 /**
@@ -27269,7 +27454,7 @@ function Pagination({
         accessibleWhenDisabled: true,
         disabled: disabled || currentPage === 1,
         label: (0,external_wp_i18n_namespaceObject.__)('First page'),
-        icon: library_previous,
+        icon: (0,external_wp_i18n_namespaceObject.isRTL)() ? library_next : library_previous,
         size: "compact"
       }), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.Button, {
         variant: buttonVariant,
@@ -27277,7 +27462,7 @@ function Pagination({
         accessibleWhenDisabled: true,
         disabled: disabled || currentPage === 1,
         label: (0,external_wp_i18n_namespaceObject.__)('Previous page'),
-        icon: chevron_left,
+        icon: (0,external_wp_i18n_namespaceObject.isRTL)() ? chevron_right : chevron_left,
         size: "compact"
       })]
     }), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.__experimentalText, {
@@ -27294,7 +27479,7 @@ function Pagination({
         accessibleWhenDisabled: true,
         disabled: disabled || currentPage === numPages,
         label: (0,external_wp_i18n_namespaceObject.__)('Next page'),
-        icon: chevron_right,
+        icon: (0,external_wp_i18n_namespaceObject.isRTL)() ? chevron_left : chevron_right,
         size: "compact"
       }), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.Button, {
         variant: buttonVariant,
@@ -27302,7 +27487,7 @@ function Pagination({
         accessibleWhenDisabled: true,
         disabled: disabled || currentPage === numPages,
         label: (0,external_wp_i18n_namespaceObject.__)('Last page'),
-        icon: library_next,
+        icon: (0,external_wp_i18n_namespaceObject.isRTL)() ? library_previous : library_next,
         size: "compact"
       })]
     })]
@@ -27336,7 +27521,7 @@ function Pagination({
 const {
   GlobalStylesContext: screen_revisions_GlobalStylesContext,
   areGlobalStyleConfigsEqual: screen_revisions_areGlobalStyleConfigsEqual
-} = lock_unlock_unlock(external_wp_blockEditor_namespaceObject.privateApis);
+} = unlock(external_wp_blockEditor_namespaceObject.privateApis);
 const PAGE_SIZE = 10;
 function ScreenRevisions() {
   const {
@@ -27350,7 +27535,7 @@ function ScreenRevisions() {
     blocks,
     editorCanvasContainerView
   } = (0,external_wp_data_namespaceObject.useSelect)(select => ({
-    editorCanvasContainerView: lock_unlock_unlock(select(store)).getEditorCanvasContainerView(),
+    editorCanvasContainerView: unlock(select(store)).getEditorCanvasContainerView(),
     blocks: select(external_wp_blockEditor_namespaceObject.store).getBlocks()
   }), []);
   const [currentPage, setCurrentPage] = (0,external_wp_element_namespaceObject.useState)(1);
@@ -27371,7 +27556,7 @@ function ScreenRevisions() {
   const [isLoadingRevisionWithUnsavedChanges, setIsLoadingRevisionWithUnsavedChanges] = (0,external_wp_element_namespaceObject.useState)(false);
   const {
     setEditorCanvasContainerView
-  } = lock_unlock_unlock((0,external_wp_data_namespaceObject.useDispatch)(store));
+  } = unlock((0,external_wp_data_namespaceObject.useDispatch)(store));
   const selectedRevisionMatchesEditorStyles = screen_revisions_areGlobalStyleConfigsEqual(currentlySelectedRevision, currentEditorGlobalStyles);
   const onCloseRevisions = () => {
     goTo('/'); // Return to global styles main panel.
@@ -27498,10 +27683,12 @@ function ScreenRevisions() {
 
 
 
+
+
 const SLOT_FILL_NAME = 'GlobalStylesMenu';
 const {
   useGlobalStylesReset: ui_useGlobalStylesReset
-} = lock_unlock_unlock(external_wp_blockEditor_namespaceObject.privateApis);
+} = unlock(external_wp_blockEditor_namespaceObject.privateApis);
 const {
   Slot: GlobalStylesMenuSlot,
   Fill: GlobalStylesMenuFill
@@ -27526,7 +27713,7 @@ function GlobalStylesActionMenu() {
   }, []);
   const {
     setEditorCanvasContainerView
-  } = lock_unlock_unlock((0,external_wp_data_namespaceObject.useDispatch)(store));
+  } = unlock((0,external_wp_data_namespaceObject.useDispatch)(store));
   const {
     goTo
   } = (0,external_wp_components_namespaceObject.__experimentalUseNavigator)();
@@ -27672,7 +27859,7 @@ function GlobalStylesEditorCanvasContainerLink() {
     goTo,
     location
   } = (0,external_wp_components_namespaceObject.__experimentalUseNavigator)();
-  const editorCanvasContainerView = (0,external_wp_data_namespaceObject.useSelect)(select => lock_unlock_unlock(select(store)).getEditorCanvasContainerView(), []);
+  const editorCanvasContainerView = (0,external_wp_data_namespaceObject.useSelect)(select => unlock(select(store)).getEditorCanvasContainerView(), []);
   const path = location?.path;
   const isRevisionsOpen = path === '/revisions';
 
@@ -27718,7 +27905,7 @@ function GlobalStylesEditorCanvasContainerLink() {
 }
 function GlobalStylesUI() {
   const blocks = (0,external_wp_blocks_namespaceObject.getBlockTypes)();
-  const editorCanvasContainerView = (0,external_wp_data_namespaceObject.useSelect)(select => lock_unlock_unlock(select(store)).getEditorCanvasContainerView(), []);
+  const editorCanvasContainerView = (0,external_wp_data_namespaceObject.useSelect)(select => unlock(select(store)).getEditorCanvasContainerView(), []);
   return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsxs)(external_wp_components_namespaceObject.__experimentalNavigatorProvider, {
     className: "edit-site-global-styles-sidebar__navigator-provider",
     initialPath: "/",
@@ -27740,6 +27927,9 @@ function GlobalStylesUI() {
     }), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(GlobalStylesNavigationScreen, {
       path: "/typography/font-sizes/:origin/:slug",
       children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(font_size, {})
+    }), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(GlobalStylesNavigationScreen, {
+      path: "/typography/typeset",
+      children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(screen_typeset, {})
     }), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(GlobalStylesNavigationScreen, {
       path: "/typography/text",
       children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(screen_typography_element, {
@@ -27783,6 +27973,9 @@ function GlobalStylesUI() {
     }), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(GlobalStylesNavigationScreen, {
       path: "/revisions",
       children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(screen_revisions, {})
+    }), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(GlobalStylesNavigationScreen, {
+      path: "/background",
+      children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(screen_background, {})
     }), blocks.map(block => /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(GlobalStylesNavigationScreen, {
       path: '/blocks/' + encodeURIComponent(block.name),
       children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(screen_block, {
@@ -27816,7 +28009,7 @@ function GlobalStylesUI() {
 const {
   ComplementaryArea,
   ComplementaryAreaMoreMenuItem
-} = lock_unlock_unlock(external_wp_editor_namespaceObject.privateApis);
+} = unlock(external_wp_editor_namespaceObject.privateApis);
 function DefaultSidebar({
   className,
   identifier,
@@ -27877,7 +28070,7 @@ function DefaultSidebar({
 
 const {
   interfaceStore: global_styles_sidebar_interfaceStore
-} = lock_unlock_unlock(external_wp_editor_namespaceObject.privateApis);
+} = unlock(external_wp_editor_namespaceObject.privateApis);
 function GlobalStylesSidebar() {
   const {
     shouldClearCanvasContainerView,
@@ -27893,7 +28086,7 @@ function GlobalStylesSidebar() {
     const {
       getEditorCanvasContainerView,
       getCanvasMode
-    } = lock_unlock_unlock(select(store));
+    } = unlock(select(store));
     const canvasContainerView = getEditorCanvasContainerView();
     const _isVisualEditorMode = 'visual' === select(external_wp_editor_namespaceObject.store).getEditorMode();
     const _isEditCanvasMode = 'edit' === getCanvasMode();
@@ -27915,7 +28108,7 @@ function GlobalStylesSidebar() {
   }, []);
   const {
     setEditorCanvasContainerView
-  } = lock_unlock_unlock((0,external_wp_data_namespaceObject.useDispatch)(store));
+  } = unlock((0,external_wp_data_namespaceObject.useDispatch)(store));
   (0,external_wp_element_namespaceObject.useEffect)(() => {
     if (shouldClearCanvasContainerView) {
       setEditorCanvasContainerView(undefined);
@@ -28108,7 +28301,7 @@ function WelcomeGuideMenuItem() {
 const {
   ToolsMoreMenuGroup,
   PreferencesModal
-} = lock_unlock_unlock(external_wp_editor_namespaceObject.privateApis);
+} = unlock(external_wp_editor_namespaceObject.privateApis);
 function MoreMenu() {
   const isBlockBasedTheme = (0,external_wp_data_namespaceObject.useSelect)(select => {
     return select(external_wp_coreData_namespaceObject.store).getCurrentTheme().is_block_theme;
@@ -28147,7 +28340,7 @@ function useEditorIframeProps() {
   } = (0,external_wp_data_namespaceObject.useSelect)(select => {
     const {
       getCanvasMode
-    } = lock_unlock_unlock(select(store));
+    } = unlock(select(store));
     return {
       canvasMode: getCanvasMode(),
       currentPostIsTrashed: select(external_wp_editor_namespaceObject.store).getCurrentPostAttribute('status') === 'trash'
@@ -28155,7 +28348,7 @@ function useEditorIframeProps() {
   }, []);
   const {
     setCanvasMode
-  } = lock_unlock_unlock((0,external_wp_data_namespaceObject.useDispatch)(store));
+  } = unlock((0,external_wp_data_namespaceObject.useDispatch)(store));
   const [isFocused, setIsFocused] = (0,external_wp_element_namespaceObject.useState)(false);
   (0,external_wp_element_namespaceObject.useEffect)(() => {
     if (canvasMode === 'edit') {
@@ -28219,7 +28412,7 @@ function useEditorIframeProps() {
 
 const {
   useLocation: use_title_useLocation
-} = lock_unlock_unlock(external_wp_router_namespaceObject.privateApis);
+} = unlock(external_wp_router_namespaceObject.privateApis);
 function useTitle(title) {
   const location = use_title_useLocation();
   const siteTitle = (0,external_wp_data_namespaceObject.useSelect)(select => select(external_wp_coreData_namespaceObject.store).getEntityRecord('root', 'site')?.title, []);
@@ -28298,6 +28491,7 @@ function useEditorTitle() {
 
 
 
+
 /**
  * Internal dependencies
  */
@@ -28324,17 +28518,40 @@ function useEditorTitle() {
 const {
   Editor,
   BackButton
-} = lock_unlock_unlock(external_wp_editor_namespaceObject.privateApis);
+} = unlock(external_wp_editor_namespaceObject.privateApis);
 const {
   useHistory: editor_useHistory,
   useLocation: editor_useLocation
-} = lock_unlock_unlock(external_wp_router_namespaceObject.privateApis);
+} = unlock(external_wp_router_namespaceObject.privateApis);
 const {
   BlockKeyboardShortcuts
-} = lock_unlock_unlock(external_wp_blockLibrary_namespaceObject.privateApis);
+} = unlock(external_wp_blockLibrary_namespaceObject.privateApis);
+const toggleHomeIconVariants = {
+  edit: {
+    opacity: 0,
+    scale: 0.2
+  },
+  hover: {
+    opacity: 1,
+    scale: 1,
+    clipPath: 'inset( 22% round 2px )'
+  }
+};
+const siteIconVariants = {
+  edit: {
+    clipPath: 'inset(0% round 0px)'
+  },
+  hover: {
+    clipPath: 'inset( 22% round 2px )'
+  },
+  tap: {
+    clipPath: 'inset(0% round 0px)'
+  }
+};
 function EditSiteEditor({
   isPostsList = false
 }) {
+  const disableMotion = (0,external_wp_compose_namespaceObject.useReducedMotion)();
   const {
     params
   } = editor_useLocation();
@@ -28349,7 +28566,8 @@ function EditSiteEditor({
     supportsGlobalStyles,
     showIconLabels,
     editorCanvasView,
-    currentPostIsTrashed
+    currentPostIsTrashed,
+    hasSiteIcon
   } = (0,external_wp_data_namespaceObject.useSelect)(select => {
     const {
       getEditorCanvasContainerView,
@@ -28358,14 +28576,16 @@ function EditSiteEditor({
       isPage,
       getEditedPostType,
       getEditedPostId
-    } = lock_unlock_unlock(select(store));
+    } = unlock(select(store));
     const {
       get
     } = select(external_wp_preferences_namespaceObject.store);
     const {
-      getCurrentTheme
+      getCurrentTheme,
+      getEntityRecord
     } = select(external_wp_coreData_namespaceObject.store);
     const _context = getEditedPostContext();
+    const siteData = getEntityRecord('root', '__unstableBase', undefined);
 
     // The currently selected entity to display.
     // Typically template or template part in the site editor.
@@ -28379,7 +28599,8 @@ function EditSiteEditor({
       supportsGlobalStyles: getCurrentTheme()?.is_block_theme,
       showIconLabels: get('core', 'showIconLabels'),
       editorCanvasView: getEditorCanvasContainerView(),
-      currentPostIsTrashed: select(external_wp_editor_namespaceObject.store).getCurrentPostAttribute('status') === 'trash'
+      currentPostIsTrashed: select(external_wp_editor_namespaceObject.store).getCurrentPostAttribute('status') === 'trash',
+      hasSiteIcon: !!siteData?.site_icon_url
     };
   }, []);
   use_editor_title();
@@ -28397,7 +28618,7 @@ function EditSiteEditor({
   }], [settings.styles, canvasMode, currentPostIsTrashed]);
   const {
     setCanvasMode
-  } = lock_unlock_unlock((0,external_wp_data_namespaceObject.useDispatch)(store));
+  } = unlock((0,external_wp_data_namespaceObject.useDispatch)(store));
   const {
     createSuccessNotice
   } = (0,external_wp_data_namespaceObject.useDispatch)(external_wp_notices_namespaceObject.store);
@@ -28438,11 +28659,11 @@ function EditSiteEditor({
   }, [history, createSuccessNotice]);
 
   // Replace the title and icon displayed in the DocumentBar when there's an overlay visible.
-  const {
-    title,
-    icon
-  } = getEditorCanvasContainerTitleAndIcon(editorCanvasView);
+  const title = getEditorCanvasContainerTitle(editorCanvasView);
   const isReady = !isLoading;
+  const transition = {
+    duration: disableMotion ? 0 : 0.2
+  };
   return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsxs)(external_ReactJSXRuntime_namespaceObject.Fragment, {
     children: [/*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(GlobalStylesRenderer, {}), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_editor_namespaceObject.EditorKeyboardShortcutsRegister, {}), isEditMode && /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(BlockKeyboardShortcuts, {}), !isReady ? /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(CanvasLoader, {
       id: loadingProgressId
@@ -28462,40 +28683,96 @@ function EditSiteEditor({
       customSavePanel: _isPreviewingTheme && /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(SavePanel, {}),
       forceDisableBlockTools: !hasDefaultEditorCanvasView,
       title: title,
-      icon: icon,
       iframeProps: iframeProps,
       onActionPerformed: onActionPerformed,
       extraSidebarPanels: !isEditingPage && /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(plugin_template_setting_panel.Slot, {}),
       children: [isEditMode && /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(BackButton, {
         children: ({
           length
-        }) => length <= 1 && /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.Button, {
-          label: (0,external_wp_i18n_namespaceObject.__)('Open Navigation'),
-          className: "edit-site-layout__view-mode-toggle",
-          onClick: () => {
-            setCanvasMode('view');
-            // TODO: this is a temporary solution to navigate to the posts list if we are
-            // come here through `posts list` and are in focus mode editing a template, template part etc..
-            if (isPostsList && params?.focusMode) {
-              history.push({
-                page: 'gutenberg-posts-dashboard',
-                postType: 'post'
-              });
-            }
-          },
-          children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(site_icon, {
-            className: "edit-site-layout__view-mode-toggle-icon"
-          })
+        }) => length <= 1 && /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsxs)(external_wp_components_namespaceObject.__unstableMotion.div, {
+          className: "edit-site-editor__view-mode-toggle",
+          transition: transition,
+          animate: "edit",
+          initial: "edit",
+          whileHover: "hover",
+          whileTap: "tap",
+          children: [/*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.Button
+          // TODO: Switch to `true` (40px size) if possible
+          , {
+            __next40pxDefaultSize: false,
+            label: (0,external_wp_i18n_namespaceObject.__)('Open Navigation'),
+            showTooltip: true,
+            tooltipPosition: "middle right",
+            onClick: () => {
+              setCanvasMode('view');
+              // TODO: this is a temporary solution to navigate to the posts list if we are
+              // come here through `posts list` and are in focus mode editing a template, template part etc..
+              if (isPostsList && params?.focusMode) {
+                history.push({
+                  page: 'gutenberg-posts-dashboard',
+                  postType: 'post'
+                });
+              }
+            },
+            children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.__unstableMotion.div, {
+              variants: siteIconVariants,
+              children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(site_icon, {
+                className: "edit-site-editor__view-mode-toggle-icon"
+              })
+            })
+          }), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.__unstableMotion.div, {
+            className: dist_clsx('edit-site-editor__back-icon', {
+              'has-site-icon': hasSiteIcon
+            }),
+            variants: toggleHomeIconVariants,
+            children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(build_module_icon, {
+              icon: home_button
+            })
+          })]
         })
       }), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(MoreMenu, {}), supportsGlobalStyles && /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(GlobalStylesSidebar, {})]
     })]
   });
 }
 
+// EXTERNAL MODULE: ./node_modules/remove-accents/index.js
+var remove_accents = __webpack_require__(4793);
+var remove_accents_default = /*#__PURE__*/__webpack_require__.n(remove_accents);
+;// CONCATENATED MODULE: ./packages/icons/build-module/library/arrow-up.js
+/**
+ * WordPress dependencies
+ */
+
+
+const arrowUp = /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_primitives_namespaceObject.SVG, {
+  xmlns: "http://www.w3.org/2000/svg",
+  viewBox: "0 0 24 24",
+  children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_primitives_namespaceObject.Path, {
+    d: "M12 3.9 6.5 9.5l1 1 3.8-3.7V20h1.5V6.8l3.7 3.7 1-1z"
+  })
+});
+/* harmony default export */ const arrow_up = (arrowUp);
+
+;// CONCATENATED MODULE: ./packages/icons/build-module/library/arrow-down.js
+/**
+ * WordPress dependencies
+ */
+
+
+const arrowDown = /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_primitives_namespaceObject.SVG, {
+  xmlns: "http://www.w3.org/2000/svg",
+  viewBox: "0 0 24 24",
+  children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_primitives_namespaceObject.Path, {
+    d: "m16.5 13.5-3.7 3.7V4h-1.5v13.2l-3.8-3.7-1 1 5.5 5.6 5.5-5.6z"
+  })
+});
+/* harmony default export */ const arrow_down = (arrowDown);
+
 ;// CONCATENATED MODULE: ./packages/dataviews/build-module/constants.js
 /**
  * WordPress dependencies
  */
+
 
 
 /**
@@ -28549,11 +28826,594 @@ const sortLabels = {
   asc: (0,external_wp_i18n_namespaceObject.__)('Sort ascending'),
   desc: (0,external_wp_i18n_namespaceObject.__)('Sort descending')
 };
+const sortIcons = {
+  asc: arrow_up,
+  desc: arrow_down
+};
 
 // View layouts.
 const constants_LAYOUT_TABLE = 'table';
 const constants_LAYOUT_GRID = 'grid';
 const constants_LAYOUT_LIST = 'list';
+
+;// CONCATENATED MODULE: ./packages/dataviews/build-module/field-types/integer.js
+/**
+ * Internal dependencies
+ */
+
+function sort(a, b, direction) {
+  return direction === 'asc' ? a - b : b - a;
+}
+function isValid(value, context) {
+  // TODO: this implicitely means the value is required.
+  if (value === '') {
+    return false;
+  }
+  if (!Number.isInteger(Number(value))) {
+    return false;
+  }
+  if (context?.elements) {
+    const validValues = context?.elements.map(f => f.value);
+    if (!validValues.includes(Number(value))) {
+      return false;
+    }
+  }
+  return true;
+}
+/* harmony default export */ const integer = ({
+  sort,
+  isValid,
+  Edit: 'integer'
+});
+
+;// CONCATENATED MODULE: ./packages/dataviews/build-module/field-types/text.js
+/**
+ * Internal dependencies
+ */
+
+function text_sort(valueA, valueB, direction) {
+  return direction === 'asc' ? valueA.localeCompare(valueB) : valueB.localeCompare(valueA);
+}
+function text_isValid(value, context) {
+  if (context?.elements) {
+    const validValues = context?.elements?.map(f => f.value);
+    if (!validValues.includes(value)) {
+      return false;
+    }
+  }
+  return true;
+}
+/* harmony default export */ const field_types_text = ({
+  sort: text_sort,
+  isValid: text_isValid,
+  Edit: 'text'
+});
+
+;// CONCATENATED MODULE: ./packages/dataviews/build-module/field-types/datetime.js
+/**
+ * Internal dependencies
+ */
+
+function datetime_sort(a, b, direction) {
+  const timeA = new Date(a).getTime();
+  const timeB = new Date(b).getTime();
+  return direction === 'asc' ? timeA - timeB : timeB - timeA;
+}
+function datetime_isValid(value, context) {
+  if (context?.elements) {
+    const validValues = context?.elements.map(f => f.value);
+    if (!validValues.includes(value)) {
+      return false;
+    }
+  }
+  return true;
+}
+/* harmony default export */ const datetime = ({
+  sort: datetime_sort,
+  isValid: datetime_isValid,
+  Edit: 'datetime'
+});
+
+;// CONCATENATED MODULE: ./packages/dataviews/build-module/field-types/index.js
+/**
+ * Internal dependencies
+ */
+
+
+
+
+
+/**
+ *
+ * @param {FieldType} type The field type definition to get.
+ *
+ * @return A field type definition.
+ */
+function getFieldTypeDefinition(type) {
+  if ('integer' === type) {
+    return integer;
+  }
+  if ('text' === type) {
+    return field_types_text;
+  }
+  if ('datetime' === type) {
+    return datetime;
+  }
+  return {
+    sort: (a, b, direction) => {
+      if (typeof a === 'number' && typeof b === 'number') {
+        return direction === 'asc' ? a - b : b - a;
+      }
+      return direction === 'asc' ? a.localeCompare(b) : b.localeCompare(a);
+    },
+    isValid: (value, context) => {
+      if (context?.elements) {
+        const validValues = context?.elements?.map(f => f.value);
+        if (!validValues.includes(value)) {
+          return false;
+        }
+      }
+      return true;
+    },
+    Edit: () => null
+  };
+}
+
+;// CONCATENATED MODULE: ./packages/dataviews/build-module/dataform-controls/datetime.js
+/**
+ * WordPress dependencies
+ */
+
+
+
+/**
+ * Internal dependencies
+ */
+
+
+function DateTime({
+  data,
+  field,
+  onChange,
+  hideLabelFromVision
+}) {
+  const {
+    id,
+    label
+  } = field;
+  const value = field.getValue({
+    item: data
+  });
+  const onChangeControl = (0,external_wp_element_namespaceObject.useCallback)(newValue => onChange({
+    [id]: newValue
+  }), [id, onChange]);
+  return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsxs)("fieldset", {
+    className: "dataviews-controls__datetime",
+    children: [!hideLabelFromVision && /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.BaseControl.VisualLabel, {
+      as: "legend",
+      children: label
+    }), hideLabelFromVision && /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.VisuallyHidden, {
+      as: "legend",
+      children: label
+    }), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.TimePicker, {
+      currentTime: value,
+      onChange: onChangeControl,
+      hideLabelFromVision: true
+    })]
+  });
+}
+
+;// CONCATENATED MODULE: ./packages/dataviews/build-module/dataform-controls/integer.js
+/**
+ * WordPress dependencies
+ */
+
+
+
+/**
+ * Internal dependencies
+ */
+
+function Integer({
+  data,
+  field,
+  onChange,
+  hideLabelFromVision
+}) {
+  var _field$getValue;
+  const {
+    id,
+    label,
+    description
+  } = field;
+  const value = (_field$getValue = field.getValue({
+    item: data
+  })) !== null && _field$getValue !== void 0 ? _field$getValue : '';
+  const onChangeControl = (0,external_wp_element_namespaceObject.useCallback)(newValue => onChange({
+    [id]: Number(newValue)
+  }), [id, onChange]);
+  return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.__experimentalNumberControl, {
+    label: label,
+    help: description,
+    value: value,
+    onChange: onChangeControl,
+    __next40pxDefaultSize: true,
+    hideLabelFromVision: hideLabelFromVision
+  });
+}
+
+;// CONCATENATED MODULE: ./packages/dataviews/build-module/dataform-controls/radio.js
+/**
+ * WordPress dependencies
+ */
+
+
+
+/**
+ * Internal dependencies
+ */
+
+function Radio({
+  data,
+  field,
+  onChange,
+  hideLabelFromVision
+}) {
+  const {
+    id,
+    label
+  } = field;
+  const value = field.getValue({
+    item: data
+  });
+  const onChangeControl = (0,external_wp_element_namespaceObject.useCallback)(newValue => onChange({
+    [id]: newValue
+  }), [id, onChange]);
+  if (field.elements) {
+    return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.RadioControl, {
+      label: label,
+      onChange: onChangeControl,
+      options: field.elements,
+      selected: value,
+      hideLabelFromVision: hideLabelFromVision
+    });
+  }
+  return null;
+}
+
+;// CONCATENATED MODULE: ./packages/dataviews/build-module/dataform-controls/select.js
+/**
+ * WordPress dependencies
+ */
+
+
+
+
+/**
+ * Internal dependencies
+ */
+
+function Select({
+  data,
+  field,
+  onChange,
+  hideLabelFromVision
+}) {
+  var _field$getValue, _field$elements;
+  const {
+    id,
+    label
+  } = field;
+  const value = (_field$getValue = field.getValue({
+    item: data
+  })) !== null && _field$getValue !== void 0 ? _field$getValue : '';
+  const onChangeControl = (0,external_wp_element_namespaceObject.useCallback)(newValue => onChange({
+    [id]: newValue
+  }), [id, onChange]);
+  const elements = [
+  /*
+   * Value can be undefined when:
+   *
+   * - the field is not required
+   * - in bulk editing
+   *
+   */
+  {
+    label: (0,external_wp_i18n_namespaceObject.__)('Select item'),
+    value: ''
+  }, ...((_field$elements = field?.elements) !== null && _field$elements !== void 0 ? _field$elements : [])];
+  return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.SelectControl, {
+    label: label,
+    value: value,
+    options: elements,
+    onChange: onChangeControl,
+    __next40pxDefaultSize: true,
+    __nextHasNoMarginBottom: true,
+    hideLabelFromVision: hideLabelFromVision
+  });
+}
+
+;// CONCATENATED MODULE: ./packages/dataviews/build-module/dataform-controls/text.js
+/**
+ * WordPress dependencies
+ */
+
+
+
+/**
+ * Internal dependencies
+ */
+
+function Text({
+  data,
+  field,
+  onChange,
+  hideLabelFromVision
+}) {
+  const {
+    id,
+    label,
+    placeholder
+  } = field;
+  const value = field.getValue({
+    item: data
+  });
+  const onChangeControl = (0,external_wp_element_namespaceObject.useCallback)(newValue => onChange({
+    [id]: newValue
+  }), [id, onChange]);
+  return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.TextControl, {
+    label: label,
+    placeholder: placeholder,
+    value: value !== null && value !== void 0 ? value : '',
+    onChange: onChangeControl,
+    __next40pxDefaultSize: true,
+    __nextHasNoMarginBottom: true,
+    hideLabelFromVision: hideLabelFromVision
+  });
+}
+
+;// CONCATENATED MODULE: ./packages/dataviews/build-module/dataform-controls/index.js
+/**
+ * External dependencies
+ */
+
+/**
+ * Internal dependencies
+ */
+
+
+
+
+
+
+const FORM_CONTROLS = {
+  datetime: DateTime,
+  integer: Integer,
+  radio: Radio,
+  select: Select,
+  text: Text
+};
+function getControl(field, fieldTypeDefinition) {
+  if (typeof field.Edit === 'function') {
+    return field.Edit;
+  }
+  if (typeof field.Edit === 'string') {
+    return getControlByType(field.Edit);
+  }
+  if (field.elements) {
+    return getControlByType('select');
+  }
+  if (typeof fieldTypeDefinition.Edit === 'string') {
+    return getControlByType(fieldTypeDefinition.Edit);
+  }
+  return fieldTypeDefinition.Edit;
+}
+function getControlByType(type) {
+  if (Object.keys(FORM_CONTROLS).includes(type)) {
+    return FORM_CONTROLS[type];
+  }
+  throw 'Control ' + type + ' not found';
+}
+
+;// CONCATENATED MODULE: ./packages/dataviews/build-module/normalize-fields.js
+/**
+ * Internal dependencies
+ */
+
+
+
+/**
+ * Apply default values and normalize the fields config.
+ *
+ * @param fields Fields config.
+ * @return Normalized fields config.
+ */
+function normalizeFields(fields) {
+  return fields.map(field => {
+    var _field$sort, _field$isValid, _field$enableHiding, _field$enableSorting;
+    const fieldTypeDefinition = getFieldTypeDefinition(field.type);
+    const getValue = field.getValue || (({
+      item
+    }) => item[field.id]);
+    const sort = (_field$sort = field.sort) !== null && _field$sort !== void 0 ? _field$sort : function sort(a, b, direction) {
+      return fieldTypeDefinition.sort(getValue({
+        item: a
+      }), getValue({
+        item: b
+      }), direction);
+    };
+    const isValid = (_field$isValid = field.isValid) !== null && _field$isValid !== void 0 ? _field$isValid : function isValid(item, context) {
+      return fieldTypeDefinition.isValid(getValue({
+        item
+      }), context);
+    };
+    const Edit = getControl(field, fieldTypeDefinition);
+    const renderFromElements = ({
+      item
+    }) => {
+      const value = getValue({
+        item
+      });
+      return field?.elements?.find(element => element.value === value)?.label || getValue({
+        item
+      });
+    };
+    const render = field.render || (field.elements ? renderFromElements : getValue);
+    return {
+      ...field,
+      label: field.label || field.id,
+      header: field.header || field.label || field.id,
+      getValue,
+      render,
+      sort,
+      isValid,
+      Edit,
+      enableHiding: (_field$enableHiding = field.enableHiding) !== null && _field$enableHiding !== void 0 ? _field$enableHiding : true,
+      enableSorting: (_field$enableSorting = field.enableSorting) !== null && _field$enableSorting !== void 0 ? _field$enableSorting : true
+    };
+  });
+}
+
+;// CONCATENATED MODULE: ./packages/dataviews/build-module/filter-and-sort-data-view.js
+/**
+ * External dependencies
+ */
+
+
+/**
+ * Internal dependencies
+ */
+
+
+function normalizeSearchInput(input = '') {
+  return remove_accents_default()(input.trim().toLowerCase());
+}
+const filter_and_sort_data_view_EMPTY_ARRAY = [];
+
+/**
+ * Applies the filtering, sorting and pagination to the raw data based on the view configuration.
+ *
+ * @param data   Raw data.
+ * @param view   View config.
+ * @param fields Fields config.
+ *
+ * @return Filtered, sorted and paginated data.
+ */
+function filterSortAndPaginate(data, view, fields) {
+  if (!data) {
+    return {
+      data: filter_and_sort_data_view_EMPTY_ARRAY,
+      paginationInfo: {
+        totalItems: 0,
+        totalPages: 0
+      }
+    };
+  }
+  const _fields = normalizeFields(fields);
+  let filteredData = [...data];
+  // Handle global search.
+  if (view.search) {
+    const normalizedSearch = normalizeSearchInput(view.search);
+    filteredData = filteredData.filter(item => {
+      return _fields.filter(field => field.enableGlobalSearch).map(field => {
+        return normalizeSearchInput(field.getValue({
+          item
+        }));
+      }).some(field => field.includes(normalizedSearch));
+    });
+  }
+  if (view.filters && view.filters?.length > 0) {
+    view.filters.forEach(filter => {
+      const field = _fields.find(_field => _field.id === filter.field);
+      if (field) {
+        if (filter.operator === constants_OPERATOR_IS_ANY && filter?.value?.length > 0) {
+          filteredData = filteredData.filter(item => {
+            const fieldValue = field.getValue({
+              item
+            });
+            if (Array.isArray(fieldValue)) {
+              return filter.value.some(filterValue => fieldValue.includes(filterValue));
+            } else if (typeof fieldValue === 'string') {
+              return filter.value.includes(fieldValue);
+            }
+            return false;
+          });
+        } else if (filter.operator === constants_OPERATOR_IS_NONE && filter?.value?.length > 0) {
+          filteredData = filteredData.filter(item => {
+            const fieldValue = field.getValue({
+              item
+            });
+            if (Array.isArray(fieldValue)) {
+              return !filter.value.some(filterValue => fieldValue.includes(filterValue));
+            } else if (typeof fieldValue === 'string') {
+              return !filter.value.includes(fieldValue);
+            }
+            return false;
+          });
+        } else if (filter.operator === OPERATOR_IS_ALL && filter?.value?.length > 0) {
+          filteredData = filteredData.filter(item => {
+            return filter.value.every(value => {
+              return field.getValue({
+                item
+              })?.includes(value);
+            });
+          });
+        } else if (filter.operator === OPERATOR_IS_NOT_ALL && filter?.value?.length > 0) {
+          filteredData = filteredData.filter(item => {
+            return filter.value.every(value => {
+              return !field.getValue({
+                item
+              })?.includes(value);
+            });
+          });
+        } else if (filter.operator === constants_OPERATOR_IS) {
+          filteredData = filteredData.filter(item => {
+            return filter.value === field.getValue({
+              item
+            });
+          });
+        } else if (filter.operator === constants_OPERATOR_IS_NOT) {
+          filteredData = filteredData.filter(item => {
+            return filter.value !== field.getValue({
+              item
+            });
+          });
+        }
+      }
+    });
+  }
+
+  // Handle sorting.
+  if (view.sort) {
+    const fieldId = view.sort.field;
+    const fieldToSort = _fields.find(field => {
+      return field.id === fieldId;
+    });
+    if (fieldToSort) {
+      filteredData.sort((a, b) => {
+        var _view$sort$direction;
+        return fieldToSort.sort(a, b, (_view$sort$direction = view.sort?.direction) !== null && _view$sort$direction !== void 0 ? _view$sort$direction : 'desc');
+      });
+    }
+  }
+
+  // Handle pagination.
+  let totalItems = filteredData.length;
+  let totalPages = 1;
+  if (view.page !== undefined && view.perPage !== undefined) {
+    const start = (view.page - 1) * view.perPage;
+    totalItems = filteredData?.length || 0;
+    totalPages = Math.ceil(totalItems / view.perPage);
+    filteredData = filteredData?.slice(start, start + view.perPage);
+  }
+  return {
+    data: filteredData,
+    paginationInfo: {
+      totalItems,
+      totalPages
+    }
+  };
+}
 
 ;// CONCATENATED MODULE: ./packages/dataviews/build-module/components/dataviews-context/index.js
 /**
@@ -28586,703 +29446,22 @@ const DataViewsContext = (0,external_wp_element_namespaceObject.createContext)({
 });
 /* harmony default export */ const dataviews_context = (DataViewsContext);
 
-;// CONCATENATED MODULE: ./packages/dataviews/build-module/lock-unlock.js
-/**
- * WordPress dependencies
- */
-
-const {
-  lock: lock_unlock_lock,
-  unlock: build_module_lock_unlock_unlock
-} = (0,external_wp_privateApis_namespaceObject.__dangerousOptInToUnstableAPIsOnlyForCoreModules)('I acknowledge private features are not for use in themes or plugins and doing so will break in the next version of WordPress.', '@wordpress/dataviews');
-
-;// CONCATENATED MODULE: ./packages/dataviews/build-module/components/dataviews-bulk-actions/index.js
+;// CONCATENATED MODULE: ./packages/icons/build-module/library/funnel.js
 /**
  * WordPress dependencies
  */
 
 
+const funnel = /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_primitives_namespaceObject.SVG, {
+  viewBox: "0 0 24 24",
+  xmlns: "http://www.w3.org/2000/svg",
+  children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_primitives_namespaceObject.Path, {
+    d: "M10 17.5H14V16H10V17.5ZM6 6V7.5H18V6H6ZM8 12.5H16V11H8V12.5Z"
+  })
+});
+/* harmony default export */ const library_funnel = (funnel);
 
-
-
-/**
- * Internal dependencies
- */
-
-
-
-
-
-
-const {
-  DropdownMenuV2: dataviews_bulk_actions_DropdownMenu,
-  DropdownMenuGroupV2: DropdownMenuGroup,
-  DropdownMenuItemV2: dataviews_bulk_actions_DropdownMenuItem,
-  DropdownMenuSeparatorV2: DropdownMenuSeparator
-} = build_module_lock_unlock_unlock(external_wp_components_namespaceObject.privateApis);
-function useHasAPossibleBulkAction(actions, item) {
-  return (0,external_wp_element_namespaceObject.useMemo)(() => {
-    return actions.some(action => {
-      return action.supportsBulk && (!action.isEligible || action.isEligible(item));
-    });
-  }, [actions, item]);
-}
-function useSomeItemHasAPossibleBulkAction(actions, data) {
-  return (0,external_wp_element_namespaceObject.useMemo)(() => {
-    return data.some(item => {
-      return actions.some(action => {
-        return action.supportsBulk && (!action.isEligible || action.isEligible(item));
-      });
-    });
-  }, [actions, data]);
-}
-function ActionWithModal({
-  action,
-  selectedItems,
-  setActionWithModal,
-  onMenuOpenChange
-}) {
-  const eligibleItems = (0,external_wp_element_namespaceObject.useMemo)(() => {
-    return selectedItems.filter(item => !action.isEligible || action.isEligible(item));
-  }, [action, selectedItems]);
-  const {
-    RenderModal,
-    hideModalHeader
-  } = action;
-  const onCloseModal = (0,external_wp_element_namespaceObject.useCallback)(() => {
-    setActionWithModal(undefined);
-  }, [setActionWithModal]);
-  const label = typeof action.label === 'string' ? action.label : action.label(selectedItems);
-  return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.Modal, {
-    title: !hideModalHeader ? label : undefined,
-    __experimentalHideHeader: !!hideModalHeader,
-    onRequestClose: onCloseModal,
-    overlayClassName: "dataviews-bulk-actions__modal",
-    children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(RenderModal, {
-      items: eligibleItems,
-      closeModal: onCloseModal,
-      onActionPerformed: () => onMenuOpenChange(false)
-    })
-  });
-}
-function BulkActionItem({
-  action,
-  selectedItems,
-  setActionWithModal
-}) {
-  const registry = (0,external_wp_data_namespaceObject.useRegistry)();
-  const eligibleItems = (0,external_wp_element_namespaceObject.useMemo)(() => {
-    return selectedItems.filter(item => !action.isEligible || action.isEligible(item));
-  }, [action, selectedItems]);
-  const shouldShowModal = ('RenderModal' in action);
-  return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(dataviews_bulk_actions_DropdownMenuItem, {
-    hideOnClick: !shouldShowModal,
-    onClick: async () => {
-      if (shouldShowModal) {
-        setActionWithModal(action);
-      } else {
-        action.callback(eligibleItems, {
-          registry
-        });
-      }
-    },
-    suffix: eligibleItems.length,
-    children: action.label
-  }, action.id);
-}
-function ActionsMenuGroup({
-  actions,
-  selectedItems,
-  setActionWithModal
-}) {
-  const elligibleActions = (0,external_wp_element_namespaceObject.useMemo)(() => {
-    return actions.filter(action => {
-      return selectedItems.some(item => !action.isEligible || action.isEligible(item));
-    });
-  }, [actions, selectedItems]);
-  if (!elligibleActions.length) {
-    return null;
-  }
-  return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsxs)(external_ReactJSXRuntime_namespaceObject.Fragment, {
-    children: [/*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(DropdownMenuGroup, {
-      children: elligibleActions.map(action => /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(BulkActionItem, {
-        action: action,
-        selectedItems: selectedItems,
-        setActionWithModal: setActionWithModal
-      }, action.id))
-    }), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(DropdownMenuSeparator, {})]
-  });
-}
-function _BulkActions() {
-  const {
-    data,
-    actions = [],
-    selection,
-    onChangeSelection,
-    getItemId
-  } = (0,external_wp_element_namespaceObject.useContext)(dataviews_context);
-  const bulkActions = (0,external_wp_element_namespaceObject.useMemo)(() => actions.filter(action => action.supportsBulk), [actions]);
-  const [isMenuOpen, onMenuOpenChange] = (0,external_wp_element_namespaceObject.useState)(false);
-  const [actionWithModal, setActionWithModal] = (0,external_wp_element_namespaceObject.useState)();
-  const selectableItems = (0,external_wp_element_namespaceObject.useMemo)(() => {
-    return data.filter(item => {
-      return bulkActions.some(action => !action.isEligible || action.isEligible(item));
-    });
-  }, [data, bulkActions]);
-  const numberSelectableItems = selectableItems.length;
-  const selectedItems = (0,external_wp_element_namespaceObject.useMemo)(() => {
-    return data.filter(item => selection.includes(getItemId(item)) && selectableItems.includes(item));
-  }, [selection, data, getItemId, selectableItems]);
-  const areAllSelected = selectedItems.length === numberSelectableItems;
-  if (bulkActions.length === 0) {
-    return null;
-  }
-  return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsxs)(external_ReactJSXRuntime_namespaceObject.Fragment, {
-    children: [/*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsxs)(dataviews_bulk_actions_DropdownMenu, {
-      open: isMenuOpen,
-      onOpenChange: onMenuOpenChange,
-      label: (0,external_wp_i18n_namespaceObject.__)('Bulk actions'),
-      style: {
-        minWidth: '240px'
-      },
-      trigger: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.Button, {
-        className: "dataviews-bulk-actions__edit-button",
-        __next40pxDefaultSize: true,
-        variant: "tertiary",
-        size: "compact",
-        children: selectedItems.length ? (0,external_wp_i18n_namespaceObject.sprintf)( /* translators: %d: Number of items. */
-        (0,external_wp_i18n_namespaceObject._n)('Edit %d item', 'Edit %d items', selectedItems.length), selectedItems.length) : (0,external_wp_i18n_namespaceObject.__)('Bulk edit')
-      }),
-      children: [/*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(ActionsMenuGroup, {
-        actions: bulkActions,
-        setActionWithModal: setActionWithModal,
-        selectedItems: selectedItems
-      }), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsxs)(DropdownMenuGroup, {
-        children: [/*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(dataviews_bulk_actions_DropdownMenuItem, {
-          disabled: areAllSelected,
-          hideOnClick: false,
-          onClick: () => {
-            onChangeSelection(selectableItems.map(item => getItemId(item)));
-          },
-          suffix: numberSelectableItems,
-          children: (0,external_wp_i18n_namespaceObject.__)('Select all')
-        }), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(dataviews_bulk_actions_DropdownMenuItem, {
-          disabled: selection.length === 0,
-          hideOnClick: false,
-          onClick: () => {
-            onChangeSelection([]);
-          },
-          children: (0,external_wp_i18n_namespaceObject.__)('Deselect')
-        })]
-      })]
-    }), actionWithModal && /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(ActionWithModal, {
-      action: actionWithModal,
-      selectedItems: selectedItems,
-      setActionWithModal: setActionWithModal,
-      onMenuOpenChange: onMenuOpenChange
-    })]
-  });
-}
-function BulkActions() {
-  const {
-    data,
-    actions = [],
-    view
-  } = (0,external_wp_element_namespaceObject.useContext)(dataviews_context);
-  const hasPossibleBulkAction = useSomeItemHasAPossibleBulkAction(actions, data);
-  if (![constants_LAYOUT_TABLE, constants_LAYOUT_GRID].includes(view.type) || !hasPossibleBulkAction) {
-    return null;
-  }
-  return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(_BulkActions, {});
-}
-
-;// CONCATENATED MODULE: ./packages/dataviews/build-module/components/dataviews-item-actions/index.js
-/**
- * External dependencies
- */
-
-/**
- * WordPress dependencies
- */
-
-
-
-
-
-
-/**
- * Internal dependencies
- */
-
-
-
-
-const {
-  DropdownMenuV2: dataviews_item_actions_DropdownMenu,
-  DropdownMenuGroupV2: dataviews_item_actions_DropdownMenuGroup,
-  DropdownMenuItemV2: dataviews_item_actions_DropdownMenuItem,
-  DropdownMenuItemLabelV2: dataviews_item_actions_DropdownMenuItemLabel,
-  kebabCase: dataviews_item_actions_kebabCase
-} = build_module_lock_unlock_unlock(external_wp_components_namespaceObject.privateApis);
-function ButtonTrigger({
-  action,
-  onClick,
-  items
-}) {
-  const label = typeof action.label === 'string' ? action.label : action.label(items);
-  return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.Button, {
-    label: label,
-    icon: action.icon,
-    isDestructive: action.isDestructive,
-    size: "compact",
-    onClick: onClick
-  });
-}
-function DropdownMenuItemTrigger({
-  action,
-  onClick,
-  items
-}) {
-  const label = typeof action.label === 'string' ? action.label : action.label(items);
-  return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(dataviews_item_actions_DropdownMenuItem, {
-    onClick: onClick,
-    hideOnClick: !('RenderModal' in action),
-    children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(dataviews_item_actions_DropdownMenuItemLabel, {
-      children: label
-    })
-  });
-}
-function ActionModal({
-  action,
-  items,
-  closeModal
-}) {
-  const label = typeof action.label === 'string' ? action.label : action.label(items);
-  return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.Modal, {
-    title: action.modalHeader || label,
-    __experimentalHideHeader: !!action.hideModalHeader,
-    onRequestClose: closeModal !== null && closeModal !== void 0 ? closeModal : () => {},
-    focusOnMount: "firstContentElement",
-    size: "small",
-    overlayClassName: `dataviews-action-modal dataviews-action-modal__${dataviews_item_actions_kebabCase(action.id)}`,
-    children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(action.RenderModal, {
-      items: items,
-      closeModal: closeModal
-    })
-  });
-}
-function dataviews_item_actions_ActionWithModal({
-  action,
-  items,
-  ActionTrigger,
-  isBusy
-}) {
-  const [isModalOpen, setIsModalOpen] = (0,external_wp_element_namespaceObject.useState)(false);
-  const actionTriggerProps = {
-    action,
-    onClick: () => {
-      setIsModalOpen(true);
-    },
-    items,
-    isBusy
-  };
-  return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsxs)(external_ReactJSXRuntime_namespaceObject.Fragment, {
-    children: [/*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(ActionTrigger, {
-      ...actionTriggerProps
-    }), isModalOpen && /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(ActionModal, {
-      action: action,
-      items: items,
-      closeModal: () => setIsModalOpen(false)
-    })]
-  });
-}
-function ActionsDropdownMenuGroup({
-  actions,
-  item
-}) {
-  const registry = (0,external_wp_data_namespaceObject.useRegistry)();
-  return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(dataviews_item_actions_DropdownMenuGroup, {
-    children: actions.map(action => {
-      if ('RenderModal' in action) {
-        return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(dataviews_item_actions_ActionWithModal, {
-          action: action,
-          items: [item],
-          ActionTrigger: DropdownMenuItemTrigger
-        }, action.id);
-      }
-      return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(DropdownMenuItemTrigger, {
-        action: action,
-        onClick: () => {
-          action.callback([item], {
-            registry
-          });
-        },
-        items: [item]
-      }, action.id);
-    })
-  });
-}
-function ItemActions({
-  item,
-  actions,
-  isCompact
-}) {
-  const registry = (0,external_wp_data_namespaceObject.useRegistry)();
-  const {
-    primaryActions,
-    eligibleActions
-  } = (0,external_wp_element_namespaceObject.useMemo)(() => {
-    // If an action is eligible for all items, doesn't need
-    // to provide the `isEligible` function.
-    const _eligibleActions = actions.filter(action => !action.isEligible || action.isEligible(item));
-    const _primaryActions = _eligibleActions.filter(action => action.isPrimary && !!action.icon);
-    return {
-      primaryActions: _primaryActions,
-      eligibleActions: _eligibleActions
-    };
-  }, [actions, item]);
-  if (isCompact) {
-    return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(CompactItemActions, {
-      item: item,
-      actions: eligibleActions
-    });
-  }
-  return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsxs)(external_wp_components_namespaceObject.__experimentalHStack, {
-    spacing: 1,
-    justify: "flex-end",
-    className: "dataviews-item-actions",
-    style: {
-      flexShrink: '0',
-      width: 'auto'
-    },
-    children: [!!primaryActions.length && primaryActions.map(action => {
-      if ('RenderModal' in action) {
-        return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(dataviews_item_actions_ActionWithModal, {
-          action: action,
-          items: [item],
-          ActionTrigger: ButtonTrigger
-        }, action.id);
-      }
-      return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(ButtonTrigger, {
-        action: action,
-        onClick: () => {
-          action.callback([item], {
-            registry
-          });
-        },
-        items: [item]
-      }, action.id);
-    }), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(CompactItemActions, {
-      item: item,
-      actions: eligibleActions
-    })]
-  });
-}
-function CompactItemActions({
-  item,
-  actions
-}) {
-  return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(dataviews_item_actions_DropdownMenu, {
-    trigger: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.Button, {
-      size: "compact",
-      icon: more_vertical,
-      label: (0,external_wp_i18n_namespaceObject.__)('Actions'),
-      accessibleWhenDisabled: true,
-      disabled: !actions.length,
-      className: "dataviews-all-actions-button"
-    }),
-    placement: "bottom-end",
-    children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(ActionsDropdownMenuGroup, {
-      actions: actions,
-      item: item
-    })
-  });
-}
-
-;// CONCATENATED MODULE: ./packages/dataviews/build-module/components/dataviews-bulk-actions-toolbar/index.js
-/**
- * WordPress dependencies
- */
-
-
-
-
-
-
-
-/**
- * Internal dependencies
- */
-
-
-
-
-
-
-
-const SNACKBAR_VARIANTS = {
-  init: {
-    bottom: -48
-  },
-  open: {
-    bottom: 24,
-    transition: {
-      bottom: {
-        type: 'tween',
-        duration: 0.2,
-        ease: [0, 0, 0.2, 1]
-      }
-    }
-  },
-  exit: {
-    opacity: 0,
-    bottom: 24,
-    transition: {
-      opacity: {
-        type: 'tween',
-        duration: 0.2,
-        ease: [0, 0, 0.2, 1]
-      }
-    }
-  }
-};
-function ActionTrigger({
-  action,
-  onClick,
-  isBusy,
-  items
-}) {
-  const label = typeof action.label === 'string' ? action.label : action.label(items);
-  return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.ToolbarButton, {
-    disabled: isBusy,
-    label: label,
-    icon: action.icon,
-    isDestructive: action.isDestructive,
-    size: "compact",
-    onClick: onClick,
-    isBusy: isBusy,
-    tooltipPosition: "top"
-  });
-}
-const dataviews_bulk_actions_toolbar_EMPTY_ARRAY = [];
-function ActionButton({
-  action,
-  selectedItems,
-  actionInProgress,
-  setActionInProgress
-}) {
-  const registry = (0,external_wp_data_namespaceObject.useRegistry)();
-  const selectedEligibleItems = (0,external_wp_element_namespaceObject.useMemo)(() => {
-    return selectedItems.filter(item => {
-      return !action.isEligible || action.isEligible(item);
-    });
-  }, [action, selectedItems]);
-  if ('RenderModal' in action) {
-    return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(dataviews_item_actions_ActionWithModal, {
-      action: action,
-      items: selectedEligibleItems,
-      ActionTrigger: ActionTrigger
-    }, action.id);
-  }
-  return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(ActionTrigger, {
-    action: action,
-    onClick: () => {
-      setActionInProgress(action.id);
-      action.callback(selectedItems, {
-        registry
-      });
-    },
-    items: selectedEligibleItems,
-    isBusy: actionInProgress === action.id
-  }, action.id);
-}
-function renderToolbarContent(selection, actionsToShow, selectedItems, actionInProgress, setActionInProgress, onChangeSelection) {
-  return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsxs)(external_ReactJSXRuntime_namespaceObject.Fragment, {
-    children: [/*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.ToolbarGroup, {
-      children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)("div", {
-        className: "dataviews-bulk-actions-toolbar__selection-count",
-        children: selection.length === 1 ? (0,external_wp_i18n_namespaceObject.__)('1 item selected') : (0,external_wp_i18n_namespaceObject.sprintf)(
-        // translators: %s: Total number of selected items.
-        (0,external_wp_i18n_namespaceObject._n)('%s item selected', '%s items selected', selection.length), selection.length)
-      })
-    }), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.ToolbarGroup, {
-      children: actionsToShow.map(action => {
-        return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(ActionButton, {
-          action: action,
-          selectedItems: selectedItems,
-          actionInProgress: actionInProgress,
-          setActionInProgress: setActionInProgress
-        }, action.id);
-      })
-    }), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.ToolbarGroup, {
-      children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.ToolbarButton, {
-        icon: close_small,
-        showTooltip: true,
-        tooltipPosition: "top",
-        label: (0,external_wp_i18n_namespaceObject.__)('Cancel'),
-        disabled: !!actionInProgress,
-        onClick: () => {
-          onChangeSelection(dataviews_bulk_actions_toolbar_EMPTY_ARRAY);
-        }
-      })
-    })]
-  });
-}
-function ToolbarContent({
-  selection,
-  actionsToShow,
-  selectedItems,
-  onChangeSelection
-}) {
-  const [actionInProgress, setActionInProgress] = (0,external_wp_element_namespaceObject.useState)(null);
-  const buttons = (0,external_wp_element_namespaceObject.useRef)(null);
-  if (!actionInProgress) {
-    if (buttons.current) {
-      buttons.current = null;
-    }
-    return renderToolbarContent(selection, actionsToShow, selectedItems, actionInProgress, setActionInProgress, onChangeSelection);
-  } else if (!buttons.current) {
-    buttons.current = renderToolbarContent(selection, actionsToShow, selectedItems, actionInProgress, setActionInProgress, onChangeSelection);
-  }
-  return buttons.current;
-}
-function _BulkActionsToolbar() {
-  const {
-    data,
-    selection,
-    actions = dataviews_bulk_actions_toolbar_EMPTY_ARRAY,
-    onChangeSelection,
-    getItemId
-  } = (0,external_wp_element_namespaceObject.useContext)(dataviews_context);
-  const isReducedMotion = (0,external_wp_compose_namespaceObject.useReducedMotion)();
-  const selectedItems = (0,external_wp_element_namespaceObject.useMemo)(() => {
-    return data.filter(item => selection.includes(getItemId(item)));
-  }, [selection, data, getItemId]);
-  const actionsToShow = (0,external_wp_element_namespaceObject.useMemo)(() => actions.filter(action => {
-    return action.supportsBulk && action.icon && selectedItems.some(item => !action.isEligible || action.isEligible(item));
-  }), [actions, selectedItems]);
-  if (selection && selection.length === 0 || actionsToShow.length === 0) {
-    return null;
-  }
-  return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.__unstableAnimatePresence, {
-    children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.__unstableMotion.div, {
-      layout: !isReducedMotion // See https://www.framer.com/docs/animation/#layout-animations
-      ,
-      initial: "init",
-      animate: "open",
-      exit: "exit",
-      variants: isReducedMotion ? undefined : SNACKBAR_VARIANTS,
-      className: "dataviews-bulk-actions-toolbar",
-      children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.Toolbar, {
-        label: (0,external_wp_i18n_namespaceObject.__)('Bulk actions'),
-        children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)("div", {
-          className: "dataviews-bulk-actions-toolbar__wrapper",
-          children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(ToolbarContent, {
-            selection: selection,
-            actionsToShow: actionsToShow,
-            selectedItems: selectedItems,
-            onChangeSelection: onChangeSelection
-          })
-        })
-      })
-    })
-  });
-}
-function BulkActionsToolbar() {
-  const {
-    data,
-    actions = [],
-    view
-  } = (0,external_wp_element_namespaceObject.useContext)(dataviews_context);
-  const hasPossibleBulkAction = useSomeItemHasAPossibleBulkAction(actions, data);
-  if (![constants_LAYOUT_TABLE, constants_LAYOUT_GRID].includes(view.type) || !hasPossibleBulkAction) {
-    return null;
-  }
-  return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(_BulkActionsToolbar, {});
-}
-
-;// CONCATENATED MODULE: ./packages/dataviews/node_modules/@ariakit/react-core/esm/__chunks/3IEDWLST.js
-"use client";
-
-// src/composite/utils.ts
-
-var NULL_ITEM = { id: null };
-function flipItems(items, activeId, shouldInsertNullItem = false) {
-  const index = items.findIndex((item) => item.id === activeId);
-  return [
-    ...items.slice(index + 1),
-    ...shouldInsertNullItem ? [NULL_ITEM] : [],
-    ...items.slice(0, index)
-  ];
-}
-function findFirstEnabledItem(items, excludeId) {
-  return items.find((item) => {
-    if (excludeId) {
-      return !item.disabled && item.id !== excludeId;
-    }
-    return !item.disabled;
-  });
-}
-function getEnabledItem(store, id) {
-  if (!id)
-    return null;
-  return store.item(id) || null;
-}
-function groupItemsByRows(items) {
-  const rows = [];
-  for (const item of items) {
-    const row = rows.find((currentRow) => {
-      var _a;
-      return ((_a = currentRow[0]) == null ? void 0 : _a.rowId) === item.rowId;
-    });
-    if (row) {
-      row.push(item);
-    } else {
-      rows.push([item]);
-    }
-  }
-  return rows;
-}
-function selectTextField(element, collapseToEnd = false) {
-  if (isTextField(element)) {
-    element.setSelectionRange(
-      collapseToEnd ? element.value.length : 0,
-      element.value.length
-    );
-  } else if (element.isContentEditable) {
-    const selection = getDocument(element).getSelection();
-    selection == null ? void 0 : selection.selectAllChildren(element);
-    if (collapseToEnd) {
-      selection == null ? void 0 : selection.collapseToEnd();
-    }
-  }
-}
-var FOCUS_SILENTLY = Symbol("FOCUS_SILENTLY");
-function focusSilently(element) {
-  element[FOCUS_SILENTLY] = true;
-  element.focus({ preventScroll: true });
-}
-function silentlyFocused(element) {
-  const isSilentlyFocused = element[FOCUS_SILENTLY];
-  delete element[FOCUS_SILENTLY];
-  return isSilentlyFocused;
-}
-function isItem(store, element, exclude) {
-  if (!element)
-    return false;
-  if (element === exclude)
-    return false;
-  const item = store.item(element.id);
-  if (!item)
-    return false;
-  if (exclude && item.element === exclude)
-    return false;
-  return true;
-}
-
-
-
-;// CONCATENATED MODULE: ./packages/dataviews/node_modules/@ariakit/react-core/esm/__chunks/4R3V3JGP.js
+;// CONCATENATED MODULE: ./packages/dataviews/node_modules/@ariakit/react-core/esm/__chunks/3YLGPPWQ.js
 "use client";
 var __defProp = Object.defineProperty;
 var __defProps = Object.defineProperties;
@@ -29291,7 +29470,7 @@ var __getOwnPropSymbols = Object.getOwnPropertySymbols;
 var __hasOwnProp = Object.prototype.hasOwnProperty;
 var __propIsEnum = Object.prototype.propertyIsEnumerable;
 var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
-var _4R3V3JGP_spreadValues = (a, b) => {
+var _3YLGPPWQ_spreadValues = (a, b) => {
   for (var prop in b || (b = {}))
     if (__hasOwnProp.call(b, prop))
       __defNormalProp(a, prop, b[prop]);
@@ -29302,7 +29481,7 @@ var _4R3V3JGP_spreadValues = (a, b) => {
     }
   return a;
 };
-var _4R3V3JGP_spreadProps = (a, b) => __defProps(a, __getOwnPropDescs(b));
+var _3YLGPPWQ_spreadProps = (a, b) => __defProps(a, __getOwnPropDescs(b));
 var __objRest = (source, exclude) => {
   var target = {};
   for (var prop in source)
@@ -29318,35 +29497,35 @@ var __objRest = (source, exclude) => {
 
 
 
-;// CONCATENATED MODULE: ./packages/dataviews/node_modules/@ariakit/core/esm/__chunks/4R3V3JGP.js
+;// CONCATENATED MODULE: ./node_modules/@ariakit/core/esm/__chunks/3YLGPPWQ.js
 "use client";
-var _4R3V3JGP_defProp = Object.defineProperty;
-var _4R3V3JGP_defProps = Object.defineProperties;
-var _4R3V3JGP_getOwnPropDescs = Object.getOwnPropertyDescriptors;
-var _4R3V3JGP_getOwnPropSymbols = Object.getOwnPropertySymbols;
-var _4R3V3JGP_hasOwnProp = Object.prototype.hasOwnProperty;
-var _4R3V3JGP_propIsEnum = Object.prototype.propertyIsEnumerable;
-var _4R3V3JGP_defNormalProp = (obj, key, value) => key in obj ? _4R3V3JGP_defProp(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
-var _chunks_4R3V3JGP_spreadValues = (a, b) => {
+var _3YLGPPWQ_defProp = Object.defineProperty;
+var _3YLGPPWQ_defProps = Object.defineProperties;
+var _3YLGPPWQ_getOwnPropDescs = Object.getOwnPropertyDescriptors;
+var _3YLGPPWQ_getOwnPropSymbols = Object.getOwnPropertySymbols;
+var _3YLGPPWQ_hasOwnProp = Object.prototype.hasOwnProperty;
+var _3YLGPPWQ_propIsEnum = Object.prototype.propertyIsEnumerable;
+var _3YLGPPWQ_defNormalProp = (obj, key, value) => key in obj ? _3YLGPPWQ_defProp(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
+var _chunks_3YLGPPWQ_spreadValues = (a, b) => {
   for (var prop in b || (b = {}))
-    if (_4R3V3JGP_hasOwnProp.call(b, prop))
-      _4R3V3JGP_defNormalProp(a, prop, b[prop]);
-  if (_4R3V3JGP_getOwnPropSymbols)
-    for (var prop of _4R3V3JGP_getOwnPropSymbols(b)) {
-      if (_4R3V3JGP_propIsEnum.call(b, prop))
-        _4R3V3JGP_defNormalProp(a, prop, b[prop]);
+    if (_3YLGPPWQ_hasOwnProp.call(b, prop))
+      _3YLGPPWQ_defNormalProp(a, prop, b[prop]);
+  if (_3YLGPPWQ_getOwnPropSymbols)
+    for (var prop of _3YLGPPWQ_getOwnPropSymbols(b)) {
+      if (_3YLGPPWQ_propIsEnum.call(b, prop))
+        _3YLGPPWQ_defNormalProp(a, prop, b[prop]);
     }
   return a;
 };
-var _chunks_4R3V3JGP_spreadProps = (a, b) => _4R3V3JGP_defProps(a, _4R3V3JGP_getOwnPropDescs(b));
-var _4R3V3JGP_objRest = (source, exclude) => {
+var _chunks_3YLGPPWQ_spreadProps = (a, b) => _3YLGPPWQ_defProps(a, _3YLGPPWQ_getOwnPropDescs(b));
+var _3YLGPPWQ_objRest = (source, exclude) => {
   var target = {};
   for (var prop in source)
-    if (_4R3V3JGP_hasOwnProp.call(source, prop) && exclude.indexOf(prop) < 0)
+    if (_3YLGPPWQ_hasOwnProp.call(source, prop) && exclude.indexOf(prop) < 0)
       target[prop] = source[prop];
-  if (source != null && _4R3V3JGP_getOwnPropSymbols)
-    for (var prop of _4R3V3JGP_getOwnPropSymbols(source)) {
-      if (exclude.indexOf(prop) < 0 && _4R3V3JGP_propIsEnum.call(source, prop))
+  if (source != null && _3YLGPPWQ_getOwnPropSymbols)
+    for (var prop of _3YLGPPWQ_getOwnPropSymbols(source)) {
+      if (exclude.indexOf(prop) < 0 && _3YLGPPWQ_propIsEnum.call(source, prop))
         target[prop] = source[prop];
     }
   return target;
@@ -29354,29 +29533,23 @@ var _4R3V3JGP_objRest = (source, exclude) => {
 
 
 
-;// CONCATENATED MODULE: ./packages/dataviews/node_modules/@ariakit/core/esm/__chunks/22HHDS5F.js
+;// CONCATENATED MODULE: ./node_modules/@ariakit/core/esm/__chunks/PBFD2E7P.js
 "use client";
 
 
 // src/utils/misc.ts
-function _22HHDS5F_noop(..._) {
+function PBFD2E7P_noop(..._) {
 }
 function shallowEqual(a, b) {
-  if (a === b)
-    return true;
-  if (!a)
-    return false;
-  if (!b)
-    return false;
-  if (typeof a !== "object")
-    return false;
-  if (typeof b !== "object")
-    return false;
+  if (a === b) return true;
+  if (!a) return false;
+  if (!b) return false;
+  if (typeof a !== "object") return false;
+  if (typeof b !== "object") return false;
   const aKeys = Object.keys(a);
   const bKeys = Object.keys(b);
   const { length } = aKeys;
-  if (bKeys.length !== length)
-    return false;
+  if (bKeys.length !== length) return false;
   for (const key of aKeys) {
     if (a[key] !== b[key]) {
       return false;
@@ -29384,7 +29557,7 @@ function shallowEqual(a, b) {
   }
   return true;
 }
-function _22HHDS5F_applyState(argument, currentValue) {
+function applyState(argument, currentValue) {
   if (isUpdater(argument)) {
     const value = isLazyValue(currentValue) ? currentValue() : currentValue;
     return argument(value);
@@ -29401,14 +29574,10 @@ function isObject(arg) {
   return typeof arg === "object" && arg != null;
 }
 function isEmpty(arg) {
-  if (Array.isArray(arg))
-    return !arg.length;
-  if (isObject(arg))
-    return !Object.keys(arg).length;
-  if (arg == null)
-    return true;
-  if (arg === "")
-    return true;
+  if (Array.isArray(arg)) return !arg.length;
+  if (isObject(arg)) return !Object.keys(arg).length;
+  if (arg == null) return true;
+  if (arg === "") return true;
   return false;
 }
 function isInteger(arg) {
@@ -29417,7 +29586,7 @@ function isInteger(arg) {
   }
   return String(Math.floor(Number(arg))) === arg;
 }
-function _22HHDS5F_hasOwnProperty(object, prop) {
+function PBFD2E7P_hasOwnProperty(object, prop) {
   if (typeof Object.hasOwn === "function") {
     return Object.hasOwn(object, prop);
   }
@@ -29439,9 +29608,9 @@ function normalizeString(str) {
   return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 }
 function omit(object, keys) {
-  const result = _chunks_4R3V3JGP_spreadValues({}, object);
+  const result = _chunks_3YLGPPWQ_spreadValues({}, object);
   for (const key of keys) {
-    if (_22HHDS5F_hasOwnProperty(result, key)) {
+    if (PBFD2E7P_hasOwnProperty(result, key)) {
       delete result[key];
     }
   }
@@ -29450,7 +29619,7 @@ function omit(object, keys) {
 function pick(object, paths) {
   const result = {};
   for (const key of paths) {
-    if (_22HHDS5F_hasOwnProperty(object, key)) {
+    if (PBFD2E7P_hasOwnProperty(object, key)) {
       result[key] = object[key];
     }
   }
@@ -29459,30 +29628,27 @@ function pick(object, paths) {
 function identity(value) {
   return value;
 }
-function beforePaint(cb = _22HHDS5F_noop) {
+function beforePaint(cb = PBFD2E7P_noop) {
   const raf = requestAnimationFrame(cb);
   return () => cancelAnimationFrame(raf);
 }
-function afterPaint(cb = _22HHDS5F_noop) {
+function afterPaint(cb = PBFD2E7P_noop) {
   let raf = requestAnimationFrame(() => {
     raf = requestAnimationFrame(cb);
   });
   return () => cancelAnimationFrame(raf);
 }
 function invariant(condition, message) {
-  if (condition)
-    return;
-  if (typeof message !== "string")
-    throw new Error("Invariant failed");
+  if (condition) return;
+  if (typeof message !== "string") throw new Error("Invariant failed");
   throw new Error(message);
 }
-function _22HHDS5F_getKeys(obj) {
+function PBFD2E7P_getKeys(obj) {
   return Object.keys(obj);
 }
 function isFalsyBooleanCallback(booleanOrCallback, ...args) {
   const result = typeof booleanOrCallback === "function" ? booleanOrCallback(...args) : booleanOrCallback;
-  if (result == null)
-    return false;
+  if (result == null) return false;
   return !result;
 }
 function disabledFromProps(props) {
@@ -29499,15 +29665,14 @@ function removeUndefinedValues(obj) {
 }
 function defaultValue(...values) {
   for (const value of values) {
-    if (value !== void 0)
-      return value;
+    if (value !== void 0) return value;
   }
   return void 0;
 }
 
 
 
-;// CONCATENATED MODULE: ./packages/dataviews/node_modules/@ariakit/react-core/esm/__chunks/XM66DUTO.js
+;// CONCATENATED MODULE: ./packages/dataviews/node_modules/@ariakit/react-core/esm/__chunks/SK3NAZA3.js
 "use client";
 
 
@@ -29522,24 +29687,21 @@ function setRef(ref, value) {
   }
 }
 function isValidElementWithRef(element) {
-  if (!element)
-    return false;
-  if (!(0,external_React_.isValidElement)(element))
-    return false;
-  if (!("ref" in element))
-    return false;
-  return true;
+  if (!element) return false;
+  if (!(0,external_React_.isValidElement)(element)) return false;
+  if ("ref" in element.props) return true;
+  if ("ref" in element) return true;
+  return false;
 }
 function getRefProperty(element) {
-  if (!isValidElementWithRef(element))
-    return null;
-  return element.ref;
+  if (!isValidElementWithRef(element)) return null;
+  const props = _3YLGPPWQ_spreadValues({}, element.props);
+  return props.ref || element.ref;
 }
 function mergeProps(base, overrides) {
-  const props = _4R3V3JGP_spreadValues({}, base);
+  const props = _3YLGPPWQ_spreadValues({}, base);
   for (const key in overrides) {
-    if (!_22HHDS5F_hasOwnProperty(overrides, key))
-      continue;
+    if (!PBFD2E7P_hasOwnProperty(overrides, key)) continue;
     if (key === "className") {
       const prop = "className";
       props[prop] = base[prop] ? `${base[prop]} ${overrides[prop]}` : overrides[prop];
@@ -29547,7 +29709,7 @@ function mergeProps(base, overrides) {
     }
     if (key === "style") {
       const prop = "style";
-      props[prop] = base[prop] ? _4R3V3JGP_spreadValues(_4R3V3JGP_spreadValues({}, base[prop]), overrides[prop]) : overrides[prop];
+      props[prop] = base[prop] ? _3YLGPPWQ_spreadValues(_3YLGPPWQ_spreadValues({}, base[prop]), overrides[prop]) : overrides[prop];
       continue;
     }
     const overrideValue = overrides[key];
@@ -29568,28 +29730,28 @@ function mergeProps(base, overrides) {
 
 
 
-;// CONCATENATED MODULE: ./packages/dataviews/node_modules/@ariakit/core/esm/__chunks/RRSZHCH6.js
+;// CONCATENATED MODULE: ./node_modules/@ariakit/core/esm/__chunks/HWOIWM4O.js
 "use client";
 
 // src/utils/dom.ts
-var RRSZHCH6_canUseDOM = checkIsBrowser();
+var HWOIWM4O_canUseDOM = checkIsBrowser();
 function checkIsBrowser() {
   var _a;
   return typeof window !== "undefined" && !!((_a = window.document) == null ? void 0 : _a.createElement);
 }
-function RRSZHCH6_getDocument(node) {
+function getDocument(node) {
   return node ? node.ownerDocument || node : document;
 }
 function getWindow(node) {
-  return RRSZHCH6_getDocument(node).defaultView || window;
+  return getDocument(node).defaultView || window;
 }
-function RRSZHCH6_getActiveElement(node, activeDescendant = false) {
-  const { activeElement } = RRSZHCH6_getDocument(node);
+function HWOIWM4O_getActiveElement(node, activeDescendant = false) {
+  const { activeElement } = getDocument(node);
   if (!(activeElement == null ? void 0 : activeElement.nodeName)) {
     return null;
   }
-  if (RRSZHCH6_isFrame(activeElement) && activeElement.contentDocument) {
-    return RRSZHCH6_getActiveElement(
+  if (HWOIWM4O_isFrame(activeElement) && activeElement.contentDocument) {
+    return HWOIWM4O_getActiveElement(
       activeElement.contentDocument.body,
       activeDescendant
     );
@@ -29597,7 +29759,7 @@ function RRSZHCH6_getActiveElement(node, activeDescendant = false) {
   if (activeDescendant) {
     const id = activeElement.getAttribute("aria-activedescendant");
     if (id) {
-      const element = RRSZHCH6_getDocument(activeElement).getElementById(id);
+      const element = getDocument(activeElement).getElementById(id);
       if (element) {
         return element;
       }
@@ -29608,13 +29770,12 @@ function RRSZHCH6_getActiveElement(node, activeDescendant = false) {
 function contains(parent, child) {
   return parent === child || parent.contains(child);
 }
-function RRSZHCH6_isFrame(element) {
+function HWOIWM4O_isFrame(element) {
   return element.tagName === "IFRAME";
 }
 function isButton(element) {
   const tagName = element.tagName.toLowerCase();
-  if (tagName === "button")
-    return true;
+  if (tagName === "button") return true;
   if (tagName === "input" && element.type) {
     return buttonInputTypes.indexOf(element.type) !== -1;
   }
@@ -29628,30 +29789,14 @@ var buttonInputTypes = [
   "reset",
   "submit"
 ];
-function matches(element, selectors) {
-  if ("matches" in element) {
-    return element.matches(selectors);
-  }
-  if ("msMatchesSelector" in element) {
-    return element.msMatchesSelector(selectors);
-  }
-  return element.webkitMatchesSelector(selectors);
-}
 function isVisible(element) {
+  if (typeof element.checkVisibility === "function") {
+    return element.checkVisibility();
+  }
   const htmlElement = element;
   return htmlElement.offsetWidth > 0 || htmlElement.offsetHeight > 0 || element.getClientRects().length > 0;
 }
-function RRSZHCH6_closest(element, selectors) {
-  if ("closest" in element)
-    return element.closest(selectors);
-  do {
-    if (matches(element, selectors))
-      return element;
-    element = element.parentElement || element.parentNode;
-  } while (element !== null && element.nodeType === 1);
-  return null;
-}
-function RRSZHCH6_isTextField(element) {
+function isTextField(element) {
   try {
     const isTextInput = element instanceof HTMLInputElement && element.selectionStart !== null;
     const isTextArea = element.tagName === "TEXTAREA";
@@ -29659,6 +29804,40 @@ function RRSZHCH6_isTextField(element) {
   } catch (error) {
     return false;
   }
+}
+function isTextbox(element) {
+  return element.isContentEditable || isTextField(element);
+}
+function getTextboxValue(element) {
+  if (isTextField(element)) {
+    return element.value;
+  }
+  if (element.isContentEditable) {
+    const range = getDocument(element).createRange();
+    range.selectNodeContents(element);
+    return range.toString();
+  }
+  return "";
+}
+function getTextboxSelection(element) {
+  let start = 0;
+  let end = 0;
+  if (isTextField(element)) {
+    start = element.selectionStart || 0;
+    end = element.selectionEnd || 0;
+  } else if (element.isContentEditable) {
+    const selection = getDocument(element).getSelection();
+    if ((selection == null ? void 0 : selection.rangeCount) && selection.anchorNode && contains(element, selection.anchorNode) && selection.focusNode && contains(element, selection.focusNode)) {
+      const range = selection.getRangeAt(0);
+      const nextRange = range.cloneRange();
+      nextRange.selectNodeContents(element);
+      nextRange.setEnd(range.startContainer, range.startOffset);
+      start = nextRange.toString().length;
+      nextRange.setEnd(range.endContainer, range.endOffset);
+      end = nextRange.toString().length;
+    }
+  }
+  return { start, end };
 }
 function getPopupRole(element, fallback) {
   const allowedPopupRoles = ["dialog", "menu", "listbox", "tree", "grid"];
@@ -29676,30 +29855,9 @@ function getPopupItemRole(element, fallback) {
     tree: "treeitem"
   };
   const popupRole = getPopupRole(element);
-  if (!popupRole)
-    return fallback;
+  if (!popupRole) return fallback;
   const key = popupRole;
   return (_a = itemRoleByPopupRole[key]) != null ? _a : fallback;
-}
-function getTextboxSelection(element) {
-  let start = 0;
-  let end = 0;
-  if (RRSZHCH6_isTextField(element)) {
-    start = element.selectionStart || 0;
-    end = element.selectionEnd || 0;
-  } else if (element.isContentEditable) {
-    const selection = RRSZHCH6_getDocument(element).getSelection();
-    if ((selection == null ? void 0 : selection.rangeCount) && selection.anchorNode && contains(element, selection.anchorNode) && selection.focusNode && contains(element, selection.focusNode)) {
-      const range = selection.getRangeAt(0);
-      const nextRange = range.cloneRange();
-      nextRange.selectNodeContents(element);
-      nextRange.setEnd(range.startContainer, range.startOffset);
-      start = nextRange.toString().length;
-      nextRange.setEnd(range.endContainer, range.endOffset);
-      end = nextRange.toString().length;
-    }
-  }
-  return { start, end };
 }
 function scrollIntoViewIfNeeded(element, arg) {
   if (isPartiallyHidden(element) && "scrollIntoView" in element) {
@@ -29707,26 +29865,22 @@ function scrollIntoViewIfNeeded(element, arg) {
   }
 }
 function getScrollingElement(element) {
-  if (!element)
-    return null;
+  if (!element) return null;
   if (element.clientHeight && element.scrollHeight > element.clientHeight) {
     const { overflowY } = getComputedStyle(element);
     const isScrollable = overflowY !== "visible" && overflowY !== "hidden";
-    if (isScrollable)
-      return element;
+    if (isScrollable) return element;
   } else if (element.clientWidth && element.scrollWidth > element.clientWidth) {
     const { overflowX } = getComputedStyle(element);
     const isScrollable = overflowX !== "visible" && overflowX !== "hidden";
-    if (isScrollable)
-      return element;
+    if (isScrollable) return element;
   }
   return getScrollingElement(element.parentElement) || document.scrollingElement || document.body;
 }
 function isPartiallyHidden(element) {
   const elementRect = element.getBoundingClientRect();
   const scroller = getScrollingElement(element);
-  if (!scroller)
-    return false;
+  if (!scroller) return false;
   const scrollerRect = scroller.getBoundingClientRect();
   const isHTML = scroller.tagName === "HTML";
   const scrollerTop = isHTML ? scrollerRect.top + scroller.scrollTop : scrollerRect.top;
@@ -29747,24 +29901,23 @@ function setSelectionRange(element, ...args) {
 
 
 
-;// CONCATENATED MODULE: ./packages/dataviews/node_modules/@ariakit/core/esm/__chunks/VDNATJW2.js
+;// CONCATENATED MODULE: ./node_modules/@ariakit/core/esm/__chunks/US4USQPI.js
 "use client";
 
 
 // src/utils/platform.ts
 function isTouchDevice() {
-  return RRSZHCH6_canUseDOM && !!navigator.maxTouchPoints;
+  return HWOIWM4O_canUseDOM && !!navigator.maxTouchPoints;
 }
 function isApple() {
-  if (!RRSZHCH6_canUseDOM)
-    return false;
+  if (!HWOIWM4O_canUseDOM) return false;
   return /mac|iphone|ipad|ipod/i.test(navigator.platform);
 }
 function isSafari() {
-  return RRSZHCH6_canUseDOM && isApple() && /apple/i.test(navigator.vendor);
+  return HWOIWM4O_canUseDOM && isApple() && /apple/i.test(navigator.vendor);
 }
 function isFirefox() {
-  return RRSZHCH6_canUseDOM && /firefox\//i.test(navigator.userAgent);
+  return HWOIWM4O_canUseDOM && /firefox\//i.test(navigator.userAgent);
 }
 function isMac() {
   return canUseDOM && navigator.platform.startsWith("Mac") && !isTouchDevice();
@@ -29772,7 +29925,7 @@ function isMac() {
 
 
 
-;// CONCATENATED MODULE: ./packages/dataviews/node_modules/@ariakit/core/esm/utils/events.js
+;// CONCATENATED MODULE: ./node_modules/@ariakit/core/esm/utils/events.js
 "use client";
 
 
@@ -29789,35 +29942,24 @@ function isSelfTarget(event) {
 }
 function isOpeningInNewTab(event) {
   const element = event.currentTarget;
-  if (!element)
-    return false;
+  if (!element) return false;
   const isAppleDevice = isApple();
-  if (isAppleDevice && !event.metaKey)
-    return false;
-  if (!isAppleDevice && !event.ctrlKey)
-    return false;
+  if (isAppleDevice && !event.metaKey) return false;
+  if (!isAppleDevice && !event.ctrlKey) return false;
   const tagName = element.tagName.toLowerCase();
-  if (tagName === "a")
-    return true;
-  if (tagName === "button" && element.type === "submit")
-    return true;
-  if (tagName === "input" && element.type === "submit")
-    return true;
+  if (tagName === "a") return true;
+  if (tagName === "button" && element.type === "submit") return true;
+  if (tagName === "input" && element.type === "submit") return true;
   return false;
 }
 function isDownloading(event) {
   const element = event.currentTarget;
-  if (!element)
-    return false;
+  if (!element) return false;
   const tagName = element.tagName.toLowerCase();
-  if (!event.altKey)
-    return false;
-  if (tagName === "a")
-    return true;
-  if (tagName === "button" && element.type === "submit")
-    return true;
-  if (tagName === "input" && element.type === "submit")
-    return true;
+  if (!event.altKey) return false;
+  if (tagName === "a") return true;
+  if (tagName === "button" && element.type === "submit") return true;
+  if (tagName === "input" && element.type === "submit") return true;
   return false;
 }
 function fireEvent(element, type, eventInit) {
@@ -29827,7 +29969,7 @@ function fireEvent(element, type, eventInit) {
 function fireBlurEvent(element, eventInit) {
   const event = new FocusEvent("blur", eventInit);
   const defaultAllowed = element.dispatchEvent(event);
-  const bubbleInit = _chunks_4R3V3JGP_spreadProps(_chunks_4R3V3JGP_spreadValues({}, eventInit), { bubbles: true });
+  const bubbleInit = _chunks_3YLGPPWQ_spreadProps(_chunks_3YLGPPWQ_spreadValues({}, eventInit), { bubbles: true });
   element.dispatchEvent(new FocusEvent("focusout", bubbleInit));
   return defaultAllowed;
 }
@@ -29851,20 +29993,32 @@ function isFocusEventOutside(event, container) {
   const relatedTarget = event.relatedTarget;
   return !relatedTarget || !contains(containerElement, relatedTarget);
 }
-function queueBeforeEvent(element, type, callback) {
-  const raf = requestAnimationFrame(() => {
-    element.removeEventListener(type, callImmediately, true);
+function getInputType(event) {
+  const nativeEvent = "nativeEvent" in event ? event.nativeEvent : event;
+  if (!nativeEvent) return;
+  if (!("inputType" in nativeEvent)) return;
+  if (typeof nativeEvent.inputType !== "string") return;
+  return nativeEvent.inputType;
+}
+function queueBeforeEvent(element, type, callback, timeout) {
+  const createTimer = (callback2) => {
+    if (timeout) {
+      const timerId2 = setTimeout(callback2, timeout);
+      return () => clearTimeout(timerId2);
+    }
+    const timerId = requestAnimationFrame(callback2);
+    return () => cancelAnimationFrame(timerId);
+  };
+  const cancelTimer = createTimer(() => {
+    element.removeEventListener(type, callSync, true);
     callback();
   });
-  const callImmediately = () => {
-    cancelAnimationFrame(raf);
+  const callSync = () => {
+    cancelTimer();
     callback();
   };
-  element.addEventListener(type, callImmediately, {
-    once: true,
-    capture: true
-  });
-  return raf;
+  element.addEventListener(type, callSync, { once: true, capture: true });
+  return cancelTimer;
 }
 function addGlobalEventListener(type, listener, options, scope = window) {
   const children = [];
@@ -29880,13 +30034,15 @@ function addGlobalEventListener(type, listener, options, scope = window) {
       scope.document.removeEventListener(type, listener, options);
     } catch (e) {
     }
-    children.forEach((remove) => remove());
+    for (const remove of children) {
+      remove();
+    }
   };
   return removeEventListener;
 }
 
 
-;// CONCATENATED MODULE: ./packages/dataviews/node_modules/@ariakit/react-core/esm/__chunks/6O5OEQGF.js
+;// CONCATENATED MODULE: ./packages/dataviews/node_modules/@ariakit/react-core/esm/__chunks/Z32BISHQ.js
 "use client";
 
 
@@ -29896,12 +30052,11 @@ function addGlobalEventListener(type, listener, options, scope = window) {
 
 
 
-
-var _React = _4R3V3JGP_spreadValues({}, external_React_namespaceObject);
+var _React = _3YLGPPWQ_spreadValues({}, external_React_namespaceObject);
 var useReactId = _React.useId;
 var useReactDeferredValue = _React.useDeferredValue;
 var useReactInsertionEffect = _React.useInsertionEffect;
-var useSafeLayoutEffect = RRSZHCH6_canUseDOM ? external_React_.useLayoutEffect : external_React_.useEffect;
+var useSafeLayoutEffect = HWOIWM4O_canUseDOM ? external_React_.useLayoutEffect : external_React_.useEffect;
 function useInitialValue(value) {
   const [initialValue] = useState(value);
   return initialValue;
@@ -29943,34 +30098,41 @@ function useEvent(callback) {
     return (_a = ref.current) == null ? void 0 : _a.call(ref, ...args);
   }, []);
 }
+function useTransactionState(callback) {
+  const [state, setState] = (0,external_React_.useState)(null);
+  useSafeLayoutEffect(() => {
+    if (state == null) return;
+    if (!callback) return;
+    let prevState = null;
+    callback((prev) => {
+      prevState = prev;
+      return state;
+    });
+    return () => {
+      callback(prevState);
+    };
+  }, [state, callback]);
+  return [state, setState];
+}
 function useMergeRefs(...refs) {
   return (0,external_React_.useMemo)(() => {
-    if (!refs.some(Boolean))
-      return;
+    if (!refs.some(Boolean)) return;
     return (value) => {
-      refs.forEach((ref) => setRef(ref, value));
+      for (const ref of refs) {
+        setRef(ref, value);
+      }
     };
   }, refs);
-}
-function useRefId(ref, deps) {
-  const [id, setId] = useState(void 0);
-  useSafeLayoutEffect(() => {
-    var _a;
-    setId((_a = ref == null ? void 0 : ref.current) == null ? void 0 : _a.id);
-  }, deps);
-  return id;
 }
 function useId(defaultId) {
   if (useReactId) {
     const reactId = useReactId();
-    if (defaultId)
-      return defaultId;
+    if (defaultId) return defaultId;
     return reactId;
   }
   const [id, setId] = (0,external_React_.useState)(defaultId);
   useSafeLayoutEffect(() => {
-    if (defaultId || id)
-      return;
+    if (defaultId || id) return;
     const random = Math.random().toString(36).substr(2, 6);
     setId(`id-${random}`);
   }, [defaultId, id]);
@@ -29989,8 +30151,7 @@ function useDeferredValue(value) {
 }
 function useTagName(refOrElement, type) {
   const stringOrUndefined = (type2) => {
-    if (typeof type2 !== "string")
-      return;
+    if (typeof type2 !== "string") return;
     return type2;
   };
   const [tagName, setTagName] = (0,external_React_.useState)(() => stringOrUndefined(type));
@@ -30004,10 +30165,16 @@ function useAttribute(refOrElement, attributeName, defaultValue) {
   const [attribute, setAttribute] = (0,external_React_.useState)(defaultValue);
   useSafeLayoutEffect(() => {
     const element = refOrElement && "current" in refOrElement ? refOrElement.current : refOrElement;
-    const value = element == null ? void 0 : element.getAttribute(attributeName);
-    if (value == null)
-      return;
-    setAttribute(value);
+    if (!element) return;
+    const callback = () => {
+      const value = element.getAttribute(attributeName);
+      if (value == null) return;
+      setAttribute(value);
+    };
+    const observer = new MutationObserver(callback);
+    observer.observe(element, { attributeFilter: [attributeName] });
+    callback();
+    return () => observer.disconnect();
   }, [refOrElement, attributeName]);
   return attribute;
 }
@@ -30041,40 +30208,7 @@ function useUpdateLayoutEffect(effect, deps) {
     []
   );
 }
-function useControlledState(defaultState, state, setState) {
-  const [localState, setLocalState] = useState(defaultState);
-  const nextState = state !== void 0 ? state : localState;
-  const stateRef = useLiveRef(state);
-  const setStateRef = useLiveRef(setState);
-  const nextStateRef = useLiveRef(nextState);
-  const setNextState = useCallback((prevValue) => {
-    const setStateProp = setStateRef.current;
-    if (setStateProp) {
-      if (isSetNextState(setStateProp)) {
-        setStateProp(prevValue);
-      } else {
-        const nextValue = applyState(prevValue, nextStateRef.current);
-        nextStateRef.current = nextValue;
-        setStateProp(nextValue);
-      }
-    }
-    if (stateRef.current === void 0) {
-      setLocalState(prevValue);
-    }
-  }, []);
-  defineSetNextState(setNextState);
-  return [nextState, setNextState];
-}
-var SET_NEXT_STATE = Symbol("setNextState");
-function isSetNextState(arg) {
-  return arg[SET_NEXT_STATE] === true;
-}
-function defineSetNextState(arg) {
-  if (!isSetNextState(arg)) {
-    Object.defineProperty(arg, SET_NEXT_STATE, { value: true });
-  }
-}
-function _6O5OEQGF_useForceUpdate() {
+function Z32BISHQ_useForceUpdate() {
   return (0,external_React_.useReducer)(() => [], []);
 }
 function useBooleanEvent(booleanOrCallback) {
@@ -30092,7 +30226,7 @@ function useWrapElement(props, callback, deps = []) {
     },
     [...deps, props.wrapElement]
   );
-  return _4R3V3JGP_spreadProps(_4R3V3JGP_spreadValues({}, props), { wrapElement });
+  return _3YLGPPWQ_spreadProps(_3YLGPPWQ_spreadValues({}, props), { wrapElement });
 }
 function usePortalRef(portalProp = false, portalRefProp) {
   const [portalNode, setPortalNode] = useState(null);
@@ -30104,7 +30238,7 @@ function useMetadataProps(props, key, value) {
   const parent = props.onLoadedMetadataCapture;
   const onLoadedMetadataCapture = (0,external_React_.useMemo)(() => {
     return Object.assign(() => {
-    }, _4R3V3JGP_spreadProps(_4R3V3JGP_spreadValues({}, parent), { [key]: value }));
+    }, _3YLGPPWQ_spreadProps(_3YLGPPWQ_spreadValues({}, parent), { [key]: value }));
   }, [parent, key, value]);
   return [parent == null ? void 0 : parent[key], { onLoadedMetadataCapture }];
 }
@@ -30130,8 +30264,7 @@ function hasMouseMovement(event) {
   return movementX || movementY || "production" === "test";
 }
 function setMouseMoving(event) {
-  if (!hasMouseMovement(event))
-    return;
+  if (!hasMouseMovement(event)) return;
   mouseMoving = true;
 }
 function resetMouseMoving() {
@@ -30140,7 +30273,7 @@ function resetMouseMoving() {
 
 
 
-;// CONCATENATED MODULE: ./packages/dataviews/node_modules/@ariakit/react-core/esm/__chunks/5M6RSQEC.js
+;// CONCATENATED MODULE: ./packages/dataviews/node_modules/@ariakit/react-core/esm/__chunks/HKOOKEDE.js
 "use client";
 
 
@@ -30150,7 +30283,7 @@ function resetMouseMoving() {
 
 
 function forwardRef2(render) {
-  const Role = external_React_.forwardRef((props, ref) => render(_4R3V3JGP_spreadProps(_4R3V3JGP_spreadValues({}, props), { ref })));
+  const Role = external_React_.forwardRef((props, ref) => render(_3YLGPPWQ_spreadProps(_3YLGPPWQ_spreadValues({}, props), { ref })));
   Role.displayName = render.displayName || render.name;
   return Role;
 }
@@ -30162,12 +30295,12 @@ function createElement(Type, props) {
   const mergedRef = useMergeRefs(props.ref, getRefProperty(render));
   let element;
   if (external_React_.isValidElement(render)) {
-    const renderProps = _4R3V3JGP_spreadProps(_4R3V3JGP_spreadValues({}, render.props), { ref: mergedRef });
+    const renderProps = _3YLGPPWQ_spreadProps(_3YLGPPWQ_spreadValues({}, render.props), { ref: mergedRef });
     element = external_React_.cloneElement(render, mergeProps(rest, renderProps));
   } else if (render) {
     element = render(rest);
   } else {
-    element = /* @__PURE__ */ (0,external_ReactJSXRuntime_namespaceObject.jsx)(Type, _4R3V3JGP_spreadValues({}, rest));
+    element = /* @__PURE__ */ (0,external_ReactJSXRuntime_namespaceObject.jsx)(Type, _3YLGPPWQ_spreadValues({}, rest));
   }
   if (wrapElement) {
     return wrapElement(element);
@@ -30188,27 +30321,25 @@ function createStoreContext(providers = [], scopedProviders = []) {
   const useScopedContext = (onlyScoped = false) => {
     const scoped = external_React_.useContext(scopedContext);
     const store = useContext2();
-    if (onlyScoped)
-      return scoped;
+    if (onlyScoped) return scoped;
     return scoped || store;
   };
   const useProviderContext = () => {
     const scoped = external_React_.useContext(scopedContext);
     const store = useContext2();
-    if (scoped && scoped === store)
-      return;
+    if (scoped && scoped === store) return;
     return store;
   };
   const ContextProvider = (props) => {
     return providers.reduceRight(
-      (children, Provider) => /* @__PURE__ */ (0,external_ReactJSXRuntime_namespaceObject.jsx)(Provider, _4R3V3JGP_spreadProps(_4R3V3JGP_spreadValues({}, props), { children })),
-      /* @__PURE__ */ (0,external_ReactJSXRuntime_namespaceObject.jsx)(context.Provider, _4R3V3JGP_spreadValues({}, props))
+      (children, Provider) => /* @__PURE__ */ (0,external_ReactJSXRuntime_namespaceObject.jsx)(Provider, _3YLGPPWQ_spreadProps(_3YLGPPWQ_spreadValues({}, props), { children })),
+      /* @__PURE__ */ (0,external_ReactJSXRuntime_namespaceObject.jsx)(context.Provider, _3YLGPPWQ_spreadValues({}, props))
     );
   };
   const ScopedContextProvider = (props) => {
-    return /* @__PURE__ */ (0,external_ReactJSXRuntime_namespaceObject.jsx)(ContextProvider, _4R3V3JGP_spreadProps(_4R3V3JGP_spreadValues({}, props), { children: scopedProviders.reduceRight(
-      (children, Provider) => /* @__PURE__ */ (0,external_ReactJSXRuntime_namespaceObject.jsx)(Provider, _4R3V3JGP_spreadProps(_4R3V3JGP_spreadValues({}, props), { children })),
-      /* @__PURE__ */ (0,external_ReactJSXRuntime_namespaceObject.jsx)(scopedContext.Provider, _4R3V3JGP_spreadValues({}, props))
+    return /* @__PURE__ */ (0,external_ReactJSXRuntime_namespaceObject.jsx)(ContextProvider, _3YLGPPWQ_spreadProps(_3YLGPPWQ_spreadValues({}, props), { children: scopedProviders.reduceRight(
+      (children, Provider) => /* @__PURE__ */ (0,external_ReactJSXRuntime_namespaceObject.jsx)(Provider, _3YLGPPWQ_spreadProps(_3YLGPPWQ_spreadValues({}, props), { children })),
+      /* @__PURE__ */ (0,external_ReactJSXRuntime_namespaceObject.jsx)(scopedContext.Provider, _3YLGPPWQ_spreadValues({}, props))
     ) }));
   };
   return {
@@ -30224,36 +30355,36 @@ function createStoreContext(providers = [], scopedProviders = []) {
 
 
 
-;// CONCATENATED MODULE: ./packages/dataviews/node_modules/@ariakit/react-core/esm/__chunks/MADQZZRL.js
+;// CONCATENATED MODULE: ./packages/dataviews/node_modules/@ariakit/react-core/esm/__chunks/FMYQNSCK.js
 "use client";
 
 
 // src/collection/collection-context.tsx
-var MADQZZRL_ctx = createStoreContext();
-var useCollectionContext = MADQZZRL_ctx.useContext;
-var useCollectionScopedContext = MADQZZRL_ctx.useScopedContext;
-var useCollectionProviderContext = MADQZZRL_ctx.useProviderContext;
-var CollectionContextProvider = MADQZZRL_ctx.ContextProvider;
-var CollectionScopedContextProvider = MADQZZRL_ctx.ScopedContextProvider;
+var FMYQNSCK_ctx = createStoreContext();
+var useCollectionContext = FMYQNSCK_ctx.useContext;
+var useCollectionScopedContext = FMYQNSCK_ctx.useScopedContext;
+var useCollectionProviderContext = FMYQNSCK_ctx.useProviderContext;
+var CollectionContextProvider = FMYQNSCK_ctx.ContextProvider;
+var CollectionScopedContextProvider = FMYQNSCK_ctx.ScopedContextProvider;
 
 
 
-;// CONCATENATED MODULE: ./packages/dataviews/node_modules/@ariakit/react-core/esm/__chunks/3D6OCOHF.js
+;// CONCATENATED MODULE: ./packages/dataviews/node_modules/@ariakit/react-core/esm/__chunks/WENSINUV.js
 "use client";
 
 
 
 // src/composite/composite-context.tsx
 
-var _3D6OCOHF_ctx = createStoreContext(
+var WENSINUV_ctx = createStoreContext(
   [CollectionContextProvider],
   [CollectionScopedContextProvider]
 );
-var useCompositeContext = _3D6OCOHF_ctx.useContext;
-var useCompositeScopedContext = _3D6OCOHF_ctx.useScopedContext;
-var useCompositeProviderContext = _3D6OCOHF_ctx.useProviderContext;
-var CompositeContextProvider = _3D6OCOHF_ctx.ContextProvider;
-var CompositeScopedContextProvider = _3D6OCOHF_ctx.ScopedContextProvider;
+var useCompositeContext = WENSINUV_ctx.useContext;
+var useCompositeScopedContext = WENSINUV_ctx.useScopedContext;
+var useCompositeProviderContext = WENSINUV_ctx.useProviderContext;
+var CompositeContextProvider = WENSINUV_ctx.ContextProvider;
+var CompositeScopedContextProvider = WENSINUV_ctx.ScopedContextProvider;
 var CompositeItemContext = (0,external_React_.createContext)(
   void 0
 );
@@ -30263,7 +30394,634 @@ var CompositeRowContext = (0,external_React_.createContext)(
 
 
 
-;// CONCATENATED MODULE: ./packages/dataviews/node_modules/@ariakit/react-core/esm/__chunks/DMSZFK7W.js
+;// CONCATENATED MODULE: ./packages/dataviews/node_modules/@ariakit/react-core/esm/__chunks/P2OTTZSX.js
+"use client";
+
+
+
+// src/tag/tag-context.tsx
+
+var TagValueContext = (0,external_React_.createContext)(null);
+var TagRemoveIdContext = (0,external_React_.createContext)(
+  null
+);
+var P2OTTZSX_ctx = createStoreContext(
+  [CompositeContextProvider],
+  [CompositeScopedContextProvider]
+);
+var useTagContext = P2OTTZSX_ctx.useContext;
+var useTagScopedContext = P2OTTZSX_ctx.useScopedContext;
+var useTagProviderContext = P2OTTZSX_ctx.useProviderContext;
+var TagContextProvider = P2OTTZSX_ctx.ContextProvider;
+var TagScopedContextProvider = P2OTTZSX_ctx.ScopedContextProvider;
+
+
+
+;// CONCATENATED MODULE: ./node_modules/@ariakit/core/esm/__chunks/EQQLU3CG.js
+"use client";
+
+
+
+// src/utils/store.ts
+function getInternal(store, key) {
+  const internals = store.__unstableInternals;
+  invariant(internals, "Invalid store");
+  return internals[key];
+}
+function createStore(initialState, ...stores) {
+  let state = initialState;
+  let prevStateBatch = state;
+  let lastUpdate = Symbol();
+  let destroy = PBFD2E7P_noop;
+  const instances = /* @__PURE__ */ new Set();
+  const updatedKeys = /* @__PURE__ */ new Set();
+  const setups = /* @__PURE__ */ new Set();
+  const listeners = /* @__PURE__ */ new Set();
+  const batchListeners = /* @__PURE__ */ new Set();
+  const disposables = /* @__PURE__ */ new WeakMap();
+  const listenerKeys = /* @__PURE__ */ new WeakMap();
+  const storeSetup = (callback) => {
+    setups.add(callback);
+    return () => setups.delete(callback);
+  };
+  const storeInit = () => {
+    const initialized = instances.size;
+    const instance = Symbol();
+    instances.add(instance);
+    const maybeDestroy = () => {
+      instances.delete(instance);
+      if (instances.size) return;
+      destroy();
+    };
+    if (initialized) return maybeDestroy;
+    const desyncs = PBFD2E7P_getKeys(state).map(
+      (key) => chain(
+        ...stores.map((store) => {
+          var _a;
+          const storeState = (_a = store == null ? void 0 : store.getState) == null ? void 0 : _a.call(store);
+          if (!storeState) return;
+          if (!PBFD2E7P_hasOwnProperty(storeState, key)) return;
+          return EQQLU3CG_sync(store, [key], (state2) => {
+            setState(
+              key,
+              state2[key],
+              // @ts-expect-error - Not public API. This is just to prevent
+              // infinite loops.
+              true
+            );
+          });
+        })
+      )
+    );
+    const teardowns = [];
+    for (const setup2 of setups) {
+      teardowns.push(setup2());
+    }
+    const cleanups = stores.map(init);
+    destroy = chain(...desyncs, ...teardowns, ...cleanups);
+    return maybeDestroy;
+  };
+  const sub = (keys, listener, set = listeners) => {
+    set.add(listener);
+    listenerKeys.set(listener, keys);
+    return () => {
+      var _a;
+      (_a = disposables.get(listener)) == null ? void 0 : _a();
+      disposables.delete(listener);
+      listenerKeys.delete(listener);
+      set.delete(listener);
+    };
+  };
+  const storeSubscribe = (keys, listener) => sub(keys, listener);
+  const storeSync = (keys, listener) => {
+    disposables.set(listener, listener(state, state));
+    return sub(keys, listener);
+  };
+  const storeBatch = (keys, listener) => {
+    disposables.set(listener, listener(state, prevStateBatch));
+    return sub(keys, listener, batchListeners);
+  };
+  const storePick = (keys) => createStore(pick(state, keys), finalStore);
+  const storeOmit = (keys) => createStore(omit(state, keys), finalStore);
+  const getState = () => state;
+  const setState = (key, value, fromStores = false) => {
+    var _a;
+    if (!PBFD2E7P_hasOwnProperty(state, key)) return;
+    const nextValue = applyState(value, state[key]);
+    if (nextValue === state[key]) return;
+    if (!fromStores) {
+      for (const store of stores) {
+        (_a = store == null ? void 0 : store.setState) == null ? void 0 : _a.call(store, key, nextValue);
+      }
+    }
+    const prevState = state;
+    state = _chunks_3YLGPPWQ_spreadProps(_chunks_3YLGPPWQ_spreadValues({}, state), { [key]: nextValue });
+    const thisUpdate = Symbol();
+    lastUpdate = thisUpdate;
+    updatedKeys.add(key);
+    const run = (listener, prev, uKeys) => {
+      var _a2;
+      const keys = listenerKeys.get(listener);
+      const updated = (k) => uKeys ? uKeys.has(k) : k === key;
+      if (!keys || keys.some(updated)) {
+        (_a2 = disposables.get(listener)) == null ? void 0 : _a2();
+        disposables.set(listener, listener(state, prev));
+      }
+    };
+    for (const listener of listeners) {
+      run(listener, prevState);
+    }
+    queueMicrotask(() => {
+      if (lastUpdate !== thisUpdate) return;
+      const snapshot = state;
+      for (const listener of batchListeners) {
+        run(listener, prevStateBatch, updatedKeys);
+      }
+      prevStateBatch = snapshot;
+      updatedKeys.clear();
+    });
+  };
+  const finalStore = {
+    getState,
+    setState,
+    __unstableInternals: {
+      setup: storeSetup,
+      init: storeInit,
+      subscribe: storeSubscribe,
+      sync: storeSync,
+      batch: storeBatch,
+      pick: storePick,
+      omit: storeOmit
+    }
+  };
+  return finalStore;
+}
+function setup(store, ...args) {
+  if (!store) return;
+  return getInternal(store, "setup")(...args);
+}
+function init(store, ...args) {
+  if (!store) return;
+  return getInternal(store, "init")(...args);
+}
+function subscribe(store, ...args) {
+  if (!store) return;
+  return getInternal(store, "subscribe")(...args);
+}
+function EQQLU3CG_sync(store, ...args) {
+  if (!store) return;
+  return getInternal(store, "sync")(...args);
+}
+function batch(store, ...args) {
+  if (!store) return;
+  return getInternal(store, "batch")(...args);
+}
+function omit2(store, ...args) {
+  if (!store) return;
+  return getInternal(store, "omit")(...args);
+}
+function pick2(store, ...args) {
+  if (!store) return;
+  return getInternal(store, "pick")(...args);
+}
+function mergeStore(...stores) {
+  const initialState = stores.reduce((state, store2) => {
+    var _a;
+    const nextState = (_a = store2 == null ? void 0 : store2.getState) == null ? void 0 : _a.call(store2);
+    if (!nextState) return state;
+    return Object.assign(state, nextState);
+  }, {});
+  const store = createStore(initialState, ...stores);
+  return store;
+}
+function throwOnConflictingProps(props, store) {
+  if (true) return;
+  if (!store) return;
+  const defaultKeys = Object.entries(props).filter(([key, value]) => key.startsWith("default") && value !== void 0).map(([key]) => {
+    var _a;
+    const stateKey = key.replace("default", "");
+    return `${((_a = stateKey[0]) == null ? void 0 : _a.toLowerCase()) || ""}${stateKey.slice(1)}`;
+  });
+  if (!defaultKeys.length) return;
+  const storeState = store.getState();
+  const conflictingProps = defaultKeys.filter(
+    (key) => PBFD2E7P_hasOwnProperty(storeState, key)
+  );
+  if (!conflictingProps.length) return;
+  throw new Error(
+    `Passing a store prop in conjunction with a default state is not supported.
+
+const store = useSelectStore();
+<SelectProvider store={store} defaultValue="Apple" />
+                ^             ^
+
+Instead, pass the default state to the topmost store:
+
+const store = useSelectStore({ defaultValue: "Apple" });
+<SelectProvider store={store} />
+
+See https://github.com/ariakit/ariakit/pull/2745 for more details.
+
+If there's a particular need for this, please submit a feature request at https://github.com/ariakit/ariakit
+`
+  );
+}
+
+
+
+// EXTERNAL MODULE: ./node_modules/use-sync-external-store/shim/index.js
+var shim = __webpack_require__(635);
+;// CONCATENATED MODULE: ./packages/dataviews/node_modules/@ariakit/react-core/esm/__chunks/2GXGCHW6.js
+"use client";
+
+
+
+// src/utils/store.tsx
+
+
+
+
+var { useSyncExternalStore } = shim;
+var noopSubscribe = () => () => {
+};
+function useStoreState(store, keyOrSelector = identity) {
+  const storeSubscribe = external_React_.useCallback(
+    (callback) => {
+      if (!store) return noopSubscribe();
+      return subscribe(store, null, callback);
+    },
+    [store]
+  );
+  const getSnapshot = () => {
+    const key = typeof keyOrSelector === "string" ? keyOrSelector : null;
+    const selector = typeof keyOrSelector === "function" ? keyOrSelector : null;
+    const state = store == null ? void 0 : store.getState();
+    if (selector) return selector(state);
+    if (!state) return;
+    if (!key) return;
+    if (!PBFD2E7P_hasOwnProperty(state, key)) return;
+    return state[key];
+  };
+  return useSyncExternalStore(storeSubscribe, getSnapshot, getSnapshot);
+}
+function useStoreProps(store, props, key, setKey) {
+  const value = PBFD2E7P_hasOwnProperty(props, key) ? props[key] : void 0;
+  const setValue = setKey ? props[setKey] : void 0;
+  const propsRef = useLiveRef({ value, setValue });
+  useSafeLayoutEffect(() => {
+    return EQQLU3CG_sync(store, [key], (state, prev) => {
+      const { value: value2, setValue: setValue2 } = propsRef.current;
+      if (!setValue2) return;
+      if (state[key] === prev[key]) return;
+      if (state[key] === value2) return;
+      setValue2(state[key]);
+    });
+  }, [store, key]);
+  useSafeLayoutEffect(() => {
+    if (value === void 0) return;
+    store.setState(key, value);
+    return batch(store, [key], () => {
+      if (value === void 0) return;
+      store.setState(key, value);
+    });
+  });
+}
+function _2GXGCHW6_useStore(createStore, props) {
+  const [store, setStore] = external_React_.useState(() => createStore(props));
+  useSafeLayoutEffect(() => init(store), [store]);
+  const useState2 = external_React_.useCallback(
+    (keyOrSelector) => useStoreState(store, keyOrSelector),
+    [store]
+  );
+  const memoizedStore = external_React_.useMemo(
+    () => _3YLGPPWQ_spreadProps(_3YLGPPWQ_spreadValues({}, store), { useState: useState2 }),
+    [store, useState2]
+  );
+  const updateStore = useEvent(() => {
+    setStore((store2) => createStore(_3YLGPPWQ_spreadValues(_3YLGPPWQ_spreadValues({}, props), store2.getState())));
+  });
+  return [memoizedStore, updateStore];
+}
+
+
+
+;// CONCATENATED MODULE: ./packages/dataviews/node_modules/@ariakit/react-core/esm/__chunks/TCAGH6BH.js
+"use client";
+
+
+
+// src/collection/collection-store.ts
+
+function useCollectionStoreProps(store, update, props) {
+  useUpdateEffect(update, [props.store]);
+  useStoreProps(store, props, "items", "setItems");
+  return store;
+}
+function useCollectionStore(props = {}) {
+  const [store, update] = useStore(Core.createCollectionStore, props);
+  return useCollectionStoreProps(store, update, props);
+}
+
+
+
+;// CONCATENATED MODULE: ./packages/dataviews/node_modules/@ariakit/react-core/esm/__chunks/UVQLZ7T5.js
+"use client";
+
+
+
+// src/composite/composite-store.ts
+
+function useCompositeStoreProps(store, update, props) {
+  store = useCollectionStoreProps(store, update, props);
+  useStoreProps(store, props, "activeId", "setActiveId");
+  useStoreProps(store, props, "includesBaseElement");
+  useStoreProps(store, props, "virtualFocus");
+  useStoreProps(store, props, "orientation");
+  useStoreProps(store, props, "rtl");
+  useStoreProps(store, props, "focusLoop");
+  useStoreProps(store, props, "focusWrap");
+  useStoreProps(store, props, "focusShift");
+  return store;
+}
+function useCompositeStore(props = {}) {
+  const [store, update] = useStore(Core.createCompositeStore, props);
+  return useCompositeStoreProps(store, update, props);
+}
+
+
+
+;// CONCATENATED MODULE: ./packages/dataviews/node_modules/@ariakit/react-core/esm/__chunks/KGK2TTFO.js
+"use client";
+
+
+
+// src/disclosure/disclosure-store.ts
+
+function useDisclosureStoreProps(store, update, props) {
+  useUpdateEffect(update, [props.store, props.disclosure]);
+  useStoreProps(store, props, "open", "setOpen");
+  useStoreProps(store, props, "mounted", "setMounted");
+  useStoreProps(store, props, "animated");
+  return Object.assign(store, { disclosure: props.disclosure });
+}
+function useDisclosureStore(props = {}) {
+  const [store, update] = useStore(Core.createDisclosureStore, props);
+  return useDisclosureStoreProps(store, update, props);
+}
+
+
+
+;// CONCATENATED MODULE: ./packages/dataviews/node_modules/@ariakit/react-core/esm/__chunks/QYS5FHDY.js
+"use client";
+
+
+
+// src/dialog/dialog-store.ts
+
+function useDialogStoreProps(store, update, props) {
+  return useDisclosureStoreProps(store, update, props);
+}
+function useDialogStore(props = {}) {
+  const [store, update] = useStore(Core.createDialogStore, props);
+  return useDialogStoreProps(store, update, props);
+}
+
+
+
+;// CONCATENATED MODULE: ./packages/dataviews/node_modules/@ariakit/react-core/esm/__chunks/CBC47ZYL.js
+"use client";
+
+
+
+
+// src/popover/popover-store.ts
+
+function usePopoverStoreProps(store, update, props) {
+  useUpdateEffect(update, [props.popover]);
+  useStoreProps(store, props, "placement");
+  return useDialogStoreProps(store, update, props);
+}
+function usePopoverStore(props = {}) {
+  const [store, update] = useStore(Core.createPopoverStore, props);
+  return usePopoverStoreProps(store, update, props);
+}
+
+
+
+;// CONCATENATED MODULE: ./node_modules/@ariakit/core/esm/__chunks/6DHTHWXD.js
+"use client";
+
+
+
+
+
+// src/collection/collection-store.ts
+function isElementPreceding(a, b) {
+  return Boolean(
+    b.compareDocumentPosition(a) & Node.DOCUMENT_POSITION_PRECEDING
+  );
+}
+function sortBasedOnDOMPosition(items) {
+  const pairs = items.map((item, index) => [index, item]);
+  let isOrderDifferent = false;
+  pairs.sort(([indexA, a], [indexB, b]) => {
+    const elementA = a.element;
+    const elementB = b.element;
+    if (elementA === elementB) return 0;
+    if (!elementA || !elementB) return 0;
+    if (isElementPreceding(elementA, elementB)) {
+      if (indexA > indexB) {
+        isOrderDifferent = true;
+      }
+      return -1;
+    }
+    if (indexA < indexB) {
+      isOrderDifferent = true;
+    }
+    return 1;
+  });
+  if (isOrderDifferent) {
+    return pairs.map(([_, item]) => item);
+  }
+  return items;
+}
+function getCommonParent(items) {
+  var _a;
+  const firstItem = items.find((item) => !!item.element);
+  const lastItem = [...items].reverse().find((item) => !!item.element);
+  let parentElement = (_a = firstItem == null ? void 0 : firstItem.element) == null ? void 0 : _a.parentElement;
+  while (parentElement && (lastItem == null ? void 0 : lastItem.element)) {
+    const parent = parentElement;
+    if (lastItem && parent.contains(lastItem.element)) {
+      return parentElement;
+    }
+    parentElement = parentElement.parentElement;
+  }
+  return getDocument(parentElement).body;
+}
+function getPrivateStore(store) {
+  return store == null ? void 0 : store.__unstablePrivateStore;
+}
+function createCollectionStore(props = {}) {
+  var _a;
+  throwOnConflictingProps(props, props.store);
+  const syncState = (_a = props.store) == null ? void 0 : _a.getState();
+  const items = defaultValue(
+    props.items,
+    syncState == null ? void 0 : syncState.items,
+    props.defaultItems,
+    []
+  );
+  const itemsMap = new Map(items.map((item) => [item.id, item]));
+  const initialState = {
+    items,
+    renderedItems: defaultValue(syncState == null ? void 0 : syncState.renderedItems, [])
+  };
+  const syncPrivateStore = getPrivateStore(props.store);
+  const privateStore = createStore(
+    { items, renderedItems: initialState.renderedItems },
+    syncPrivateStore
+  );
+  const collection = createStore(initialState, props.store);
+  const sortItems = (renderedItems) => {
+    const sortedItems = sortBasedOnDOMPosition(renderedItems);
+    privateStore.setState("renderedItems", sortedItems);
+    collection.setState("renderedItems", sortedItems);
+  };
+  setup(collection, () => init(privateStore));
+  setup(privateStore, () => {
+    return batch(privateStore, ["items"], (state) => {
+      collection.setState("items", state.items);
+    });
+  });
+  setup(privateStore, () => {
+    return batch(privateStore, ["renderedItems"], (state) => {
+      let firstRun = true;
+      let raf = requestAnimationFrame(() => {
+        const { renderedItems } = collection.getState();
+        if (state.renderedItems === renderedItems) return;
+        sortItems(state.renderedItems);
+      });
+      if (typeof IntersectionObserver !== "function") {
+        return () => cancelAnimationFrame(raf);
+      }
+      const ioCallback = () => {
+        if (firstRun) {
+          firstRun = false;
+          return;
+        }
+        cancelAnimationFrame(raf);
+        raf = requestAnimationFrame(() => sortItems(state.renderedItems));
+      };
+      const root = getCommonParent(state.renderedItems);
+      const observer = new IntersectionObserver(ioCallback, { root });
+      for (const item of state.renderedItems) {
+        if (!item.element) continue;
+        observer.observe(item.element);
+      }
+      return () => {
+        cancelAnimationFrame(raf);
+        observer.disconnect();
+      };
+    });
+  });
+  const mergeItem = (item, setItems, canDeleteFromMap = false) => {
+    let prevItem;
+    setItems((items2) => {
+      const index = items2.findIndex(({ id }) => id === item.id);
+      const nextItems = items2.slice();
+      if (index !== -1) {
+        prevItem = items2[index];
+        const nextItem = _chunks_3YLGPPWQ_spreadValues(_chunks_3YLGPPWQ_spreadValues({}, prevItem), item);
+        nextItems[index] = nextItem;
+        itemsMap.set(item.id, nextItem);
+      } else {
+        nextItems.push(item);
+        itemsMap.set(item.id, item);
+      }
+      return nextItems;
+    });
+    const unmergeItem = () => {
+      setItems((items2) => {
+        if (!prevItem) {
+          if (canDeleteFromMap) {
+            itemsMap.delete(item.id);
+          }
+          return items2.filter(({ id }) => id !== item.id);
+        }
+        const index = items2.findIndex(({ id }) => id === item.id);
+        if (index === -1) return items2;
+        const nextItems = items2.slice();
+        nextItems[index] = prevItem;
+        itemsMap.set(item.id, prevItem);
+        return nextItems;
+      });
+    };
+    return unmergeItem;
+  };
+  const registerItem = (item) => mergeItem(
+    item,
+    (getItems) => privateStore.setState("items", getItems),
+    true
+  );
+  return _chunks_3YLGPPWQ_spreadProps(_chunks_3YLGPPWQ_spreadValues({}, collection), {
+    registerItem,
+    renderItem: (item) => chain(
+      registerItem(item),
+      mergeItem(
+        item,
+        (getItems) => privateStore.setState("renderedItems", getItems)
+      )
+    ),
+    item: (id) => {
+      if (!id) return null;
+      let item = itemsMap.get(id);
+      if (!item) {
+        const { items: items2 } = collection.getState();
+        item = items2.find((item2) => item2.id === id);
+        if (item) {
+          itemsMap.set(id, item);
+        }
+      }
+      return item || null;
+    },
+    // @ts-expect-error Internal
+    __unstablePrivateStore: privateStore
+  });
+}
+
+
+
+;// CONCATENATED MODULE: ./node_modules/@ariakit/core/esm/__chunks/7PRQYBBV.js
+"use client";
+
+// src/utils/array.ts
+function _7PRQYBBV_toArray(arg) {
+  if (Array.isArray(arg)) {
+    return arg;
+  }
+  return typeof arg !== "undefined" ? [arg] : [];
+}
+function addItemToArray(array, item, index = -1) {
+  if (!(index in array)) {
+    return [...array, item];
+  }
+  return [...array.slice(0, index), item, ...array.slice(index)];
+}
+function flatten2DArray(array) {
+  const flattened = [];
+  for (const row of array) {
+    flattened.push(...row);
+  }
+  return flattened;
+}
+function reverseArray(array) {
+  return array.slice().reverse();
+}
+
+
+
+;// CONCATENATED MODULE: ./node_modules/@ariakit/core/esm/__chunks/D7EIQZAU.js
 "use client";
 
 
@@ -30271,159 +31029,891 @@ var CompositeRowContext = (0,external_React_.createContext)(
 
 
 
-// src/composite/composite-typeahead.ts
-
-
-
-
-var TagName = "div";
-var chars = "";
-function clearChars() {
-  chars = "";
+// src/composite/composite-store.ts
+var NULL_ITEM = { id: null };
+function findFirstEnabledItem(items, excludeId) {
+  return items.find((item) => {
+    if (excludeId) {
+      return !item.disabled && item.id !== excludeId;
+    }
+    return !item.disabled;
+  });
 }
-function isValidTypeaheadEvent(event) {
-  const target = event.target;
-  if (target && RRSZHCH6_isTextField(target))
-    return false;
-  if (event.key === " " && chars.length)
-    return true;
-  return event.key.length === 1 && !event.ctrlKey && !event.altKey && !event.metaKey && /^[\p{Letter}\p{Number}]$/u.test(event.key);
+function getEnabledItems(items, excludeId) {
+  return items.filter((item) => {
+    if (excludeId) {
+      return !item.disabled && item.id !== excludeId;
+    }
+    return !item.disabled;
+  });
 }
-function isSelfTargetOrItem(event, items) {
-  if (isSelfTarget(event))
-    return true;
-  const target = event.target;
-  if (!target)
-    return false;
-  const isItem = items.some((item) => item.element === target);
-  return isItem;
+function getOppositeOrientation(orientation) {
+  if (orientation === "vertical") return "horizontal";
+  if (orientation === "horizontal") return "vertical";
+  return;
 }
-function getEnabledItems(items) {
-  return items.filter((item) => !item.disabled);
+function getItemsInRow(items, rowId) {
+  return items.filter((item) => item.rowId === rowId);
 }
-function itemTextStartsWith(item, text) {
-  var _a;
-  const itemText = ((_a = item.element) == null ? void 0 : _a.textContent) || item.children;
-  if (!itemText)
-    return false;
-  return normalizeString(itemText).trim().toLowerCase().startsWith(text.toLowerCase());
+function flipItems(items, activeId, shouldInsertNullItem = false) {
+  const index = items.findIndex((item) => item.id === activeId);
+  return [
+    ...items.slice(index + 1),
+    ...shouldInsertNullItem ? [NULL_ITEM] : [],
+    ...items.slice(0, index)
+  ];
 }
-function getSameInitialItems(items, char, activeId) {
-  if (!activeId)
-    return items;
-  const activeItem = items.find((item) => item.id === activeId);
-  if (!activeItem)
-    return items;
-  if (!itemTextStartsWith(activeItem, char))
-    return items;
-  if (chars !== char && itemTextStartsWith(activeItem, chars))
-    return items;
-  chars = char;
-  return flipItems(
-    items.filter((item) => itemTextStartsWith(item, chars)),
-    activeId
-  ).filter((item) => item.id !== activeId);
-}
-var useCompositeTypeahead = createHook(function useCompositeTypeahead2(_a) {
-  var _b = _a, { store, typeahead = true } = _b, props = __objRest(_b, ["store", "typeahead"]);
-  const context = useCompositeContext();
-  store = store || context;
-  invariant(
-    store,
-     false && 0
-  );
-  const onKeyDownCaptureProp = props.onKeyDownCapture;
-  const cleanupTimeoutRef = (0,external_React_.useRef)(0);
-  const onKeyDownCapture = useEvent((event) => {
-    onKeyDownCaptureProp == null ? void 0 : onKeyDownCaptureProp(event);
-    if (event.defaultPrevented)
-      return;
-    if (!typeahead)
-      return;
-    if (!store)
-      return;
-    const { items, activeId } = store.getState();
-    if (!isValidTypeaheadEvent(event))
-      return clearChars();
-    let enabledItems = getEnabledItems(items);
-    if (!isSelfTargetOrItem(event, enabledItems))
-      return clearChars();
-    event.preventDefault();
-    window.clearTimeout(cleanupTimeoutRef.current);
-    cleanupTimeoutRef.current = window.setTimeout(() => {
-      chars = "";
-    }, 500);
-    const char = event.key.toLowerCase();
-    chars += char;
-    enabledItems = getSameInitialItems(enabledItems, char, activeId);
-    const item = enabledItems.find((item2) => itemTextStartsWith(item2, chars));
-    if (item) {
-      store.move(item.id);
+function groupItemsByRows(items) {
+  const rows = [];
+  for (const item of items) {
+    const row = rows.find((currentRow) => {
+      var _a;
+      return ((_a = currentRow[0]) == null ? void 0 : _a.rowId) === item.rowId;
+    });
+    if (row) {
+      row.push(item);
     } else {
-      clearChars();
+      rows.push([item]);
+    }
+  }
+  return rows;
+}
+function getMaxRowLength(array) {
+  let maxLength = 0;
+  for (const { length } of array) {
+    if (length > maxLength) {
+      maxLength = length;
+    }
+  }
+  return maxLength;
+}
+function createEmptyItem(rowId) {
+  return {
+    id: "__EMPTY_ITEM__",
+    disabled: true,
+    rowId
+  };
+}
+function normalizeRows(rows, activeId, focusShift) {
+  const maxLength = getMaxRowLength(rows);
+  for (const row of rows) {
+    for (let i = 0; i < maxLength; i += 1) {
+      const item = row[i];
+      if (!item || focusShift && item.disabled) {
+        const isFirst = i === 0;
+        const previousItem = isFirst && focusShift ? findFirstEnabledItem(row) : row[i - 1];
+        row[i] = previousItem && activeId !== previousItem.id && focusShift ? previousItem : createEmptyItem(previousItem == null ? void 0 : previousItem.rowId);
+      }
+    }
+  }
+  return rows;
+}
+function verticalizeItems(items) {
+  const rows = groupItemsByRows(items);
+  const maxLength = getMaxRowLength(rows);
+  const verticalized = [];
+  for (let i = 0; i < maxLength; i += 1) {
+    for (const row of rows) {
+      const item = row[i];
+      if (item) {
+        verticalized.push(_chunks_3YLGPPWQ_spreadProps(_chunks_3YLGPPWQ_spreadValues({}, item), {
+          // If there's no rowId, it means that it's not a grid composite, but
+          // a single row instead. So, instead of verticalizing it, that is,
+          // assigning a different rowId based on the column index, we keep it
+          // undefined so they will be part of the same row. This is useful
+          // when using up/down on one-dimensional composites.
+          rowId: item.rowId ? `${i}` : void 0
+        }));
+      }
+    }
+  }
+  return verticalized;
+}
+function createCompositeStore(props = {}) {
+  var _a;
+  const syncState = (_a = props.store) == null ? void 0 : _a.getState();
+  const collection = createCollectionStore(props);
+  const activeId = defaultValue(
+    props.activeId,
+    syncState == null ? void 0 : syncState.activeId,
+    props.defaultActiveId
+  );
+  const initialState = _chunks_3YLGPPWQ_spreadProps(_chunks_3YLGPPWQ_spreadValues({}, collection.getState()), {
+    activeId,
+    baseElement: defaultValue(syncState == null ? void 0 : syncState.baseElement, null),
+    includesBaseElement: defaultValue(
+      props.includesBaseElement,
+      syncState == null ? void 0 : syncState.includesBaseElement,
+      activeId === null
+    ),
+    moves: defaultValue(syncState == null ? void 0 : syncState.moves, 0),
+    orientation: defaultValue(
+      props.orientation,
+      syncState == null ? void 0 : syncState.orientation,
+      "both"
+    ),
+    rtl: defaultValue(props.rtl, syncState == null ? void 0 : syncState.rtl, false),
+    virtualFocus: defaultValue(
+      props.virtualFocus,
+      syncState == null ? void 0 : syncState.virtualFocus,
+      false
+    ),
+    focusLoop: defaultValue(props.focusLoop, syncState == null ? void 0 : syncState.focusLoop, false),
+    focusWrap: defaultValue(props.focusWrap, syncState == null ? void 0 : syncState.focusWrap, false),
+    focusShift: defaultValue(props.focusShift, syncState == null ? void 0 : syncState.focusShift, false)
+  });
+  const composite = createStore(initialState, collection, props.store);
+  setup(
+    composite,
+    () => EQQLU3CG_sync(composite, ["renderedItems", "activeId"], (state) => {
+      composite.setState("activeId", (activeId2) => {
+        var _a2;
+        if (activeId2 !== void 0) return activeId2;
+        return (_a2 = findFirstEnabledItem(state.renderedItems)) == null ? void 0 : _a2.id;
+      });
+    })
+  );
+  const getNextId = (items, orientation, hasNullItem, skip) => {
+    var _a2, _b;
+    const { activeId: activeId2, rtl, focusLoop, focusWrap, includesBaseElement } = composite.getState();
+    const isHorizontal = orientation !== "vertical";
+    const isRTL = rtl && isHorizontal;
+    const allItems = isRTL ? reverseArray(items) : items;
+    if (activeId2 == null) {
+      return (_a2 = findFirstEnabledItem(allItems)) == null ? void 0 : _a2.id;
+    }
+    const activeItem = allItems.find((item) => item.id === activeId2);
+    if (!activeItem) {
+      return (_b = findFirstEnabledItem(allItems)) == null ? void 0 : _b.id;
+    }
+    const isGrid = !!activeItem.rowId;
+    const activeIndex = allItems.indexOf(activeItem);
+    const nextItems = allItems.slice(activeIndex + 1);
+    const nextItemsInRow = getItemsInRow(nextItems, activeItem.rowId);
+    if (skip !== void 0) {
+      const nextEnabledItemsInRow = getEnabledItems(nextItemsInRow, activeId2);
+      const nextItem2 = nextEnabledItemsInRow.slice(skip)[0] || // If we can't find an item, just return the last one.
+      nextEnabledItemsInRow[nextEnabledItemsInRow.length - 1];
+      return nextItem2 == null ? void 0 : nextItem2.id;
+    }
+    const oppositeOrientation = getOppositeOrientation(
+      // If it's a grid and orientation is not set, it's a next/previous call,
+      // which is inherently horizontal. up/down will call next with orientation
+      // set to vertical by default (see below on up/down methods).
+      isGrid ? orientation || "horizontal" : orientation
+    );
+    const canLoop = focusLoop && focusLoop !== oppositeOrientation;
+    const canWrap = isGrid && focusWrap && focusWrap !== oppositeOrientation;
+    hasNullItem = hasNullItem || !isGrid && canLoop && includesBaseElement;
+    if (canLoop) {
+      const loopItems = canWrap && !hasNullItem ? allItems : getItemsInRow(allItems, activeItem.rowId);
+      const sortedItems = flipItems(loopItems, activeId2, hasNullItem);
+      const nextItem2 = findFirstEnabledItem(sortedItems, activeId2);
+      return nextItem2 == null ? void 0 : nextItem2.id;
+    }
+    if (canWrap) {
+      const nextItem2 = findFirstEnabledItem(
+        // We can use nextItems, which contains all the next items, including
+        // items from other rows, to wrap between rows. However, if there is a
+        // null item (the composite container), we'll only use the next items in
+        // the row. So moving next from the last item will focus on the
+        // composite container. On grid composites, horizontal navigation never
+        // focuses on the composite container, only vertical.
+        hasNullItem ? nextItemsInRow : nextItems,
+        activeId2
+      );
+      const nextId = hasNullItem ? (nextItem2 == null ? void 0 : nextItem2.id) || null : nextItem2 == null ? void 0 : nextItem2.id;
+      return nextId;
+    }
+    const nextItem = findFirstEnabledItem(nextItemsInRow, activeId2);
+    if (!nextItem && hasNullItem) {
+      return null;
+    }
+    return nextItem == null ? void 0 : nextItem.id;
+  };
+  return _chunks_3YLGPPWQ_spreadProps(_chunks_3YLGPPWQ_spreadValues(_chunks_3YLGPPWQ_spreadValues({}, collection), composite), {
+    setBaseElement: (element) => composite.setState("baseElement", element),
+    setActiveId: (id) => composite.setState("activeId", id),
+    move: (id) => {
+      if (id === void 0) return;
+      composite.setState("activeId", id);
+      composite.setState("moves", (moves) => moves + 1);
+    },
+    first: () => {
+      var _a2;
+      return (_a2 = findFirstEnabledItem(composite.getState().renderedItems)) == null ? void 0 : _a2.id;
+    },
+    last: () => {
+      var _a2;
+      return (_a2 = findFirstEnabledItem(reverseArray(composite.getState().renderedItems))) == null ? void 0 : _a2.id;
+    },
+    next: (skip) => {
+      const { renderedItems, orientation } = composite.getState();
+      return getNextId(renderedItems, orientation, false, skip);
+    },
+    previous: (skip) => {
+      var _a2;
+      const { renderedItems, orientation, includesBaseElement } = composite.getState();
+      const isGrid = !!((_a2 = findFirstEnabledItem(renderedItems)) == null ? void 0 : _a2.rowId);
+      const hasNullItem = !isGrid && includesBaseElement;
+      return getNextId(
+        reverseArray(renderedItems),
+        orientation,
+        hasNullItem,
+        skip
+      );
+    },
+    down: (skip) => {
+      const {
+        activeId: activeId2,
+        renderedItems,
+        focusShift,
+        focusLoop,
+        includesBaseElement
+      } = composite.getState();
+      const shouldShift = focusShift && !skip;
+      const verticalItems = verticalizeItems(
+        flatten2DArray(
+          normalizeRows(groupItemsByRows(renderedItems), activeId2, shouldShift)
+        )
+      );
+      const canLoop = focusLoop && focusLoop !== "horizontal";
+      const hasNullItem = canLoop && includesBaseElement;
+      return getNextId(verticalItems, "vertical", hasNullItem, skip);
+    },
+    up: (skip) => {
+      const { activeId: activeId2, renderedItems, focusShift, includesBaseElement } = composite.getState();
+      const shouldShift = focusShift && !skip;
+      const verticalItems = verticalizeItems(
+        reverseArray(
+          flatten2DArray(
+            normalizeRows(
+              groupItemsByRows(renderedItems),
+              activeId2,
+              shouldShift
+            )
+          )
+        )
+      );
+      const hasNullItem = includesBaseElement;
+      return getNextId(verticalItems, "vertical", hasNullItem, skip);
     }
   });
-  props = _4R3V3JGP_spreadProps(_4R3V3JGP_spreadValues({}, props), {
-    onKeyDownCapture
+}
+
+
+
+;// CONCATENATED MODULE: ./node_modules/@ariakit/core/esm/__chunks/6E4KKOSB.js
+"use client";
+
+
+
+
+// src/disclosure/disclosure-store.ts
+function createDisclosureStore(props = {}) {
+  const store = mergeStore(
+    props.store,
+    omit2(props.disclosure, ["contentElement", "disclosureElement"])
+  );
+  throwOnConflictingProps(props, store);
+  const syncState = store == null ? void 0 : store.getState();
+  const open = defaultValue(
+    props.open,
+    syncState == null ? void 0 : syncState.open,
+    props.defaultOpen,
+    false
+  );
+  const animated = defaultValue(props.animated, syncState == null ? void 0 : syncState.animated, false);
+  const initialState = {
+    open,
+    animated,
+    animating: !!animated && open,
+    mounted: open,
+    contentElement: defaultValue(syncState == null ? void 0 : syncState.contentElement, null),
+    disclosureElement: defaultValue(syncState == null ? void 0 : syncState.disclosureElement, null)
+  };
+  const disclosure = createStore(initialState, store);
+  setup(
+    disclosure,
+    () => EQQLU3CG_sync(disclosure, ["animated", "animating"], (state) => {
+      if (state.animated) return;
+      disclosure.setState("animating", false);
+    })
+  );
+  setup(
+    disclosure,
+    () => subscribe(disclosure, ["open"], () => {
+      if (!disclosure.getState().animated) return;
+      disclosure.setState("animating", true);
+    })
+  );
+  setup(
+    disclosure,
+    () => EQQLU3CG_sync(disclosure, ["open", "animating"], (state) => {
+      disclosure.setState("mounted", state.open || state.animating);
+    })
+  );
+  return _chunks_3YLGPPWQ_spreadProps(_chunks_3YLGPPWQ_spreadValues({}, disclosure), {
+    disclosure: props.disclosure,
+    setOpen: (value) => disclosure.setState("open", value),
+    show: () => disclosure.setState("open", true),
+    hide: () => disclosure.setState("open", false),
+    toggle: () => disclosure.setState("open", (open2) => !open2),
+    stopAnimation: () => disclosure.setState("animating", false),
+    setContentElement: (value) => disclosure.setState("contentElement", value),
+    setDisclosureElement: (value) => disclosure.setState("disclosureElement", value)
   });
-  return removeUndefinedValues(props);
+}
+
+
+
+;// CONCATENATED MODULE: ./node_modules/@ariakit/core/esm/__chunks/YOHCVXJB.js
+"use client";
+
+
+// src/dialog/dialog-store.ts
+function createDialogStore(props = {}) {
+  return createDisclosureStore(props);
+}
+
+
+
+;// CONCATENATED MODULE: ./node_modules/@ariakit/core/esm/__chunks/3UYWTADI.js
+"use client";
+
+
+
+
+
+// src/popover/popover-store.ts
+function createPopoverStore(_a = {}) {
+  var _b = _a, {
+    popover: otherPopover
+  } = _b, props = _3YLGPPWQ_objRest(_b, [
+    "popover"
+  ]);
+  const store = mergeStore(
+    props.store,
+    omit2(otherPopover, [
+      "arrowElement",
+      "anchorElement",
+      "contentElement",
+      "popoverElement",
+      "disclosureElement"
+    ])
+  );
+  throwOnConflictingProps(props, store);
+  const syncState = store == null ? void 0 : store.getState();
+  const dialog = createDialogStore(_chunks_3YLGPPWQ_spreadProps(_chunks_3YLGPPWQ_spreadValues({}, props), { store }));
+  const placement = defaultValue(
+    props.placement,
+    syncState == null ? void 0 : syncState.placement,
+    "bottom"
+  );
+  const initialState = _chunks_3YLGPPWQ_spreadProps(_chunks_3YLGPPWQ_spreadValues({}, dialog.getState()), {
+    placement,
+    currentPlacement: placement,
+    anchorElement: defaultValue(syncState == null ? void 0 : syncState.anchorElement, null),
+    popoverElement: defaultValue(syncState == null ? void 0 : syncState.popoverElement, null),
+    arrowElement: defaultValue(syncState == null ? void 0 : syncState.arrowElement, null),
+    rendered: Symbol("rendered")
+  });
+  const popover = createStore(initialState, dialog, store);
+  return _chunks_3YLGPPWQ_spreadProps(_chunks_3YLGPPWQ_spreadValues(_chunks_3YLGPPWQ_spreadValues({}, dialog), popover), {
+    setAnchorElement: (element) => popover.setState("anchorElement", element),
+    setPopoverElement: (element) => popover.setState("popoverElement", element),
+    setArrowElement: (element) => popover.setState("arrowElement", element),
+    render: () => popover.setState("rendered", Symbol("rendered"))
+  });
+}
+
+
+
+;// CONCATENATED MODULE: ./node_modules/@ariakit/core/esm/combobox/combobox-store.js
+"use client";
+
+
+
+
+
+
+
+
+
+
+
+
+// src/combobox/combobox-store.ts
+var isTouchSafari = isSafari() && isTouchDevice();
+function createComboboxStore(_a = {}) {
+  var _b = _a, {
+    tag
+  } = _b, props = _3YLGPPWQ_objRest(_b, [
+    "tag"
+  ]);
+  const store = mergeStore(props.store, pick2(tag, ["value", "rtl"]));
+  throwOnConflictingProps(props, store);
+  const tagState = tag == null ? void 0 : tag.getState();
+  const syncState = store == null ? void 0 : store.getState();
+  const activeId = defaultValue(
+    props.activeId,
+    syncState == null ? void 0 : syncState.activeId,
+    props.defaultActiveId,
+    null
+  );
+  const composite = createCompositeStore(_chunks_3YLGPPWQ_spreadProps(_chunks_3YLGPPWQ_spreadValues({}, props), {
+    activeId,
+    includesBaseElement: defaultValue(
+      props.includesBaseElement,
+      syncState == null ? void 0 : syncState.includesBaseElement,
+      true
+    ),
+    orientation: defaultValue(
+      props.orientation,
+      syncState == null ? void 0 : syncState.orientation,
+      "vertical"
+    ),
+    focusLoop: defaultValue(props.focusLoop, syncState == null ? void 0 : syncState.focusLoop, true),
+    focusWrap: defaultValue(props.focusWrap, syncState == null ? void 0 : syncState.focusWrap, true),
+    virtualFocus: defaultValue(
+      props.virtualFocus,
+      syncState == null ? void 0 : syncState.virtualFocus,
+      true
+    )
+  }));
+  const popover = createPopoverStore(_chunks_3YLGPPWQ_spreadProps(_chunks_3YLGPPWQ_spreadValues({}, props), {
+    placement: defaultValue(
+      props.placement,
+      syncState == null ? void 0 : syncState.placement,
+      "bottom-start"
+    )
+  }));
+  const value = defaultValue(
+    props.value,
+    syncState == null ? void 0 : syncState.value,
+    props.defaultValue,
+    ""
+  );
+  const selectedValue = defaultValue(
+    props.selectedValue,
+    syncState == null ? void 0 : syncState.selectedValue,
+    tagState == null ? void 0 : tagState.values,
+    props.defaultSelectedValue,
+    ""
+  );
+  const multiSelectable = Array.isArray(selectedValue);
+  const initialState = _chunks_3YLGPPWQ_spreadProps(_chunks_3YLGPPWQ_spreadValues(_chunks_3YLGPPWQ_spreadValues({}, composite.getState()), popover.getState()), {
+    value,
+    selectedValue,
+    resetValueOnSelect: defaultValue(
+      props.resetValueOnSelect,
+      syncState == null ? void 0 : syncState.resetValueOnSelect,
+      multiSelectable
+    ),
+    resetValueOnHide: defaultValue(
+      props.resetValueOnHide,
+      syncState == null ? void 0 : syncState.resetValueOnHide,
+      multiSelectable && !tag
+    ),
+    activeValue: syncState == null ? void 0 : syncState.activeValue
+  });
+  const combobox = createStore(initialState, composite, popover, store);
+  if (isTouchSafari) {
+    setup(
+      combobox,
+      () => EQQLU3CG_sync(combobox, ["virtualFocus"], () => {
+        combobox.setState("virtualFocus", false);
+      })
+    );
+  }
+  setup(combobox, () => {
+    if (!tag) return;
+    return chain(
+      EQQLU3CG_sync(combobox, ["selectedValue"], (state) => {
+        if (!Array.isArray(state.selectedValue)) return;
+        tag.setValues(state.selectedValue);
+      }),
+      EQQLU3CG_sync(tag, ["values"], (state) => {
+        combobox.setState("selectedValue", state.values);
+      })
+    );
+  });
+  setup(
+    combobox,
+    () => EQQLU3CG_sync(combobox, ["resetValueOnHide", "mounted"], (state) => {
+      if (!state.resetValueOnHide) return;
+      if (state.mounted) return;
+      combobox.setState("value", value);
+    })
+  );
+  setup(
+    combobox,
+    () => batch(combobox, ["mounted"], (state) => {
+      if (state.mounted) return;
+      combobox.setState("activeId", activeId);
+      combobox.setState("moves", 0);
+    })
+  );
+  setup(
+    combobox,
+    () => EQQLU3CG_sync(combobox, ["moves", "activeId"], (state, prevState) => {
+      if (state.moves === prevState.moves) {
+        combobox.setState("activeValue", void 0);
+      }
+    })
+  );
+  setup(
+    combobox,
+    () => batch(combobox, ["moves", "renderedItems"], (state, prev) => {
+      if (state.moves === prev.moves) return;
+      const { activeId: activeId2 } = combobox.getState();
+      const activeItem = composite.item(activeId2);
+      combobox.setState("activeValue", activeItem == null ? void 0 : activeItem.value);
+    })
+  );
+  return _chunks_3YLGPPWQ_spreadProps(_chunks_3YLGPPWQ_spreadValues(_chunks_3YLGPPWQ_spreadValues(_chunks_3YLGPPWQ_spreadValues({}, popover), composite), combobox), {
+    tag,
+    setValue: (value2) => combobox.setState("value", value2),
+    resetValue: () => combobox.setState("value", initialState.value),
+    setSelectedValue: (selectedValue2) => combobox.setState("selectedValue", selectedValue2)
+  });
+}
+
+
+;// CONCATENATED MODULE: ./packages/dataviews/node_modules/@ariakit/react-core/esm/__chunks/7BSNT25J.js
+"use client";
+
+
+
+
+
+
+
+// src/combobox/combobox-store.ts
+
+function useComboboxStoreProps(store, update, props) {
+  useUpdateEffect(update, [props.tag]);
+  useStoreProps(store, props, "value", "setValue");
+  useStoreProps(store, props, "selectedValue", "setSelectedValue");
+  useStoreProps(store, props, "resetValueOnHide");
+  useStoreProps(store, props, "resetValueOnSelect");
+  return Object.assign(
+    useCompositeStoreProps(
+      usePopoverStoreProps(store, update, props),
+      update,
+      props
+    ),
+    { tag: props.tag }
+  );
+}
+function useComboboxStore(props = {}) {
+  const tag = useTagContext();
+  props = _3YLGPPWQ_spreadProps(_3YLGPPWQ_spreadValues({}, props), {
+    tag: props.tag !== void 0 ? props.tag : tag
+  });
+  const [store, update] = _2GXGCHW6_useStore(createComboboxStore, props);
+  return useComboboxStoreProps(store, update, props);
+}
+
+
+
+;// CONCATENATED MODULE: ./packages/dataviews/node_modules/@ariakit/react-core/esm/__chunks/RGUP62TM.js
+"use client";
+
+
+// src/disclosure/disclosure-context.tsx
+var RGUP62TM_ctx = createStoreContext();
+var useDisclosureContext = RGUP62TM_ctx.useContext;
+var useDisclosureScopedContext = RGUP62TM_ctx.useScopedContext;
+var useDisclosureProviderContext = RGUP62TM_ctx.useProviderContext;
+var DisclosureContextProvider = RGUP62TM_ctx.ContextProvider;
+var DisclosureScopedContextProvider = RGUP62TM_ctx.ScopedContextProvider;
+
+
+
+;// CONCATENATED MODULE: ./packages/dataviews/node_modules/@ariakit/react-core/esm/__chunks/DU4D3UCJ.js
+"use client";
+
+
+
+// src/dialog/dialog-context.tsx
+
+var DU4D3UCJ_ctx = createStoreContext(
+  [DisclosureContextProvider],
+  [DisclosureScopedContextProvider]
+);
+var useDialogContext = DU4D3UCJ_ctx.useContext;
+var useDialogScopedContext = DU4D3UCJ_ctx.useScopedContext;
+var useDialogProviderContext = DU4D3UCJ_ctx.useProviderContext;
+var DialogContextProvider = DU4D3UCJ_ctx.ContextProvider;
+var DialogScopedContextProvider = DU4D3UCJ_ctx.ScopedContextProvider;
+var DialogHeadingContext = (0,external_React_.createContext)(void 0);
+var DialogDescriptionContext = (0,external_React_.createContext)(void 0);
+
+
+
+;// CONCATENATED MODULE: ./packages/dataviews/node_modules/@ariakit/react-core/esm/__chunks/54MGSIOI.js
+"use client";
+
+
+
+// src/popover/popover-context.tsx
+var _54MGSIOI_ctx = createStoreContext(
+  [DialogContextProvider],
+  [DialogScopedContextProvider]
+);
+var usePopoverContext = _54MGSIOI_ctx.useContext;
+var usePopoverScopedContext = _54MGSIOI_ctx.useScopedContext;
+var usePopoverProviderContext = _54MGSIOI_ctx.useProviderContext;
+var PopoverContextProvider = _54MGSIOI_ctx.ContextProvider;
+var PopoverScopedContextProvider = _54MGSIOI_ctx.ScopedContextProvider;
+
+
+
+;// CONCATENATED MODULE: ./packages/dataviews/node_modules/@ariakit/react-core/esm/__chunks/DWZ7E5TJ.js
+"use client";
+
+
+
+
+// src/combobox/combobox-context.tsx
+
+var ComboboxListRoleContext = (0,external_React_.createContext)(
+  void 0
+);
+var DWZ7E5TJ_ctx = createStoreContext(
+  [PopoverContextProvider, CompositeContextProvider],
+  [PopoverScopedContextProvider, CompositeScopedContextProvider]
+);
+var useComboboxContext = DWZ7E5TJ_ctx.useContext;
+var useComboboxScopedContext = DWZ7E5TJ_ctx.useScopedContext;
+var useComboboxProviderContext = DWZ7E5TJ_ctx.useProviderContext;
+var ComboboxContextProvider = DWZ7E5TJ_ctx.ContextProvider;
+var ComboboxScopedContextProvider = DWZ7E5TJ_ctx.ScopedContextProvider;
+var ComboboxItemValueContext = (0,external_React_.createContext)(
+  void 0
+);
+var ComboboxItemCheckedContext = (0,external_React_.createContext)(false);
+
+
+
+;// CONCATENATED MODULE: ./packages/dataviews/node_modules/@ariakit/react-core/esm/combobox/combobox-provider.js
+"use client";
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// src/combobox/combobox-provider.tsx
+
+function ComboboxProvider(props = {}) {
+  const store = useComboboxStore(props);
+  return /* @__PURE__ */ (0,external_ReactJSXRuntime_namespaceObject.jsx)(ComboboxContextProvider, { value: store, children: props.children });
+}
+
+
+;// CONCATENATED MODULE: ./packages/dataviews/node_modules/@ariakit/react-core/esm/combobox/combobox-label.js
+"use client";
+
+
+
+
+
+
+
+
+
+
+
+// src/combobox/combobox-label.tsx
+
+var TagName = "label";
+var useComboboxLabel = createHook(
+  function useComboboxLabel2(_a) {
+    var _b = _a, { store } = _b, props = __objRest(_b, ["store"]);
+    const context = useComboboxProviderContext();
+    store = store || context;
+    invariant(
+      store,
+       false && 0
+    );
+    const comboboxId = store.useState((state) => {
+      var _a2;
+      return (_a2 = state.baseElement) == null ? void 0 : _a2.id;
+    });
+    props = _3YLGPPWQ_spreadValues({
+      htmlFor: comboboxId
+    }, props);
+    return removeUndefinedValues(props);
+  }
+);
+var ComboboxLabel = memo2(
+  forwardRef2(function ComboboxLabel2(props) {
+    const htmlProps = useComboboxLabel(props);
+    return createElement(TagName, htmlProps);
+  })
+);
+
+
+;// CONCATENATED MODULE: ./packages/dataviews/node_modules/@ariakit/react-core/esm/__chunks/74NFH3UH.js
+"use client";
+
+
+
+
+
+// src/popover/popover-anchor.tsx
+var _74NFH3UH_TagName = "div";
+var usePopoverAnchor = createHook(
+  function usePopoverAnchor2(_a) {
+    var _b = _a, { store } = _b, props = __objRest(_b, ["store"]);
+    const context = usePopoverProviderContext();
+    store = store || context;
+    props = _3YLGPPWQ_spreadProps(_3YLGPPWQ_spreadValues({}, props), {
+      ref: useMergeRefs(store == null ? void 0 : store.setAnchorElement, props.ref)
+    });
+    return props;
+  }
+);
+var PopoverAnchor = forwardRef2(function PopoverAnchor2(props) {
+  const htmlProps = usePopoverAnchor(props);
+  return createElement(_74NFH3UH_TagName, htmlProps);
 });
-var CompositeTypeahead = forwardRef2(function CompositeTypeahead2(props) {
-  const htmlProps = useCompositeTypeahead(props);
-  return createElement(TagName, htmlProps);
-});
 
 
 
-;// CONCATENATED MODULE: ./packages/dataviews/node_modules/@ariakit/core/esm/utils/focus.js
+;// CONCATENATED MODULE: ./packages/dataviews/node_modules/@ariakit/react-core/esm/__chunks/5VQZOHHZ.js
+"use client";
+
+// src/composite/utils.ts
+
+var _5VQZOHHZ_NULL_ITEM = { id: null };
+function _5VQZOHHZ_flipItems(items, activeId, shouldInsertNullItem = false) {
+  const index = items.findIndex((item) => item.id === activeId);
+  return [
+    ...items.slice(index + 1),
+    ...shouldInsertNullItem ? [_5VQZOHHZ_NULL_ITEM] : [],
+    ...items.slice(0, index)
+  ];
+}
+function _5VQZOHHZ_findFirstEnabledItem(items, excludeId) {
+  return items.find((item) => {
+    if (excludeId) {
+      return !item.disabled && item.id !== excludeId;
+    }
+    return !item.disabled;
+  });
+}
+function getEnabledItem(store, id) {
+  if (!id) return null;
+  return store.item(id) || null;
+}
+function _5VQZOHHZ_groupItemsByRows(items) {
+  const rows = [];
+  for (const item of items) {
+    const row = rows.find((currentRow) => {
+      var _a;
+      return ((_a = currentRow[0]) == null ? void 0 : _a.rowId) === item.rowId;
+    });
+    if (row) {
+      row.push(item);
+    } else {
+      rows.push([item]);
+    }
+  }
+  return rows;
+}
+function selectTextField(element, collapseToEnd = false) {
+  if (isTextField(element)) {
+    element.setSelectionRange(
+      collapseToEnd ? element.value.length : 0,
+      element.value.length
+    );
+  } else if (element.isContentEditable) {
+    const selection = getDocument(element).getSelection();
+    selection == null ? void 0 : selection.selectAllChildren(element);
+    if (collapseToEnd) {
+      selection == null ? void 0 : selection.collapseToEnd();
+    }
+  }
+}
+var FOCUS_SILENTLY = Symbol("FOCUS_SILENTLY");
+function focusSilently(element) {
+  element[FOCUS_SILENTLY] = true;
+  element.focus({ preventScroll: true });
+}
+function silentlyFocused(element) {
+  const isSilentlyFocused = element[FOCUS_SILENTLY];
+  delete element[FOCUS_SILENTLY];
+  return isSilentlyFocused;
+}
+function isItem(store, element, exclude) {
+  if (!element) return false;
+  if (element === exclude) return false;
+  const item = store.item(element.id);
+  if (!item) return false;
+  if (exclude && item.element === exclude) return false;
+  return true;
+}
+
+
+
+;// CONCATENATED MODULE: ./packages/dataviews/node_modules/@ariakit/react-core/esm/__chunks/SWN3JYXT.js
+"use client";
+
+// src/focusable/focusable-context.tsx
+
+var FocusableContext = (0,external_React_.createContext)(true);
+
+
+
+;// CONCATENATED MODULE: ./node_modules/@ariakit/core/esm/utils/focus.js
 "use client";
 
 
 
 // src/utils/focus.ts
-var selector = "input:not([type='hidden']):not([disabled]), select:not([disabled]), textarea:not([disabled]), a[href], button:not([disabled]), [tabindex], iframe, object, embed, area[href], audio[controls], video[controls], [contenteditable]:not([contenteditable='false'])";
+var selector = "input:not([type='hidden']):not([disabled]), select:not([disabled]), textarea:not([disabled]), a[href], button:not([disabled]), [tabindex], summary, iframe, object, embed, area[href], audio[controls], video[controls], [contenteditable]:not([contenteditable='false'])";
 function hasNegativeTabIndex(element) {
-  const tabIndex = parseInt(element.getAttribute("tabindex") || "0", 10);
+  const tabIndex = Number.parseInt(element.getAttribute("tabindex") || "0", 10);
   return tabIndex < 0;
 }
 function isFocusable(element) {
-  if (!matches(element, selector))
-    return false;
-  if (!isVisible(element))
-    return false;
-  if (RRSZHCH6_closest(element, "[inert]"))
-    return false;
+  if (!element.matches(selector)) return false;
+  if (!isVisible(element)) return false;
+  if (element.closest("[inert]")) return false;
   return true;
 }
 function isTabbable(element) {
-  if (!isFocusable(element))
-    return false;
-  if (hasNegativeTabIndex(element))
-    return false;
-  if (!("form" in element))
-    return true;
-  if (!element.form)
-    return true;
-  if (element.checked)
-    return true;
-  if (element.type !== "radio")
-    return true;
+  if (!isFocusable(element)) return false;
+  if (hasNegativeTabIndex(element)) return false;
+  if (!("form" in element)) return true;
+  if (!element.form) return true;
+  if (element.checked) return true;
+  if (element.type !== "radio") return true;
   const radioGroup = element.form.elements.namedItem(element.name);
-  if (!radioGroup)
-    return true;
-  if (!("length" in radioGroup))
-    return true;
+  if (!radioGroup) return true;
+  if (!("length" in radioGroup)) return true;
   const activeElement = getActiveElement(element);
-  if (!activeElement)
-    return true;
-  if (activeElement === element)
-    return true;
-  if (!("form" in activeElement))
-    return true;
-  if (activeElement.form !== element.form)
-    return true;
-  if (activeElement.name !== element.name)
-    return true;
+  if (!activeElement) return true;
+  if (activeElement === element) return true;
+  if (!("form" in activeElement)) return true;
+  if (activeElement.form !== element.form) return true;
+  if (activeElement.name !== element.name) return true;
   return false;
 }
 function getAllFocusableIn(container, includeContainer) {
@@ -30533,34 +32023,26 @@ function getPreviousTabbable(fallbackToFirst, fallbackToFocusable) {
 }
 function getClosestFocusable(element) {
   while (element && !isFocusable(element)) {
-    element = closest(element, selector);
+    element = element.closest(selector);
   }
   return element || null;
 }
 function hasFocus(element) {
-  const activeElement = RRSZHCH6_getActiveElement(element);
-  if (!activeElement)
-    return false;
-  if (activeElement === element)
-    return true;
+  const activeElement = HWOIWM4O_getActiveElement(element);
+  if (!activeElement) return false;
+  if (activeElement === element) return true;
   const activeDescendant = activeElement.getAttribute("aria-activedescendant");
-  if (!activeDescendant)
-    return false;
+  if (!activeDescendant) return false;
   return activeDescendant === element.id;
 }
 function hasFocusWithin(element) {
-  const activeElement = RRSZHCH6_getActiveElement(element);
-  if (!activeElement)
-    return false;
-  if (contains(element, activeElement))
-    return true;
+  const activeElement = HWOIWM4O_getActiveElement(element);
+  if (!activeElement) return false;
+  if (contains(element, activeElement)) return true;
   const activeDescendant = activeElement.getAttribute("aria-activedescendant");
-  if (!activeDescendant)
-    return false;
-  if (!("id" in element))
-    return false;
-  if (activeDescendant === element.id)
-    return true;
+  if (!activeDescendant) return false;
+  if (!("id" in element)) return false;
+  if (activeDescendant === element.id) return true;
   return !!element.querySelector(`#${CSS.escape(activeDescendant)}`);
 }
 function focusIfNeeded(element) {
@@ -30576,7 +32058,9 @@ function disableFocus(element) {
 }
 function disableFocusIn(container, includeContainer) {
   const tabbableElements = getAllTabbableIn(container, includeContainer);
-  tabbableElements.forEach(disableFocus);
+  for (const element of tabbableElements) {
+    disableFocus(element);
+  }
 }
 function restoreFocusIn(container) {
   const elements = container.querySelectorAll("[data-tabindex]");
@@ -30592,1544 +32076,35 @@ function restoreFocusIn(container) {
   if (container.hasAttribute("data-tabindex")) {
     restoreTabIndex(container);
   }
-  elements.forEach(restoreTabIndex);
+  for (const element of elements) {
+    restoreTabIndex(element);
+  }
 }
 function focusIntoView(element, options) {
   if (!("scrollIntoView" in element)) {
     element.focus();
   } else {
     element.focus({ preventScroll: true });
-    element.scrollIntoView(_chunks_4R3V3JGP_spreadValues({ block: "nearest", inline: "nearest" }, options));
+    element.scrollIntoView(_chunks_3YLGPPWQ_spreadValues({ block: "nearest", inline: "nearest" }, options));
   }
 }
 
 
-;// CONCATENATED MODULE: ./packages/dataviews/node_modules/@ariakit/react-core/esm/__chunks/WL6TTPTB.js
+;// CONCATENATED MODULE: ./packages/dataviews/node_modules/@ariakit/react-core/esm/__chunks/HGZKAGPL.js
 "use client";
 
 
 
 
 
-// src/composite/composite-hover.ts
+// src/focusable/focusable.tsx
 
 
 
 
-var WL6TTPTB_TagName = "div";
-function getMouseDestination(event) {
-  const relatedTarget = event.relatedTarget;
-  if ((relatedTarget == null ? void 0 : relatedTarget.nodeType) === Node.ELEMENT_NODE) {
-    return relatedTarget;
-  }
-  return null;
-}
-function hoveringInside(event) {
-  const nextElement = getMouseDestination(event);
-  if (!nextElement)
-    return false;
-  return contains(event.currentTarget, nextElement);
-}
-var symbol = Symbol("composite-hover");
-function movingToAnotherItem(event) {
-  let dest = getMouseDestination(event);
-  if (!dest)
-    return false;
-  do {
-    if (_22HHDS5F_hasOwnProperty(dest, symbol) && dest[symbol])
-      return true;
-    dest = dest.parentElement;
-  } while (dest);
-  return false;
-}
-var useCompositeHover = createHook(
-  function useCompositeHover2(_a) {
-    var _b = _a, {
-      store,
-      focusOnHover = true,
-      blurOnHoverEnd = !!focusOnHover
-    } = _b, props = __objRest(_b, [
-      "store",
-      "focusOnHover",
-      "blurOnHoverEnd"
-    ]);
-    const context = useCompositeContext();
-    store = store || context;
-    invariant(
-      store,
-       false && 0
-    );
-    const isMouseMoving = useIsMouseMoving();
-    const onMouseMoveProp = props.onMouseMove;
-    const focusOnHoverProp = useBooleanEvent(focusOnHover);
-    const onMouseMove = useEvent((event) => {
-      onMouseMoveProp == null ? void 0 : onMouseMoveProp(event);
-      if (event.defaultPrevented)
-        return;
-      if (!isMouseMoving())
-        return;
-      if (!focusOnHoverProp(event))
-        return;
-      if (!hasFocusWithin(event.currentTarget)) {
-        const baseElement = store == null ? void 0 : store.getState().baseElement;
-        if (baseElement && !hasFocus(baseElement)) {
-          baseElement.focus();
-        }
-      }
-      store == null ? void 0 : store.setActiveId(event.currentTarget.id);
-    });
-    const onMouseLeaveProp = props.onMouseLeave;
-    const blurOnHoverEndProp = useBooleanEvent(blurOnHoverEnd);
-    const onMouseLeave = useEvent((event) => {
-      var _a2;
-      onMouseLeaveProp == null ? void 0 : onMouseLeaveProp(event);
-      if (event.defaultPrevented)
-        return;
-      if (!isMouseMoving())
-        return;
-      if (hoveringInside(event))
-        return;
-      if (movingToAnotherItem(event))
-        return;
-      if (!focusOnHoverProp(event))
-        return;
-      if (!blurOnHoverEndProp(event))
-        return;
-      store == null ? void 0 : store.setActiveId(null);
-      (_a2 = store == null ? void 0 : store.getState().baseElement) == null ? void 0 : _a2.focus();
-    });
-    const ref = (0,external_React_.useCallback)((element) => {
-      if (!element)
-        return;
-      element[symbol] = true;
-    }, []);
-    props = _4R3V3JGP_spreadProps(_4R3V3JGP_spreadValues({}, props), {
-      ref: useMergeRefs(ref, props.ref),
-      onMouseMove,
-      onMouseLeave
-    });
-    return removeUndefinedValues(props);
-  }
-);
-var CompositeHover = memo2(
-  forwardRef2(function CompositeHover2(props) {
-    const htmlProps = useCompositeHover(props);
-    return createElement(WL6TTPTB_TagName, htmlProps);
-  })
-);
 
 
-
-;// CONCATENATED MODULE: ./packages/dataviews/node_modules/@ariakit/core/esm/__chunks/R676XYVY.js
-"use client";
-
-
-
-// src/utils/store.ts
-function getInternal(store, key) {
-  const internals = store.__unstableInternals;
-  invariant(internals, "Invalid store");
-  return internals[key];
-}
-function createStore(initialState, ...stores) {
-  let state = initialState;
-  let prevStateBatch = state;
-  let lastUpdate = Symbol();
-  let destroy = _22HHDS5F_noop;
-  const instances = /* @__PURE__ */ new Set();
-  const updatedKeys = /* @__PURE__ */ new Set();
-  const setups = /* @__PURE__ */ new Set();
-  const listeners = /* @__PURE__ */ new Set();
-  const batchListeners = /* @__PURE__ */ new Set();
-  const disposables = /* @__PURE__ */ new WeakMap();
-  const listenerKeys = /* @__PURE__ */ new WeakMap();
-  const storeSetup = (callback) => {
-    setups.add(callback);
-    return () => setups.delete(callback);
-  };
-  const storeInit = () => {
-    const initialized = instances.size;
-    const instance = Symbol();
-    instances.add(instance);
-    const maybeDestroy = () => {
-      instances.delete(instance);
-      if (instances.size)
-        return;
-      destroy();
-    };
-    if (initialized)
-      return maybeDestroy;
-    const desyncs = _22HHDS5F_getKeys(state).map(
-      (key) => chain(
-        ...stores.map((store) => {
-          var _a;
-          const storeState = (_a = store == null ? void 0 : store.getState) == null ? void 0 : _a.call(store);
-          if (!storeState)
-            return;
-          if (!_22HHDS5F_hasOwnProperty(storeState, key))
-            return;
-          return R676XYVY_sync(store, [key], (state2) => {
-            setState(
-              key,
-              state2[key],
-              // @ts-expect-error - Not public API. This is just to prevent
-              // infinite loops.
-              true
-            );
-          });
-        })
-      )
-    );
-    const teardowns = [];
-    setups.forEach((setup2) => teardowns.push(setup2()));
-    const cleanups = stores.map(init);
-    destroy = chain(...desyncs, ...teardowns, ...cleanups);
-    return maybeDestroy;
-  };
-  const sub = (keys, listener, set = listeners) => {
-    set.add(listener);
-    listenerKeys.set(listener, keys);
-    return () => {
-      var _a;
-      (_a = disposables.get(listener)) == null ? void 0 : _a();
-      disposables.delete(listener);
-      listenerKeys.delete(listener);
-      set.delete(listener);
-    };
-  };
-  const storeSubscribe = (keys, listener) => sub(keys, listener);
-  const storeSync = (keys, listener) => {
-    disposables.set(listener, listener(state, state));
-    return sub(keys, listener);
-  };
-  const storeBatch = (keys, listener) => {
-    disposables.set(listener, listener(state, prevStateBatch));
-    return sub(keys, listener, batchListeners);
-  };
-  const storePick = (keys) => createStore(pick(state, keys), finalStore);
-  const storeOmit = (keys) => createStore(omit(state, keys), finalStore);
-  const getState = () => state;
-  const setState = (key, value, fromStores = false) => {
-    if (!_22HHDS5F_hasOwnProperty(state, key))
-      return;
-    const nextValue = _22HHDS5F_applyState(value, state[key]);
-    if (nextValue === state[key])
-      return;
-    if (!fromStores) {
-      stores.forEach((store) => {
-        var _a;
-        (_a = store == null ? void 0 : store.setState) == null ? void 0 : _a.call(store, key, nextValue);
-      });
-    }
-    const prevState = state;
-    state = _chunks_4R3V3JGP_spreadProps(_chunks_4R3V3JGP_spreadValues({}, state), { [key]: nextValue });
-    const thisUpdate = Symbol();
-    lastUpdate = thisUpdate;
-    updatedKeys.add(key);
-    const run = (listener, prev, uKeys) => {
-      var _a;
-      const keys = listenerKeys.get(listener);
-      const updated = (k) => uKeys ? uKeys.has(k) : k === key;
-      if (!keys || keys.some(updated)) {
-        (_a = disposables.get(listener)) == null ? void 0 : _a();
-        disposables.set(listener, listener(state, prev));
-      }
-    };
-    listeners.forEach((listener) => {
-      run(listener, prevState);
-    });
-    queueMicrotask(() => {
-      if (lastUpdate !== thisUpdate)
-        return;
-      const snapshot = state;
-      batchListeners.forEach((listener) => {
-        run(listener, prevStateBatch, updatedKeys);
-      });
-      prevStateBatch = snapshot;
-      updatedKeys.clear();
-    });
-  };
-  const finalStore = {
-    getState,
-    setState,
-    __unstableInternals: {
-      setup: storeSetup,
-      init: storeInit,
-      subscribe: storeSubscribe,
-      sync: storeSync,
-      batch: storeBatch,
-      pick: storePick,
-      omit: storeOmit
-    }
-  };
-  return finalStore;
-}
-function setup(store, ...args) {
-  if (!store)
-    return;
-  return getInternal(store, "setup")(...args);
-}
-function init(store, ...args) {
-  if (!store)
-    return;
-  return getInternal(store, "init")(...args);
-}
-function subscribe(store, ...args) {
-  if (!store)
-    return;
-  return getInternal(store, "subscribe")(...args);
-}
-function R676XYVY_sync(store, ...args) {
-  if (!store)
-    return;
-  return getInternal(store, "sync")(...args);
-}
-function batch(store, ...args) {
-  if (!store)
-    return;
-  return getInternal(store, "batch")(...args);
-}
-function omit2(store, ...args) {
-  if (!store)
-    return;
-  return getInternal(store, "omit")(...args);
-}
-function pick2(store, ...args) {
-  if (!store)
-    return;
-  return getInternal(store, "pick")(...args);
-}
-function mergeStore(...stores) {
-  const initialState = stores.reduce((state, store2) => {
-    var _a;
-    const nextState = (_a = store2 == null ? void 0 : store2.getState) == null ? void 0 : _a.call(store2);
-    if (!nextState)
-      return state;
-    return _chunks_4R3V3JGP_spreadValues(_chunks_4R3V3JGP_spreadValues({}, state), nextState);
-  }, {});
-  const store = createStore(initialState, ...stores);
-  return store;
-}
-function throwOnConflictingProps(props, store) {
-  if (true)
-    return;
-  if (!store)
-    return;
-  const defaultKeys = Object.entries(props).filter(([key, value]) => key.startsWith("default") && value !== void 0).map(([key]) => {
-    var _a;
-    const stateKey = key.replace("default", "");
-    return `${((_a = stateKey[0]) == null ? void 0 : _a.toLowerCase()) || ""}${stateKey.slice(1)}`;
-  });
-  if (!defaultKeys.length)
-    return;
-  const storeState = store.getState();
-  const conflictingProps = defaultKeys.filter(
-    (key) => _22HHDS5F_hasOwnProperty(storeState, key)
-  );
-  if (!conflictingProps.length)
-    return;
-  throw new Error(
-    `Passing a store prop in conjunction with a default state is not supported.
-
-const store = useSelectStore();
-<SelectProvider store={store} defaultValue="Apple" />
-                ^             ^
-
-Instead, pass the default state to the topmost store:
-
-const store = useSelectStore({ defaultValue: "Apple" });
-<SelectProvider store={store} />
-
-See https://github.com/ariakit/ariakit/pull/2745 for more details.
-
-If there's a particular need for this, please submit a feature request at https://github.com/ariakit/ariakit
-`
-  );
-}
-
-
-
-// EXTERNAL MODULE: ./node_modules/use-sync-external-store/shim/index.js
-var shim = __webpack_require__(635);
-;// CONCATENATED MODULE: ./packages/dataviews/node_modules/@ariakit/react-core/esm/__chunks/EKQEJRUF.js
-"use client";
-
-
-
-// src/utils/store.tsx
-
-
-
-
-var { useSyncExternalStore } = shim;
-var noopSubscribe = () => () => {
-};
-function useStoreState(store, keyOrSelector = identity) {
-  const storeSubscribe = external_React_.useCallback(
-    (callback) => {
-      if (!store)
-        return noopSubscribe();
-      return subscribe(store, null, callback);
-    },
-    [store]
-  );
-  const getSnapshot = () => {
-    const key = typeof keyOrSelector === "string" ? keyOrSelector : null;
-    const selector = typeof keyOrSelector === "function" ? keyOrSelector : null;
-    const state = store == null ? void 0 : store.getState();
-    if (selector)
-      return selector(state);
-    if (!state)
-      return;
-    if (!key)
-      return;
-    if (!_22HHDS5F_hasOwnProperty(state, key))
-      return;
-    return state[key];
-  };
-  return useSyncExternalStore(storeSubscribe, getSnapshot, getSnapshot);
-}
-function useStoreProps(store, props, key, setKey) {
-  const value = _22HHDS5F_hasOwnProperty(props, key) ? props[key] : void 0;
-  const setValue = setKey ? props[setKey] : void 0;
-  const propsRef = useLiveRef({ value, setValue });
-  useSafeLayoutEffect(() => {
-    return R676XYVY_sync(store, [key], (state, prev) => {
-      const { value: value2, setValue: setValue2 } = propsRef.current;
-      if (!setValue2)
-        return;
-      if (state[key] === prev[key])
-        return;
-      if (state[key] === value2)
-        return;
-      setValue2(state[key]);
-    });
-  }, [store, key]);
-  useSafeLayoutEffect(() => {
-    if (value === void 0)
-      return;
-    store.setState(key, value);
-    return batch(store, [key], () => {
-      if (value === void 0)
-        return;
-      store.setState(key, value);
-    });
-  });
-}
-function EKQEJRUF_useStore(createStore, props) {
-  const [store, setStore] = external_React_.useState(() => createStore(props));
-  useSafeLayoutEffect(() => init(store), [store]);
-  const useState2 = external_React_.useCallback(
-    (keyOrSelector) => useStoreState(store, keyOrSelector),
-    [store]
-  );
-  const memoizedStore = external_React_.useMemo(
-    () => _4R3V3JGP_spreadProps(_4R3V3JGP_spreadValues({}, store), { useState: useState2 }),
-    [store, useState2]
-  );
-  const updateStore = useEvent(() => {
-    setStore((store2) => createStore(_4R3V3JGP_spreadValues(_4R3V3JGP_spreadValues({}, props), store2.getState())));
-  });
-  return [memoizedStore, updateStore];
-}
-
-
-
-;// CONCATENATED MODULE: ./packages/dataviews/node_modules/@ariakit/react-core/esm/__chunks/Y6GYTNQ2.js
-"use client";
-
-
-
-// src/collection/collection-store.ts
-
-function useCollectionStoreProps(store, update, props) {
-  useUpdateEffect(update, [props.store]);
-  useStoreProps(store, props, "items", "setItems");
-  return store;
-}
-function useCollectionStore(props = {}) {
-  const [store, update] = useStore(Core.createCollectionStore, props);
-  return useCollectionStoreProps(store, update, props);
-}
-
-
-
-;// CONCATENATED MODULE: ./packages/dataviews/node_modules/@ariakit/react-core/esm/__chunks/7GBW5FLS.js
-"use client";
-
-
-
-// src/composite/composite-store.ts
-
-function useCompositeStoreProps(store, update, props) {
-  store = useCollectionStoreProps(store, update, props);
-  useStoreProps(store, props, "activeId", "setActiveId");
-  useStoreProps(store, props, "includesBaseElement");
-  useStoreProps(store, props, "virtualFocus");
-  useStoreProps(store, props, "orientation");
-  useStoreProps(store, props, "rtl");
-  useStoreProps(store, props, "focusLoop");
-  useStoreProps(store, props, "focusWrap");
-  useStoreProps(store, props, "focusShift");
-  return store;
-}
-function _7GBW5FLS_useCompositeStore(props = {}) {
-  const [store, update] = useStore(Core.createCompositeStore, props);
-  return useCompositeStoreProps(store, update, props);
-}
-
-
-
-;// CONCATENATED MODULE: ./packages/dataviews/node_modules/@ariakit/react-core/esm/__chunks/HZJ2XALY.js
-"use client";
-
-
-
-// src/disclosure/disclosure-store.ts
-
-function useDisclosureStoreProps(store, update, props) {
-  useUpdateEffect(update, [props.store, props.disclosure]);
-  useStoreProps(store, props, "open", "setOpen");
-  useStoreProps(store, props, "mounted", "setMounted");
-  useStoreProps(store, props, "animated");
-  return Object.assign(store, { disclosure: props.disclosure });
-}
-function useDisclosureStore(props = {}) {
-  const [store, update] = useStore(Core.createDisclosureStore, props);
-  return useDisclosureStoreProps(store, update, props);
-}
-
-
-
-;// CONCATENATED MODULE: ./packages/dataviews/node_modules/@ariakit/react-core/esm/__chunks/I62TROYO.js
-"use client";
-
-
-
-// src/dialog/dialog-store.ts
-
-function useDialogStoreProps(store, update, props) {
-  return useDisclosureStoreProps(store, update, props);
-}
-function useDialogStore(props = {}) {
-  const [store, update] = useStore(Core.createDialogStore, props);
-  return useDialogStoreProps(store, update, props);
-}
-
-
-
-;// CONCATENATED MODULE: ./packages/dataviews/node_modules/@ariakit/react-core/esm/__chunks/XWCFCD3Q.js
-"use client";
-
-
-
-
-// src/popover/popover-store.ts
-
-function usePopoverStoreProps(store, update, props) {
-  useUpdateEffect(update, [props.popover]);
-  useStoreProps(store, props, "placement");
-  return useDialogStoreProps(store, update, props);
-}
-function usePopoverStore(props = {}) {
-  const [store, update] = useStore(Core.createPopoverStore, props);
-  return usePopoverStoreProps(store, update, props);
-}
-
-
-
-;// CONCATENATED MODULE: ./packages/dataviews/node_modules/@ariakit/core/esm/__chunks/WCKXDMU7.js
-"use client";
-
-
-
-
-// src/disclosure/disclosure-store.ts
-function createDisclosureStore(props = {}) {
-  const store = mergeStore(
-    props.store,
-    omit2(props.disclosure, ["contentElement", "disclosureElement"])
-  );
-  throwOnConflictingProps(props, store);
-  const syncState = store == null ? void 0 : store.getState();
-  const open = defaultValue(
-    props.open,
-    syncState == null ? void 0 : syncState.open,
-    props.defaultOpen,
-    false
-  );
-  const animated = defaultValue(props.animated, syncState == null ? void 0 : syncState.animated, false);
-  const initialState = {
-    open,
-    animated,
-    animating: !!animated && open,
-    mounted: open,
-    contentElement: defaultValue(syncState == null ? void 0 : syncState.contentElement, null),
-    disclosureElement: defaultValue(syncState == null ? void 0 : syncState.disclosureElement, null)
-  };
-  const disclosure = createStore(initialState, store);
-  setup(
-    disclosure,
-    () => R676XYVY_sync(disclosure, ["animated", "animating"], (state) => {
-      if (state.animated)
-        return;
-      disclosure.setState("animating", false);
-    })
-  );
-  setup(
-    disclosure,
-    () => subscribe(disclosure, ["open"], () => {
-      if (!disclosure.getState().animated)
-        return;
-      disclosure.setState("animating", true);
-    })
-  );
-  setup(
-    disclosure,
-    () => R676XYVY_sync(disclosure, ["open", "animating"], (state) => {
-      disclosure.setState("mounted", state.open || state.animating);
-    })
-  );
-  return _chunks_4R3V3JGP_spreadProps(_chunks_4R3V3JGP_spreadValues({}, disclosure), {
-    disclosure: props.disclosure,
-    setOpen: (value) => disclosure.setState("open", value),
-    show: () => disclosure.setState("open", true),
-    hide: () => disclosure.setState("open", false),
-    toggle: () => disclosure.setState("open", (open2) => !open2),
-    stopAnimation: () => disclosure.setState("animating", false),
-    setContentElement: (value) => disclosure.setState("contentElement", value),
-    setDisclosureElement: (value) => disclosure.setState("disclosureElement", value)
-  });
-}
-
-
-
-;// CONCATENATED MODULE: ./packages/dataviews/node_modules/@ariakit/core/esm/__chunks/5RJNXXU2.js
-"use client";
-
-
-// src/dialog/dialog-store.ts
-function createDialogStore(props = {}) {
-  return createDisclosureStore(props);
-}
-
-
-
-;// CONCATENATED MODULE: ./packages/dataviews/node_modules/@ariakit/core/esm/__chunks/MFZZDIHG.js
-"use client";
-
-
-
-
-
-// src/popover/popover-store.ts
-function createPopoverStore(_a = {}) {
-  var _b = _a, {
-    popover: otherPopover
-  } = _b, props = _4R3V3JGP_objRest(_b, [
-    "popover"
-  ]);
-  const store = mergeStore(
-    props.store,
-    omit2(otherPopover, [
-      "arrowElement",
-      "anchorElement",
-      "contentElement",
-      "popoverElement",
-      "disclosureElement"
-    ])
-  );
-  throwOnConflictingProps(props, store);
-  const syncState = store == null ? void 0 : store.getState();
-  const dialog = createDialogStore(_chunks_4R3V3JGP_spreadProps(_chunks_4R3V3JGP_spreadValues({}, props), { store }));
-  const placement = defaultValue(
-    props.placement,
-    syncState == null ? void 0 : syncState.placement,
-    "bottom"
-  );
-  const initialState = _chunks_4R3V3JGP_spreadProps(_chunks_4R3V3JGP_spreadValues({}, dialog.getState()), {
-    placement,
-    currentPlacement: placement,
-    anchorElement: defaultValue(syncState == null ? void 0 : syncState.anchorElement, null),
-    popoverElement: defaultValue(syncState == null ? void 0 : syncState.popoverElement, null),
-    arrowElement: defaultValue(syncState == null ? void 0 : syncState.arrowElement, null),
-    rendered: Symbol("rendered")
-  });
-  const popover = createStore(initialState, dialog, store);
-  return _chunks_4R3V3JGP_spreadProps(_chunks_4R3V3JGP_spreadValues(_chunks_4R3V3JGP_spreadValues({}, dialog), popover), {
-    setAnchorElement: (element) => popover.setState("anchorElement", element),
-    setPopoverElement: (element) => popover.setState("popoverElement", element),
-    setArrowElement: (element) => popover.setState("arrowElement", element),
-    render: () => popover.setState("rendered", Symbol("rendered"))
-  });
-}
-
-
-
-;// CONCATENATED MODULE: ./packages/dataviews/node_modules/@ariakit/core/esm/__chunks/URUD7X4C.js
-"use client";
-
-
-
-
-
-// src/collection/collection-store.ts
-function isElementPreceding(a, b) {
-  return Boolean(
-    b.compareDocumentPosition(a) & Node.DOCUMENT_POSITION_PRECEDING
-  );
-}
-function sortBasedOnDOMPosition(items) {
-  const pairs = items.map((item, index) => [index, item]);
-  let isOrderDifferent = false;
-  pairs.sort(([indexA, a], [indexB, b]) => {
-    const elementA = a.element;
-    const elementB = b.element;
-    if (elementA === elementB)
-      return 0;
-    if (!elementA || !elementB)
-      return 0;
-    if (isElementPreceding(elementA, elementB)) {
-      if (indexA > indexB) {
-        isOrderDifferent = true;
-      }
-      return -1;
-    }
-    if (indexA < indexB) {
-      isOrderDifferent = true;
-    }
-    return 1;
-  });
-  if (isOrderDifferent) {
-    return pairs.map(([_, item]) => item);
-  }
-  return items;
-}
-function getCommonParent(items) {
-  var _a;
-  const firstItem = items.find((item) => !!item.element);
-  const lastItem = [...items].reverse().find((item) => !!item.element);
-  let parentElement = (_a = firstItem == null ? void 0 : firstItem.element) == null ? void 0 : _a.parentElement;
-  while (parentElement && (lastItem == null ? void 0 : lastItem.element)) {
-    const parent = parentElement;
-    if (lastItem && parent.contains(lastItem.element)) {
-      return parentElement;
-    }
-    parentElement = parentElement.parentElement;
-  }
-  return RRSZHCH6_getDocument(parentElement).body;
-}
-function getPrivateStore(store) {
-  return store == null ? void 0 : store.__unstablePrivateStore;
-}
-function createCollectionStore(props = {}) {
-  var _a;
-  throwOnConflictingProps(props, props.store);
-  const syncState = (_a = props.store) == null ? void 0 : _a.getState();
-  const items = defaultValue(
-    props.items,
-    syncState == null ? void 0 : syncState.items,
-    props.defaultItems,
-    []
-  );
-  const itemsMap = new Map(items.map((item) => [item.id, item]));
-  const initialState = {
-    items,
-    renderedItems: defaultValue(syncState == null ? void 0 : syncState.renderedItems, [])
-  };
-  const syncPrivateStore = getPrivateStore(props.store);
-  const privateStore = createStore(
-    { items, renderedItems: initialState.renderedItems },
-    syncPrivateStore
-  );
-  const collection = createStore(initialState, props.store);
-  const sortItems = (renderedItems) => {
-    const sortedItems = sortBasedOnDOMPosition(renderedItems);
-    privateStore.setState("renderedItems", sortedItems);
-    collection.setState("renderedItems", sortedItems);
-  };
-  setup(collection, () => init(privateStore));
-  setup(privateStore, () => {
-    return batch(privateStore, ["items"], (state) => {
-      collection.setState("items", state.items);
-    });
-  });
-  setup(privateStore, () => {
-    return batch(privateStore, ["renderedItems"], (state) => {
-      let firstRun = true;
-      let raf = requestAnimationFrame(() => {
-        const { renderedItems } = collection.getState();
-        if (state.renderedItems === renderedItems)
-          return;
-        sortItems(state.renderedItems);
-      });
-      if (typeof IntersectionObserver !== "function") {
-        return () => cancelAnimationFrame(raf);
-      }
-      const ioCallback = () => {
-        if (firstRun) {
-          firstRun = false;
-          return;
-        }
-        cancelAnimationFrame(raf);
-        raf = requestAnimationFrame(() => sortItems(state.renderedItems));
-      };
-      const root = getCommonParent(state.renderedItems);
-      const observer = new IntersectionObserver(ioCallback, { root });
-      for (const item of state.renderedItems) {
-        if (!item.element)
-          continue;
-        observer.observe(item.element);
-      }
-      return () => {
-        cancelAnimationFrame(raf);
-        observer.disconnect();
-      };
-    });
-  });
-  const mergeItem = (item, setItems, canDeleteFromMap = false) => {
-    let prevItem;
-    setItems((items2) => {
-      const index = items2.findIndex(({ id }) => id === item.id);
-      const nextItems = items2.slice();
-      if (index !== -1) {
-        prevItem = items2[index];
-        const nextItem = _chunks_4R3V3JGP_spreadValues(_chunks_4R3V3JGP_spreadValues({}, prevItem), item);
-        nextItems[index] = nextItem;
-        itemsMap.set(item.id, nextItem);
-      } else {
-        nextItems.push(item);
-        itemsMap.set(item.id, item);
-      }
-      return nextItems;
-    });
-    const unmergeItem = () => {
-      setItems((items2) => {
-        if (!prevItem) {
-          if (canDeleteFromMap) {
-            itemsMap.delete(item.id);
-          }
-          return items2.filter(({ id }) => id !== item.id);
-        }
-        const index = items2.findIndex(({ id }) => id === item.id);
-        if (index === -1)
-          return items2;
-        const nextItems = items2.slice();
-        nextItems[index] = prevItem;
-        itemsMap.set(item.id, prevItem);
-        return nextItems;
-      });
-    };
-    return unmergeItem;
-  };
-  const registerItem = (item) => mergeItem(
-    item,
-    (getItems) => privateStore.setState("items", getItems),
-    true
-  );
-  return _chunks_4R3V3JGP_spreadProps(_chunks_4R3V3JGP_spreadValues({}, collection), {
-    registerItem,
-    renderItem: (item) => chain(
-      registerItem(item),
-      mergeItem(
-        item,
-        (getItems) => privateStore.setState("renderedItems", getItems)
-      )
-    ),
-    item: (id) => {
-      if (!id)
-        return null;
-      let item = itemsMap.get(id);
-      if (!item) {
-        const { items: items2 } = collection.getState();
-        item = items2.find((item2) => item2.id === id);
-        if (item) {
-          itemsMap.set(id, item);
-        }
-      }
-      return item || null;
-    },
-    // @ts-expect-error Internal
-    __unstablePrivateStore: privateStore
-  });
-}
-
-
-
-;// CONCATENATED MODULE: ./packages/dataviews/node_modules/@ariakit/core/esm/__chunks/7PRQYBBV.js
-"use client";
-
-// src/utils/array.ts
-function _7PRQYBBV_toArray(arg) {
-  if (Array.isArray(arg)) {
-    return arg;
-  }
-  return typeof arg !== "undefined" ? [arg] : [];
-}
-function addItemToArray(array, item, index = -1) {
-  if (!(index in array)) {
-    return [...array, item];
-  }
-  return [...array.slice(0, index), item, ...array.slice(index)];
-}
-function flatten2DArray(array) {
-  const flattened = [];
-  for (const row of array) {
-    flattened.push(...row);
-  }
-  return flattened;
-}
-function reverseArray(array) {
-  return array.slice().reverse();
-}
-
-
-
-;// CONCATENATED MODULE: ./packages/dataviews/node_modules/@ariakit/core/esm/__chunks/2H5K47H4.js
-"use client";
-
-
-
-
-
-
-// src/composite/composite-store.ts
-var _2H5K47H4_NULL_ITEM = { id: null };
-function _2H5K47H4_findFirstEnabledItem(items, excludeId) {
-  return items.find((item) => {
-    if (excludeId) {
-      return !item.disabled && item.id !== excludeId;
-    }
-    return !item.disabled;
-  });
-}
-function _2H5K47H4_getEnabledItems(items, excludeId) {
-  return items.filter((item) => {
-    if (excludeId) {
-      return !item.disabled && item.id !== excludeId;
-    }
-    return !item.disabled;
-  });
-}
-function getOppositeOrientation(orientation) {
-  if (orientation === "vertical")
-    return "horizontal";
-  if (orientation === "horizontal")
-    return "vertical";
-  return;
-}
-function getItemsInRow(items, rowId) {
-  return items.filter((item) => item.rowId === rowId);
-}
-function _2H5K47H4_flipItems(items, activeId, shouldInsertNullItem = false) {
-  const index = items.findIndex((item) => item.id === activeId);
-  return [
-    ...items.slice(index + 1),
-    ...shouldInsertNullItem ? [_2H5K47H4_NULL_ITEM] : [],
-    ...items.slice(0, index)
-  ];
-}
-function _2H5K47H4_groupItemsByRows(items) {
-  const rows = [];
-  for (const item of items) {
-    const row = rows.find((currentRow) => {
-      var _a;
-      return ((_a = currentRow[0]) == null ? void 0 : _a.rowId) === item.rowId;
-    });
-    if (row) {
-      row.push(item);
-    } else {
-      rows.push([item]);
-    }
-  }
-  return rows;
-}
-function getMaxRowLength(array) {
-  let maxLength = 0;
-  for (const { length } of array) {
-    if (length > maxLength) {
-      maxLength = length;
-    }
-  }
-  return maxLength;
-}
-function createEmptyItem(rowId) {
-  return {
-    id: "__EMPTY_ITEM__",
-    disabled: true,
-    rowId
-  };
-}
-function normalizeRows(rows, activeId, focusShift) {
-  const maxLength = getMaxRowLength(rows);
-  for (const row of rows) {
-    for (let i = 0; i < maxLength; i += 1) {
-      const item = row[i];
-      if (!item || focusShift && item.disabled) {
-        const isFirst = i === 0;
-        const previousItem = isFirst && focusShift ? _2H5K47H4_findFirstEnabledItem(row) : row[i - 1];
-        row[i] = previousItem && activeId !== previousItem.id && focusShift ? previousItem : createEmptyItem(previousItem == null ? void 0 : previousItem.rowId);
-      }
-    }
-  }
-  return rows;
-}
-function verticalizeItems(items) {
-  const rows = _2H5K47H4_groupItemsByRows(items);
-  const maxLength = getMaxRowLength(rows);
-  const verticalized = [];
-  for (let i = 0; i < maxLength; i += 1) {
-    for (const row of rows) {
-      const item = row[i];
-      if (item) {
-        verticalized.push(_chunks_4R3V3JGP_spreadProps(_chunks_4R3V3JGP_spreadValues({}, item), {
-          // If there's no rowId, it means that it's not a grid composite, but
-          // a single row instead. So, instead of verticalizing it, that is,
-          // assigning a different rowId based on the column index, we keep it
-          // undefined so they will be part of the same row. This is useful
-          // when using up/down on one-dimensional composites.
-          rowId: item.rowId ? `${i}` : void 0
-        }));
-      }
-    }
-  }
-  return verticalized;
-}
-function createCompositeStore(props = {}) {
-  var _a;
-  const syncState = (_a = props.store) == null ? void 0 : _a.getState();
-  const collection = createCollectionStore(props);
-  const activeId = defaultValue(
-    props.activeId,
-    syncState == null ? void 0 : syncState.activeId,
-    props.defaultActiveId
-  );
-  const initialState = _chunks_4R3V3JGP_spreadProps(_chunks_4R3V3JGP_spreadValues({}, collection.getState()), {
-    activeId,
-    baseElement: defaultValue(syncState == null ? void 0 : syncState.baseElement, null),
-    includesBaseElement: defaultValue(
-      props.includesBaseElement,
-      syncState == null ? void 0 : syncState.includesBaseElement,
-      activeId === null
-    ),
-    moves: defaultValue(syncState == null ? void 0 : syncState.moves, 0),
-    orientation: defaultValue(
-      props.orientation,
-      syncState == null ? void 0 : syncState.orientation,
-      "both"
-    ),
-    rtl: defaultValue(props.rtl, syncState == null ? void 0 : syncState.rtl, false),
-    virtualFocus: defaultValue(
-      props.virtualFocus,
-      syncState == null ? void 0 : syncState.virtualFocus,
-      false
-    ),
-    focusLoop: defaultValue(props.focusLoop, syncState == null ? void 0 : syncState.focusLoop, false),
-    focusWrap: defaultValue(props.focusWrap, syncState == null ? void 0 : syncState.focusWrap, false),
-    focusShift: defaultValue(props.focusShift, syncState == null ? void 0 : syncState.focusShift, false)
-  });
-  const composite = createStore(initialState, collection, props.store);
-  setup(
-    composite,
-    () => R676XYVY_sync(composite, ["renderedItems", "activeId"], (state) => {
-      composite.setState("activeId", (activeId2) => {
-        var _a2;
-        if (activeId2 !== void 0)
-          return activeId2;
-        return (_a2 = _2H5K47H4_findFirstEnabledItem(state.renderedItems)) == null ? void 0 : _a2.id;
-      });
-    })
-  );
-  const getNextId = (items, orientation, hasNullItem, skip) => {
-    var _a2, _b;
-    const { activeId: activeId2, rtl, focusLoop, focusWrap, includesBaseElement } = composite.getState();
-    const isHorizontal = orientation !== "vertical";
-    const isRTL = rtl && isHorizontal;
-    const allItems = isRTL ? reverseArray(items) : items;
-    if (activeId2 == null) {
-      return (_a2 = _2H5K47H4_findFirstEnabledItem(allItems)) == null ? void 0 : _a2.id;
-    }
-    const activeItem = allItems.find((item) => item.id === activeId2);
-    if (!activeItem) {
-      return (_b = _2H5K47H4_findFirstEnabledItem(allItems)) == null ? void 0 : _b.id;
-    }
-    const isGrid = !!activeItem.rowId;
-    const activeIndex = allItems.indexOf(activeItem);
-    const nextItems = allItems.slice(activeIndex + 1);
-    const nextItemsInRow = getItemsInRow(nextItems, activeItem.rowId);
-    if (skip !== void 0) {
-      const nextEnabledItemsInRow = _2H5K47H4_getEnabledItems(nextItemsInRow, activeId2);
-      const nextItem2 = nextEnabledItemsInRow.slice(skip)[0] || // If we can't find an item, just return the last one.
-      nextEnabledItemsInRow[nextEnabledItemsInRow.length - 1];
-      return nextItem2 == null ? void 0 : nextItem2.id;
-    }
-    const oppositeOrientation = getOppositeOrientation(
-      // If it's a grid and orientation is not set, it's a next/previous call,
-      // which is inherently horizontal. up/down will call next with orientation
-      // set to vertical by default (see below on up/down methods).
-      isGrid ? orientation || "horizontal" : orientation
-    );
-    const canLoop = focusLoop && focusLoop !== oppositeOrientation;
-    const canWrap = isGrid && focusWrap && focusWrap !== oppositeOrientation;
-    hasNullItem = hasNullItem || !isGrid && canLoop && includesBaseElement;
-    if (canLoop) {
-      const loopItems = canWrap && !hasNullItem ? allItems : getItemsInRow(allItems, activeItem.rowId);
-      const sortedItems = _2H5K47H4_flipItems(loopItems, activeId2, hasNullItem);
-      const nextItem2 = _2H5K47H4_findFirstEnabledItem(sortedItems, activeId2);
-      return nextItem2 == null ? void 0 : nextItem2.id;
-    }
-    if (canWrap) {
-      const nextItem2 = _2H5K47H4_findFirstEnabledItem(
-        // We can use nextItems, which contains all the next items, including
-        // items from other rows, to wrap between rows. However, if there is a
-        // null item (the composite container), we'll only use the next items in
-        // the row. So moving next from the last item will focus on the
-        // composite container. On grid composites, horizontal navigation never
-        // focuses on the composite container, only vertical.
-        hasNullItem ? nextItemsInRow : nextItems,
-        activeId2
-      );
-      const nextId = hasNullItem ? (nextItem2 == null ? void 0 : nextItem2.id) || null : nextItem2 == null ? void 0 : nextItem2.id;
-      return nextId;
-    }
-    const nextItem = _2H5K47H4_findFirstEnabledItem(nextItemsInRow, activeId2);
-    if (!nextItem && hasNullItem) {
-      return null;
-    }
-    return nextItem == null ? void 0 : nextItem.id;
-  };
-  return _chunks_4R3V3JGP_spreadProps(_chunks_4R3V3JGP_spreadValues(_chunks_4R3V3JGP_spreadValues({}, collection), composite), {
-    setBaseElement: (element) => composite.setState("baseElement", element),
-    setActiveId: (id) => composite.setState("activeId", id),
-    move: (id) => {
-      if (id === void 0)
-        return;
-      composite.setState("activeId", id);
-      composite.setState("moves", (moves) => moves + 1);
-    },
-    first: () => {
-      var _a2;
-      return (_a2 = _2H5K47H4_findFirstEnabledItem(composite.getState().renderedItems)) == null ? void 0 : _a2.id;
-    },
-    last: () => {
-      var _a2;
-      return (_a2 = _2H5K47H4_findFirstEnabledItem(reverseArray(composite.getState().renderedItems))) == null ? void 0 : _a2.id;
-    },
-    next: (skip) => {
-      const { renderedItems, orientation } = composite.getState();
-      return getNextId(renderedItems, orientation, false, skip);
-    },
-    previous: (skip) => {
-      var _a2;
-      const { renderedItems, orientation, includesBaseElement } = composite.getState();
-      const isGrid = !!((_a2 = _2H5K47H4_findFirstEnabledItem(renderedItems)) == null ? void 0 : _a2.rowId);
-      const hasNullItem = !isGrid && includesBaseElement;
-      return getNextId(
-        reverseArray(renderedItems),
-        orientation,
-        hasNullItem,
-        skip
-      );
-    },
-    down: (skip) => {
-      const {
-        activeId: activeId2,
-        renderedItems,
-        focusShift,
-        focusLoop,
-        includesBaseElement
-      } = composite.getState();
-      const shouldShift = focusShift && !skip;
-      const verticalItems = verticalizeItems(
-        flatten2DArray(
-          normalizeRows(_2H5K47H4_groupItemsByRows(renderedItems), activeId2, shouldShift)
-        )
-      );
-      const canLoop = focusLoop && focusLoop !== "horizontal";
-      const hasNullItem = canLoop && includesBaseElement;
-      return getNextId(verticalItems, "vertical", hasNullItem, skip);
-    },
-    up: (skip) => {
-      const { activeId: activeId2, renderedItems, focusShift, includesBaseElement } = composite.getState();
-      const shouldShift = focusShift && !skip;
-      const verticalItems = verticalizeItems(
-        reverseArray(
-          flatten2DArray(
-            normalizeRows(
-              _2H5K47H4_groupItemsByRows(renderedItems),
-              activeId2,
-              shouldShift
-            )
-          )
-        )
-      );
-      const hasNullItem = includesBaseElement;
-      return getNextId(verticalItems, "vertical", hasNullItem, skip);
-    }
-  });
-}
-
-
-
-;// CONCATENATED MODULE: ./packages/dataviews/node_modules/@ariakit/core/esm/combobox/combobox-store.js
-"use client";
-
-
-
-
-
-
-
-
-
-
-
-
-// src/combobox/combobox-store.ts
-var isSafariOnMobile = isSafari() && isTouchDevice();
-function createComboboxStore(props = {}) {
-  var _a;
-  throwOnConflictingProps(props, props.store);
-  const syncState = (_a = props.store) == null ? void 0 : _a.getState();
-  const activeId = defaultValue(
-    props.activeId,
-    syncState == null ? void 0 : syncState.activeId,
-    props.defaultActiveId,
-    null
-  );
-  const composite = createCompositeStore(_chunks_4R3V3JGP_spreadProps(_chunks_4R3V3JGP_spreadValues({}, props), {
-    activeId,
-    includesBaseElement: defaultValue(
-      props.includesBaseElement,
-      syncState == null ? void 0 : syncState.includesBaseElement,
-      true
-    ),
-    orientation: defaultValue(
-      props.orientation,
-      syncState == null ? void 0 : syncState.orientation,
-      "vertical"
-    ),
-    focusLoop: defaultValue(props.focusLoop, syncState == null ? void 0 : syncState.focusLoop, true),
-    focusWrap: defaultValue(props.focusWrap, syncState == null ? void 0 : syncState.focusWrap, true),
-    virtualFocus: defaultValue(
-      props.virtualFocus,
-      syncState == null ? void 0 : syncState.virtualFocus,
-      !isSafariOnMobile
-    )
-  }));
-  const popover = createPopoverStore(_chunks_4R3V3JGP_spreadProps(_chunks_4R3V3JGP_spreadValues({}, props), {
-    placement: defaultValue(
-      props.placement,
-      syncState == null ? void 0 : syncState.placement,
-      "bottom-start"
-    )
-  }));
-  const value = defaultValue(
-    props.value,
-    syncState == null ? void 0 : syncState.value,
-    props.defaultValue,
-    ""
-  );
-  const selectedValue = defaultValue(
-    props.selectedValue,
-    syncState == null ? void 0 : syncState.selectedValue,
-    props.defaultSelectedValue,
-    ""
-  );
-  const multiSelectable = Array.isArray(selectedValue);
-  const initialState = _chunks_4R3V3JGP_spreadProps(_chunks_4R3V3JGP_spreadValues(_chunks_4R3V3JGP_spreadValues({}, composite.getState()), popover.getState()), {
-    value,
-    selectedValue,
-    resetValueOnSelect: defaultValue(
-      props.resetValueOnSelect,
-      syncState == null ? void 0 : syncState.resetValueOnSelect,
-      multiSelectable
-    ),
-    resetValueOnHide: defaultValue(
-      props.resetValueOnHide,
-      syncState == null ? void 0 : syncState.resetValueOnHide,
-      multiSelectable
-    ),
-    activeValue: syncState == null ? void 0 : syncState.activeValue
-  });
-  const combobox = createStore(initialState, composite, popover, props.store);
-  setup(
-    combobox,
-    () => R676XYVY_sync(combobox, ["resetValueOnHide", "mounted"], (state) => {
-      if (!state.resetValueOnHide)
-        return;
-      if (state.mounted)
-        return;
-      combobox.setState("value", value);
-    })
-  );
-  setup(
-    combobox,
-    () => R676XYVY_sync(combobox, ["resetValueOnSelect", "selectedValue"], (state) => {
-      if (!state.resetValueOnSelect)
-        return;
-      combobox.setState("value", value);
-    })
-  );
-  setup(
-    combobox,
-    () => batch(combobox, ["mounted"], (state) => {
-      if (state.mounted)
-        return;
-      combobox.setState("activeId", activeId);
-      combobox.setState("moves", 0);
-    })
-  );
-  setup(
-    combobox,
-    () => R676XYVY_sync(combobox, ["moves", "activeId"], (state, prevState) => {
-      if (state.moves === prevState.moves) {
-        combobox.setState("activeValue", void 0);
-      }
-    })
-  );
-  setup(
-    combobox,
-    () => batch(combobox, ["moves", "renderedItems"], (state, prev) => {
-      if (state.moves === prev.moves)
-        return;
-      const { activeId: activeId2 } = combobox.getState();
-      const activeItem = composite.item(activeId2);
-      combobox.setState("activeValue", activeItem == null ? void 0 : activeItem.value);
-    })
-  );
-  return _chunks_4R3V3JGP_spreadProps(_chunks_4R3V3JGP_spreadValues(_chunks_4R3V3JGP_spreadValues(_chunks_4R3V3JGP_spreadValues({}, popover), composite), combobox), {
-    setValue: (value2) => combobox.setState("value", value2),
-    setSelectedValue: (selectedValue2) => combobox.setState("selectedValue", selectedValue2)
-  });
-}
-
-
-;// CONCATENATED MODULE: ./packages/dataviews/node_modules/@ariakit/react-core/esm/__chunks/URCSOWGR.js
-"use client";
-
-
-
-
-// src/combobox/combobox-store.ts
-
-function useComboboxStoreProps(store, update, props) {
-  useStoreProps(store, props, "value", "setValue");
-  useStoreProps(store, props, "selectedValue", "setSelectedValue");
-  useStoreProps(store, props, "resetValueOnHide");
-  useStoreProps(store, props, "resetValueOnSelect");
-  return useCompositeStoreProps(
-    usePopoverStoreProps(store, update, props),
-    update,
-    props
-  );
-}
-function useComboboxStore(props = {}) {
-  const [store, update] = EKQEJRUF_useStore(createComboboxStore, props);
-  return useComboboxStoreProps(store, update, props);
-}
-
-
-
-;// CONCATENATED MODULE: ./packages/dataviews/node_modules/@ariakit/react-core/esm/__chunks/J55AVALY.js
-"use client";
-
-
-// src/disclosure/disclosure-context.tsx
-var J55AVALY_ctx = createStoreContext();
-var useDisclosureContext = J55AVALY_ctx.useContext;
-var useDisclosureScopedContext = J55AVALY_ctx.useScopedContext;
-var useDisclosureProviderContext = J55AVALY_ctx.useProviderContext;
-var DisclosureContextProvider = J55AVALY_ctx.ContextProvider;
-var DisclosureScopedContextProvider = J55AVALY_ctx.ScopedContextProvider;
-
-
-
-;// CONCATENATED MODULE: ./packages/dataviews/node_modules/@ariakit/react-core/esm/__chunks/XXVAHUAO.js
-"use client";
-
-
-
-// src/dialog/dialog-context.tsx
-
-var XXVAHUAO_ctx = createStoreContext(
-  [DisclosureContextProvider],
-  [DisclosureScopedContextProvider]
-);
-var useDialogContext = XXVAHUAO_ctx.useContext;
-var useDialogScopedContext = XXVAHUAO_ctx.useScopedContext;
-var useDialogProviderContext = XXVAHUAO_ctx.useProviderContext;
-var DialogContextProvider = XXVAHUAO_ctx.ContextProvider;
-var DialogScopedContextProvider = XXVAHUAO_ctx.ScopedContextProvider;
-var DialogHeadingContext = (0,external_React_.createContext)(void 0);
-var DialogDescriptionContext = (0,external_React_.createContext)(void 0);
-
-
-
-;// CONCATENATED MODULE: ./packages/dataviews/node_modules/@ariakit/react-core/esm/__chunks/TE637IA7.js
-"use client";
-
-
-
-// src/popover/popover-context.tsx
-var TE637IA7_ctx = createStoreContext(
-  [DialogContextProvider],
-  [DialogScopedContextProvider]
-);
-var usePopoverContext = TE637IA7_ctx.useContext;
-var usePopoverScopedContext = TE637IA7_ctx.useScopedContext;
-var usePopoverProviderContext = TE637IA7_ctx.useProviderContext;
-var PopoverContextProvider = TE637IA7_ctx.ContextProvider;
-var PopoverScopedContextProvider = TE637IA7_ctx.ScopedContextProvider;
-
-
-
-;// CONCATENATED MODULE: ./packages/dataviews/node_modules/@ariakit/react-core/esm/__chunks/UNDSQXBK.js
-"use client";
-
-
-
-
-// src/combobox/combobox-context.tsx
-
-var UNDSQXBK_ctx = createStoreContext(
-  [PopoverContextProvider, CompositeContextProvider],
-  [PopoverScopedContextProvider, CompositeScopedContextProvider]
-);
-var useComboboxContext = UNDSQXBK_ctx.useContext;
-var useComboboxScopedContext = UNDSQXBK_ctx.useScopedContext;
-var useComboboxProviderContext = UNDSQXBK_ctx.useProviderContext;
-var ComboboxContextProvider = UNDSQXBK_ctx.ContextProvider;
-var ComboboxScopedContextProvider = UNDSQXBK_ctx.ScopedContextProvider;
-var ComboboxItemValueContext = (0,external_React_.createContext)(
-  void 0
-);
-var ComboboxItemCheckedContext = (0,external_React_.createContext)(false);
-
-
-
-;// CONCATENATED MODULE: ./packages/dataviews/node_modules/@ariakit/react-core/esm/combobox/combobox-provider.js
-"use client";
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// src/combobox/combobox-provider.tsx
-
-function ComboboxProvider(props = {}) {
-  const store = useComboboxStore(props);
-  return /* @__PURE__ */ (0,external_ReactJSXRuntime_namespaceObject.jsx)(ComboboxContextProvider, { value: store, children: props.children });
-}
-
-
-;// CONCATENATED MODULE: ./packages/dataviews/node_modules/@ariakit/react-core/esm/combobox/combobox-label.js
-"use client";
-
-
-
-
-
-
-
-
-
-
-
-// src/combobox/combobox-label.ts
-
-var combobox_label_TagName = "label";
-var useComboboxLabel = createHook(
-  function useComboboxLabel2(_a) {
-    var _b = _a, { store } = _b, props = __objRest(_b, ["store"]);
-    const context = useComboboxProviderContext();
-    store = store || context;
-    invariant(
-      store,
-       false && 0
-    );
-    const comboboxId = store.useState((state) => {
-      var _a2;
-      return (_a2 = state.baseElement) == null ? void 0 : _a2.id;
-    });
-    props = _4R3V3JGP_spreadValues({
-      htmlFor: comboboxId
-    }, props);
-    return removeUndefinedValues(props);
-  }
-);
-var ComboboxLabel = memo2(
-  forwardRef2(function ComboboxLabel2(props) {
-    const htmlProps = useComboboxLabel(props);
-    return createElement(combobox_label_TagName, htmlProps);
-  })
-);
-
-
-;// CONCATENATED MODULE: ./packages/dataviews/node_modules/@ariakit/react-core/esm/__chunks/NLT7LY5Y.js
-"use client";
-
-
-
-
-
-// src/popover/popover-anchor.ts
-var NLT7LY5Y_TagName = "div";
-var usePopoverAnchor = createHook(
-  function usePopoverAnchor2(_a) {
-    var _b = _a, { store } = _b, props = __objRest(_b, ["store"]);
-    const context = usePopoverProviderContext();
-    store = store || context;
-    props = _4R3V3JGP_spreadProps(_4R3V3JGP_spreadValues({}, props), {
-      ref: useMergeRefs(store == null ? void 0 : store.setAnchorElement, props.ref)
-    });
-    return props;
-  }
-);
-var PopoverAnchor = forwardRef2(function PopoverAnchor2(props) {
-  const htmlProps = usePopoverAnchor(props);
-  return createElement(NLT7LY5Y_TagName, htmlProps);
-});
-
-
-
-;// CONCATENATED MODULE: ./packages/dataviews/node_modules/@ariakit/react-core/esm/__chunks/SHA3WOPI.js
-"use client";
-
-// src/focusable/focusable-context.ts
-
-var FocusableContext = (0,external_React_.createContext)(true);
-
-
-
-;// CONCATENATED MODULE: ./packages/dataviews/node_modules/@ariakit/react-core/esm/__chunks/WAZE6NXP.js
-"use client";
-
-
-
-
-
-// src/focusable/focusable.ts
-
-
-
-
-
-
-var WAZE6NXP_TagName = "div";
+var HGZKAGPL_TagName = "div";
 var isSafariBrowser = isSafari();
 var alwaysFocusVisibleInputTypes = [
   "text",
@@ -32148,22 +32123,17 @@ var alwaysFocusVisibleInputTypes = [
 ];
 function isAlwaysFocusVisible(element) {
   const { tagName, readOnly, type } = element;
-  if (tagName === "TEXTAREA" && !readOnly)
-    return true;
-  if (tagName === "SELECT" && !readOnly)
-    return true;
+  if (tagName === "TEXTAREA" && !readOnly) return true;
+  if (tagName === "SELECT" && !readOnly) return true;
   if (tagName === "INPUT" && !readOnly) {
     return alwaysFocusVisibleInputTypes.includes(type);
   }
-  if (element.isContentEditable)
-    return true;
-  return false;
-}
-function isAlwaysFocusVisibleDelayed(element) {
+  if (element.isContentEditable) return true;
   const role = element.getAttribute("role");
-  if (role !== "combobox")
-    return false;
-  return !!element.dataset.name;
+  if (role === "combobox" && element.dataset.name) {
+    return true;
+  }
+  return false;
 }
 function getLabels(element) {
   if ("labels" in element) {
@@ -32179,13 +32149,11 @@ function isNativeCheckboxOrRadio(element) {
   return false;
 }
 function isNativeTabbable(tagName) {
-  if (!tagName)
-    return true;
-  return tagName === "button" || tagName === "input" || tagName === "select" || tagName === "textarea" || tagName === "a";
+  if (!tagName) return true;
+  return tagName === "button" || tagName === "summary" || tagName === "input" || tagName === "select" || tagName === "textarea" || tagName === "a";
 }
 function supportsDisabledAttribute(tagName) {
-  if (!tagName)
-    return true;
+  if (!tagName) return true;
   return tagName === "button" || tagName === "input" || tagName === "select" || tagName === "textarea";
 }
 function getTabIndex(focusable, trulyDisabled, nativeTabbable, supportsDisabled, tabIndexProp) {
@@ -32206,8 +32174,7 @@ function getTabIndex(focusable, trulyDisabled, nativeTabbable, supportsDisabled,
 function useDisableEvent(onEvent, disabled) {
   return useEvent((event) => {
     onEvent == null ? void 0 : onEvent(event);
-    if (event.defaultPrevented)
-      return;
+    if (event.defaultPrevented) return;
     if (disabled) {
       event.stopPropagation();
       event.preventDefault();
@@ -32224,12 +32191,9 @@ function onGlobalMouseDown(event) {
   }
 }
 function onGlobalKeyDown(event) {
-  if (event.metaKey)
-    return;
-  if (event.ctrlKey)
-    return;
-  if (event.altKey)
-    return;
+  if (event.metaKey) return;
+  if (event.ctrlKey) return;
+  if (event.altKey) return;
   isKeyboardModality = true;
 }
 var useFocusable = createHook(
@@ -32247,29 +32211,26 @@ var useFocusable = createHook(
     ]);
     const ref = (0,external_React_.useRef)(null);
     (0,external_React_.useEffect)(() => {
-      if (!focusable)
-        return;
+      if (!focusable) return;
       addGlobalEventListener("mousedown", onGlobalMouseDown, true);
       addGlobalEventListener("keydown", onGlobalKeyDown, true);
     }, [focusable]);
     if (isSafariBrowser) {
       (0,external_React_.useEffect)(() => {
-        if (!focusable)
-          return;
+        if (!focusable) return;
         const element = ref.current;
-        if (!element)
-          return;
-        if (!isNativeCheckboxOrRadio(element))
-          return;
+        if (!element) return;
+        if (!isNativeCheckboxOrRadio(element)) return;
         const labels = getLabels(element);
-        if (!labels)
-          return;
+        if (!labels) return;
         const onMouseUp = () => queueMicrotask(() => element.focus());
-        labels.forEach((label) => label.addEventListener("mouseup", onMouseUp));
+        for (const label of labels) {
+          label.addEventListener("mouseup", onMouseUp);
+        }
         return () => {
-          labels.forEach(
-            (label) => label.removeEventListener("mouseup", onMouseUp)
-          );
+          for (const label of labels) {
+            label.removeEventListener("mouseup", onMouseUp);
+          }
         };
       }, [focusable]);
     }
@@ -32277,22 +32238,17 @@ var useFocusable = createHook(
     const trulyDisabled = !!disabled && !accessibleWhenDisabled;
     const [focusVisible, setFocusVisible] = (0,external_React_.useState)(false);
     (0,external_React_.useEffect)(() => {
-      if (!focusable)
-        return;
+      if (!focusable) return;
       if (trulyDisabled && focusVisible) {
         setFocusVisible(false);
       }
     }, [focusable, trulyDisabled, focusVisible]);
     (0,external_React_.useEffect)(() => {
-      if (!focusable)
-        return;
-      if (!focusVisible)
-        return;
+      if (!focusable) return;
+      if (!focusVisible) return;
       const element = ref.current;
-      if (!element)
-        return;
-      if (typeof IntersectionObserver === "undefined")
-        return;
+      if (!element) return;
+      if (typeof IntersectionObserver === "undefined") return;
       const observer = new IntersectionObserver(() => {
         if (!isFocusable(element)) {
           setFocusVisible(false);
@@ -32313,17 +32269,12 @@ var useFocusable = createHook(
     const onMouseDownProp = props.onMouseDown;
     const onMouseDown = useEvent((event) => {
       onMouseDownProp == null ? void 0 : onMouseDownProp(event);
-      if (event.defaultPrevented)
-        return;
-      if (!focusable)
-        return;
+      if (event.defaultPrevented) return;
+      if (!focusable) return;
       const element = event.currentTarget;
-      if (!isSafariBrowser)
-        return;
-      if (isPortalEvent(event))
-        return;
-      if (!isButton(element) && !isNativeCheckboxOrRadio(element))
-        return;
+      if (!isSafariBrowser) return;
+      if (isPortalEvent(event)) return;
+      if (!isButton(element) && !isNativeCheckboxOrRadio(element)) return;
       let receivedFocus = false;
       const onFocus = () => {
         receivedFocus = true;
@@ -32332,8 +32283,7 @@ var useFocusable = createHook(
       element.addEventListener("focusin", onFocus, options);
       queueBeforeEvent(element, "mouseup", () => {
         element.removeEventListener("focusin", onFocus, true);
-        if (receivedFocus)
-          return;
+        if (receivedFocus) return;
         focusIfNeeded(element);
       });
     });
@@ -32341,45 +32291,33 @@ var useFocusable = createHook(
       if (currentTarget) {
         event.currentTarget = currentTarget;
       }
-      if (!focusable)
-        return;
+      if (!focusable) return;
       const element = event.currentTarget;
-      if (!element)
-        return;
-      if (!hasFocus(element))
-        return;
+      if (!element) return;
+      if (!hasFocus(element)) return;
       onFocusVisible == null ? void 0 : onFocusVisible(event);
-      if (event.defaultPrevented)
-        return;
+      if (event.defaultPrevented) return;
       setFocusVisible(true);
     };
     const onKeyDownCaptureProp = props.onKeyDownCapture;
     const onKeyDownCapture = useEvent((event) => {
       onKeyDownCaptureProp == null ? void 0 : onKeyDownCaptureProp(event);
-      if (event.defaultPrevented)
-        return;
-      if (!focusable)
-        return;
-      if (focusVisible)
-        return;
-      if (event.metaKey)
-        return;
-      if (event.altKey)
-        return;
-      if (event.ctrlKey)
-        return;
-      if (!isSelfTarget(event))
-        return;
+      if (event.defaultPrevented) return;
+      if (!focusable) return;
+      if (focusVisible) return;
+      if (event.metaKey) return;
+      if (event.altKey) return;
+      if (event.ctrlKey) return;
+      if (!isSelfTarget(event)) return;
       const element = event.currentTarget;
-      queueMicrotask(() => handleFocusVisible(event, element));
+      const applyFocusVisible = () => handleFocusVisible(event, element);
+      queueBeforeEvent(element, "focusout", applyFocusVisible);
     });
     const onFocusCaptureProp = props.onFocusCapture;
     const onFocusCapture = useEvent((event) => {
       onFocusCaptureProp == null ? void 0 : onFocusCaptureProp(event);
-      if (event.defaultPrevented)
-        return;
-      if (!focusable)
-        return;
+      if (event.defaultPrevented) return;
+      if (!focusable) return;
       if (!isSelfTarget(event)) {
         setFocusVisible(false);
         return;
@@ -32387,8 +32325,6 @@ var useFocusable = createHook(
       const element = event.currentTarget;
       const applyFocusVisible = () => handleFocusVisible(event, element);
       if (isKeyboardModality || isAlwaysFocusVisible(event.target)) {
-        queueMicrotask(applyFocusVisible);
-      } else if (isAlwaysFocusVisibleDelayed(event.target)) {
         queueBeforeEvent(event.target, "focusout", applyFocusVisible);
       } else {
         setFocusVisible(false);
@@ -32397,27 +32333,19 @@ var useFocusable = createHook(
     const onBlurProp = props.onBlur;
     const onBlur = useEvent((event) => {
       onBlurProp == null ? void 0 : onBlurProp(event);
-      if (!focusable)
-        return;
-      if (!isFocusEventOutside(event))
-        return;
+      if (!focusable) return;
+      if (!isFocusEventOutside(event)) return;
       setFocusVisible(false);
     });
     const autoFocusOnShow = (0,external_React_.useContext)(FocusableContext);
     const autoFocusRef = useEvent((element) => {
-      if (!focusable)
-        return;
-      if (!autoFocus)
-        return;
-      if (!element)
-        return;
-      if (!autoFocusOnShow)
-        return;
+      if (!focusable) return;
+      if (!autoFocus) return;
+      if (!element) return;
+      if (!autoFocusOnShow) return;
       queueMicrotask(() => {
-        if (hasFocus(element))
-          return;
-        if (!isFocusable(element))
-          return;
+        if (hasFocus(element)) return;
+        if (!isFocusable(element)) return;
         element.focus();
       });
     });
@@ -32427,11 +32355,11 @@ var useFocusable = createHook(
     const styleProp = props.style;
     const style = (0,external_React_.useMemo)(() => {
       if (trulyDisabled) {
-        return _4R3V3JGP_spreadValues({ pointerEvents: "none" }, styleProp);
+        return _3YLGPPWQ_spreadValues({ pointerEvents: "none" }, styleProp);
       }
       return styleProp;
     }, [trulyDisabled, styleProp]);
-    props = _4R3V3JGP_spreadProps(_4R3V3JGP_spreadValues({
+    props = _3YLGPPWQ_spreadProps(_3YLGPPWQ_spreadValues({
       "data-focus-visible": focusable && focusVisible || void 0,
       "data-autofocus": autoFocus || void 0,
       "aria-disabled": disabled || void 0
@@ -32461,12 +32389,12 @@ var useFocusable = createHook(
 );
 var Focusable = forwardRef2(function Focusable2(props) {
   const htmlProps = useFocusable(props);
-  return createElement(WAZE6NXP_TagName, htmlProps);
+  return createElement(HGZKAGPL_TagName, htmlProps);
 });
 
 
 
-;// CONCATENATED MODULE: ./packages/dataviews/node_modules/@ariakit/react-core/esm/__chunks/FTNKYK65.js
+;// CONCATENATED MODULE: ./packages/dataviews/node_modules/@ariakit/react-core/esm/__chunks/TW35PKTK.js
 "use client";
 
 
@@ -32483,14 +32411,13 @@ var Focusable = forwardRef2(function Focusable2(props) {
 
 
 
-var FTNKYK65_TagName = "div";
+var TW35PKTK_TagName = "div";
 function isGrid(items) {
   return items.some((item) => !!item.rowId);
 }
 function isPrintableKey(event) {
   const target = event.target;
-  if (target && !RRSZHCH6_isTextField(target))
-    return false;
+  if (target && !isTextField(target)) return false;
   return event.key.length === 1 && !event.ctrlKey && !event.metaKey;
 }
 function isModifierKey(event) {
@@ -32500,20 +32427,14 @@ function useKeyboardEventProxy(store, onKeyboardEvent, previousElementRef) {
   return useEvent((event) => {
     var _a;
     onKeyboardEvent == null ? void 0 : onKeyboardEvent(event);
-    if (event.defaultPrevented)
-      return;
-    if (event.isPropagationStopped())
-      return;
-    if (!isSelfTarget(event))
-      return;
-    if (isModifierKey(event))
-      return;
-    if (isPrintableKey(event))
-      return;
+    if (event.defaultPrevented) return;
+    if (event.isPropagationStopped()) return;
+    if (!isSelfTarget(event)) return;
+    if (isModifierKey(event)) return;
+    if (isPrintableKey(event)) return;
     const state = store.getState();
     const activeElement = (_a = getEnabledItem(store, state.activeId)) == null ? void 0 : _a.element;
-    if (!activeElement)
-      return;
+    if (!activeElement) return;
     const _b = event, { view } = _b, eventInit = __objRest(_b, ["view"]);
     const previousElement = previousElementRef == null ? void 0 : previousElementRef.current;
     if (activeElement !== previousElement) {
@@ -32528,8 +32449,8 @@ function useKeyboardEventProxy(store, onKeyboardEvent, previousElementRef) {
   });
 }
 function findFirstEnabledItemInTheLastRow(items) {
-  return findFirstEnabledItem(
-    flatten2DArray(reverseArray(groupItemsByRows(items)))
+  return _5VQZOHHZ_findFirstEnabledItem(
+    flatten2DArray(reverseArray(_5VQZOHHZ_groupItemsByRows(items)))
   );
 }
 function useScheduleFocus(store) {
@@ -32540,10 +32461,8 @@ function useScheduleFocus(store) {
   );
   (0,external_React_.useEffect)(() => {
     const activeElement = activeItem == null ? void 0 : activeItem.element;
-    if (!scheduled)
-      return;
-    if (!activeElement)
-      return;
+    if (!scheduled) return;
+    if (!activeElement) return;
     setScheduled(false);
     activeElement.focus({ preventScroll: true });
   }, [activeItem, scheduled]);
@@ -32568,38 +32487,32 @@ var useComposite = createHook(
       store,
        false && 0
     );
+    const ref = (0,external_React_.useRef)(null);
     const previousElementRef = (0,external_React_.useRef)(null);
     const scheduleFocus = useScheduleFocus(store);
     const moves = store.useState("moves");
+    const [, setBaseElement] = useTransactionState(
+      composite ? store.setBaseElement : null
+    );
     (0,external_React_.useEffect)(() => {
       var _a2;
-      if (!store)
-        return;
-      if (!moves)
-        return;
-      if (!composite)
-        return;
-      if (!focusOnMove)
-        return;
+      if (!store) return;
+      if (!moves) return;
+      if (!composite) return;
+      if (!focusOnMove) return;
       const { activeId: activeId2 } = store.getState();
       const itemElement = (_a2 = getEnabledItem(store, activeId2)) == null ? void 0 : _a2.element;
-      if (!itemElement)
-        return;
+      if (!itemElement) return;
       focusIntoView(itemElement);
     }, [store, moves, composite, focusOnMove]);
     useSafeLayoutEffect(() => {
-      if (!store)
-        return;
-      if (!moves)
-        return;
-      if (!composite)
-        return;
+      if (!store) return;
+      if (!moves) return;
+      if (!composite) return;
       const { baseElement, activeId: activeId2 } = store.getState();
       const isSelfAcive = activeId2 === null;
-      if (!isSelfAcive)
-        return;
-      if (!baseElement)
-        return;
+      if (!isSelfAcive) return;
+      if (!baseElement) return;
       const previousElement = previousElementRef.current;
       previousElementRef.current = null;
       if (previousElement) {
@@ -32613,20 +32526,15 @@ var useComposite = createHook(
     const virtualFocus = store.useState("virtualFocus");
     useSafeLayoutEffect(() => {
       var _a2;
-      if (!store)
-        return;
-      if (!composite)
-        return;
-      if (!virtualFocus)
-        return;
+      if (!store) return;
+      if (!composite) return;
+      if (!virtualFocus) return;
       const previousElement = previousElementRef.current;
       previousElementRef.current = null;
-      if (!previousElement)
-        return;
+      if (!previousElement) return;
       const activeElement = (_a2 = getEnabledItem(store, activeId)) == null ? void 0 : _a2.element;
-      const relatedTarget = activeElement || RRSZHCH6_getActiveElement(previousElement);
-      if (relatedTarget === previousElement)
-        return;
+      const relatedTarget = activeElement || HWOIWM4O_getActiveElement(previousElement);
+      if (relatedTarget === previousElement) return;
       fireBlurEvent(previousElement, { relatedTarget });
     }, [store, activeId, virtualFocus, composite]);
     const onKeyDownCapture = useKeyboardEventProxy(
@@ -32642,13 +32550,10 @@ var useComposite = createHook(
     const onFocusCaptureProp = props.onFocusCapture;
     const onFocusCapture = useEvent((event) => {
       onFocusCaptureProp == null ? void 0 : onFocusCaptureProp(event);
-      if (event.defaultPrevented)
-        return;
-      if (!store)
-        return;
+      if (event.defaultPrevented) return;
+      if (!store) return;
       const { virtualFocus: virtualFocus2 } = store.getState();
-      if (!virtualFocus2)
-        return;
+      if (!virtualFocus2) return;
       const previousActiveElement = event.relatedTarget;
       const isSilentlyFocused = silentlyFocused(event.currentTarget);
       if (isSelfTarget(event) && isSilentlyFocused) {
@@ -32659,12 +32564,9 @@ var useComposite = createHook(
     const onFocusProp = props.onFocus;
     const onFocus = useEvent((event) => {
       onFocusProp == null ? void 0 : onFocusProp(event);
-      if (event.defaultPrevented)
-        return;
-      if (!composite)
-        return;
-      if (!store)
-        return;
+      if (event.defaultPrevented) return;
+      if (!composite) return;
+      if (!store) return;
       const { relatedTarget } = event;
       const { virtualFocus: virtualFocus2 } = store.getState();
       if (virtualFocus2) {
@@ -32679,13 +32581,10 @@ var useComposite = createHook(
     const onBlurCapture = useEvent((event) => {
       var _a2;
       onBlurCaptureProp == null ? void 0 : onBlurCaptureProp(event);
-      if (event.defaultPrevented)
-        return;
-      if (!store)
-        return;
+      if (event.defaultPrevented) return;
+      if (!store) return;
       const { virtualFocus: virtualFocus2, activeId: activeId2 } = store.getState();
-      if (!virtualFocus2)
-        return;
+      if (!virtualFocus2) return;
       const activeElement = (_a2 = getEnabledItem(store, activeId2)) == null ? void 0 : _a2.element;
       const nextActiveElement = event.relatedTarget;
       const nextActiveElementIsItem = isItem(store, nextActiveElement);
@@ -32714,22 +32613,17 @@ var useComposite = createHook(
     const onKeyDown = useEvent((event) => {
       var _a2;
       onKeyDownProp == null ? void 0 : onKeyDownProp(event);
-      if (event.defaultPrevented)
-        return;
-      if (!store)
-        return;
-      if (!isSelfTarget(event))
-        return;
+      if (event.defaultPrevented) return;
+      if (!store) return;
+      if (!isSelfTarget(event)) return;
       const { orientation, items, renderedItems, activeId: activeId2 } = store.getState();
       const activeItem = getEnabledItem(store, activeId2);
-      if ((_a2 = activeItem == null ? void 0 : activeItem.element) == null ? void 0 : _a2.isConnected)
-        return;
+      if ((_a2 = activeItem == null ? void 0 : activeItem.element) == null ? void 0 : _a2.isConnected) return;
       const isVertical = orientation !== "horizontal";
       const isHorizontal = orientation !== "vertical";
       const grid = isGrid(renderedItems);
       const isHorizontalKey = event.key === "ArrowLeft" || event.key === "ArrowRight" || event.key === "Home" || event.key === "End";
-      if (isHorizontalKey && RRSZHCH6_isTextField(event.currentTarget))
-        return;
+      if (isHorizontalKey && isTextField(event.currentTarget)) return;
       const up = () => {
         if (grid) {
           const item = items && findFirstEnabledItemInTheLastRow(items);
@@ -32751,8 +32645,7 @@ var useComposite = createHook(
       if (action) {
         const id = action();
         if (id !== void 0) {
-          if (!moveOnKeyPressProp(event))
-            return;
+          if (!moveOnKeyPressProp(event)) return;
           event.preventDefault();
           store.move(id);
         }
@@ -32765,18 +32658,15 @@ var useComposite = createHook(
     );
     const activeDescendant = store.useState((state) => {
       var _a2;
-      if (!store)
-        return;
-      if (!composite)
-        return;
-      if (!state.virtualFocus)
-        return;
+      if (!store) return;
+      if (!composite) return;
+      if (!state.virtualFocus) return;
       return (_a2 = getEnabledItem(store, state.activeId)) == null ? void 0 : _a2.id;
     });
-    props = _4R3V3JGP_spreadProps(_4R3V3JGP_spreadValues({
+    props = _3YLGPPWQ_spreadProps(_3YLGPPWQ_spreadValues({
       "aria-activedescendant": activeDescendant
     }, props), {
-      ref: useMergeRefs(composite ? store.setBaseElement : null, props.ref),
+      ref: useMergeRefs(ref, setBaseElement, props.ref),
       onKeyDownCapture,
       onKeyUpCapture,
       onFocusCapture,
@@ -32787,13 +32677,13 @@ var useComposite = createHook(
     const focusable = store.useState(
       (state) => composite && (state.virtualFocus || state.activeId === null)
     );
-    props = useFocusable(_4R3V3JGP_spreadValues({ focusable }, props));
+    props = useFocusable(_3YLGPPWQ_spreadValues({ focusable }, props));
     return props;
   }
 );
-var FTNKYK65_Composite = forwardRef2(function Composite2(props) {
+var Composite = forwardRef2(function Composite2(props) {
   const htmlProps = useComposite(props);
-  return createElement(FTNKYK65_TagName, htmlProps);
+  return createElement(TW35PKTK_TagName, htmlProps);
 });
 
 
@@ -32816,7 +32706,7 @@ var FTNKYK65_Composite = forwardRef2(function Composite2(props) {
 
 
 
-// src/combobox/combobox.ts
+// src/combobox/combobox.tsx
 
 
 
@@ -32825,16 +32715,13 @@ var FTNKYK65_Composite = forwardRef2(function Composite2(props) {
 
 var combobox_TagName = "input";
 function isFirstItemAutoSelected(items, activeValue, autoSelect) {
-  if (!autoSelect)
-    return false;
+  if (!autoSelect) return false;
   const firstItem = items.find((item) => !item.disabled && item.value);
   return (firstItem == null ? void 0 : firstItem.value) === activeValue;
 }
 function hasCompletionString(value, activeValue) {
-  if (!activeValue)
-    return false;
-  if (value == null)
-    return false;
+  if (!activeValue) return false;
+  if (value == null) return false;
   value = normalizeString(value);
   return activeValue.length > value.length && activeValue.toLowerCase().indexOf(value.toLowerCase()) === 0;
 }
@@ -32844,6 +32731,14 @@ function isInputEvent(event) {
 function isAriaAutoCompleteValue(value) {
   return value === "inline" || value === "list" || value === "both" || value === "none";
 }
+function getDefaultAutoSelectId(items) {
+  const item = items.find((item2) => {
+    var _a;
+    if (item2.disabled) return false;
+    return ((_a = item2.element) == null ? void 0 : _a.getAttribute("role")) !== "tab";
+  });
+  return item == null ? void 0 : item.id;
+}
 var useCombobox = createHook(
   function useCombobox2(_a) {
     var _b = _a, {
@@ -32851,14 +32746,15 @@ var useCombobox = createHook(
       focusable = true,
       autoSelect: autoSelectProp = false,
       getAutoSelectId,
-      showOnChange = true,
-      setValueOnChange = true,
-      showOnMouseDown = true,
+      setValueOnChange,
+      showMinLength = 0,
+      showOnChange,
+      showOnMouseDown,
       showOnClick = showOnMouseDown,
+      showOnKeyDown,
+      showOnKeyPress = showOnKeyDown,
       blurActiveItemOnClick,
       setValueOnClick = true,
-      showOnKeyDown = true,
-      showOnKeyPress = showOnKeyDown,
       moveOnKeyPress = true,
       autoComplete = "list"
     } = _b, props = __objRest(_b, [
@@ -32866,14 +32762,15 @@ var useCombobox = createHook(
       "focusable",
       "autoSelect",
       "getAutoSelectId",
-      "showOnChange",
       "setValueOnChange",
+      "showMinLength",
+      "showOnChange",
       "showOnMouseDown",
       "showOnClick",
-      "blurActiveItemOnClick",
-      "setValueOnClick",
       "showOnKeyDown",
       "showOnKeyPress",
+      "blurActiveItemOnClick",
+      "setValueOnClick",
       "moveOnKeyPress",
       "autoComplete"
     ]);
@@ -32884,7 +32781,7 @@ var useCombobox = createHook(
        false && 0
     );
     const ref = (0,external_React_.useRef)(null);
-    const [valueUpdated, forceValueUpdate] = _6O5OEQGF_useForceUpdate();
+    const [valueUpdated, forceValueUpdate] = Z32BISHQ_useForceUpdate();
     const canAutoSelectRef = (0,external_React_.useRef)(false);
     const composingRef = (0,external_React_.useRef)(false);
     const autoSelect = store.useState(
@@ -32893,40 +32790,49 @@ var useCombobox = createHook(
     const inline = autoComplete === "inline" || autoComplete === "both";
     const [canInline, setCanInline] = (0,external_React_.useState)(inline);
     useUpdateLayoutEffect(() => {
-      if (!inline)
-        return;
+      if (!inline) return;
       setCanInline(true);
     }, [inline]);
     const storeValue = store.useState("value");
-    const activeValue = store.useState(
-      (state) => inline && canInline ? state.activeValue : void 0
-    );
+    const prevSelectedValueRef = (0,external_React_.useRef)();
+    (0,external_React_.useEffect)(() => {
+      return EQQLU3CG_sync(store, ["selectedValue", "activeId"], (_, prev) => {
+        prevSelectedValueRef.current = prev.selectedValue;
+      });
+    }, []);
+    const inlineActiveValue = store.useState((state) => {
+      var _a2;
+      if (!inline) return;
+      if (!canInline) return;
+      if (state.activeValue && Array.isArray(state.selectedValue)) {
+        if (state.selectedValue.includes(state.activeValue)) return;
+        if ((_a2 = prevSelectedValueRef.current) == null ? void 0 : _a2.includes(state.activeValue)) return;
+      }
+      return state.activeValue;
+    });
     const items = store.useState("renderedItems");
     const open = store.useState("open");
     const contentElement = store.useState("contentElement");
     const value = (0,external_React_.useMemo)(() => {
-      if (!inline)
-        return storeValue;
-      if (!canInline)
-        return storeValue;
+      if (!inline) return storeValue;
+      if (!canInline) return storeValue;
       const firstItemAutoSelected = isFirstItemAutoSelected(
         items,
-        activeValue,
+        inlineActiveValue,
         autoSelect
       );
       if (firstItemAutoSelected) {
-        if (hasCompletionString(storeValue, activeValue)) {
-          const slice = (activeValue == null ? void 0 : activeValue.slice(storeValue.length)) || "";
+        if (hasCompletionString(storeValue, inlineActiveValue)) {
+          const slice = (inlineActiveValue == null ? void 0 : inlineActiveValue.slice(storeValue.length)) || "";
           return storeValue + slice;
         }
         return storeValue;
       }
-      return activeValue || storeValue;
-    }, [inline, canInline, items, activeValue, autoSelect, storeValue]);
+      return inlineActiveValue || storeValue;
+    }, [inline, canInline, items, inlineActiveValue, autoSelect, storeValue]);
     (0,external_React_.useEffect)(() => {
       const element = ref.current;
-      if (!element)
-        return;
+      if (!element) return;
       const onCompositeItemMove = () => setCanInline(true);
       element.addEventListener("combobox-item-move", onCompositeItemMove);
       return () => {
@@ -32934,32 +32840,38 @@ var useCombobox = createHook(
       };
     }, []);
     (0,external_React_.useEffect)(() => {
-      if (!inline)
-        return;
-      if (!canInline)
-        return;
-      if (!activeValue)
-        return;
+      if (!inline) return;
+      if (!canInline) return;
+      if (!inlineActiveValue) return;
       const firstItemAutoSelected = isFirstItemAutoSelected(
         items,
-        activeValue,
+        inlineActiveValue,
         autoSelect
       );
-      if (!firstItemAutoSelected)
-        return;
-      if (!hasCompletionString(storeValue, activeValue))
-        return;
+      if (!firstItemAutoSelected) return;
+      if (!hasCompletionString(storeValue, inlineActiveValue)) return;
+      let cleanup = PBFD2E7P_noop;
       queueMicrotask(() => {
         const element = ref.current;
-        if (!element)
-          return;
-        setSelectionRange(element, storeValue.length, activeValue.length);
+        if (!element) return;
+        const { start: prevStart, end: prevEnd } = getTextboxSelection(element);
+        const nextStart = storeValue.length;
+        const nextEnd = inlineActiveValue.length;
+        setSelectionRange(element, nextStart, nextEnd);
+        cleanup = () => {
+          if (!hasFocus(element)) return;
+          const { start, end } = getTextboxSelection(element);
+          if (start !== nextStart) return;
+          if (end !== nextEnd) return;
+          setSelectionRange(element, prevStart, prevEnd);
+        };
       });
+      return () => cleanup();
     }, [
       valueUpdated,
       inline,
       canInline,
-      activeValue,
+      inlineActiveValue,
       items,
       autoSelect,
       storeValue
@@ -32968,62 +32880,50 @@ var useCombobox = createHook(
     const getAutoSelectIdProp = useEvent(getAutoSelectId);
     const autoSelectIdRef = (0,external_React_.useRef)(null);
     (0,external_React_.useEffect)(() => {
-      if (!open)
-        return;
-      if (!contentElement)
-        return;
+      if (!open) return;
+      if (!contentElement) return;
       const scrollingElement = getScrollingElement(contentElement);
-      if (!scrollingElement)
-        return;
+      if (!scrollingElement) return;
       scrollingElementRef.current = scrollingElement;
-      const onWheel = () => {
+      const onUserScroll = () => {
         canAutoSelectRef.current = false;
       };
       const onScroll = () => {
-        if (!store)
-          return;
-        if (!canAutoSelectRef.current)
-          return;
+        if (!store) return;
+        if (!canAutoSelectRef.current) return;
         const { activeId } = store.getState();
-        if (activeId === null)
-          return;
-        if (activeId === autoSelectIdRef.current)
-          return;
+        if (activeId === null) return;
+        if (activeId === autoSelectIdRef.current) return;
         canAutoSelectRef.current = false;
       };
       const options = { passive: true, capture: true };
-      scrollingElement.addEventListener("wheel", onWheel, options);
+      scrollingElement.addEventListener("wheel", onUserScroll, options);
+      scrollingElement.addEventListener("touchmove", onUserScroll, options);
       scrollingElement.addEventListener("scroll", onScroll, options);
       return () => {
-        scrollingElement.removeEventListener("wheel", onWheel, true);
+        scrollingElement.removeEventListener("wheel", onUserScroll, true);
+        scrollingElement.removeEventListener("touchmove", onUserScroll, true);
         scrollingElement.removeEventListener("scroll", onScroll, true);
       };
     }, [open, contentElement, store]);
     useSafeLayoutEffect(() => {
-      if (!storeValue)
-        return;
-      if (composingRef.current)
-        return;
+      if (!storeValue) return;
+      if (composingRef.current) return;
       canAutoSelectRef.current = true;
     }, [storeValue]);
     useSafeLayoutEffect(() => {
-      if (autoSelect !== "always" && open)
-        return;
+      if (autoSelect !== "always" && open) return;
       canAutoSelectRef.current = open;
     }, [autoSelect, open]);
     const resetValueOnSelect = store.useState("resetValueOnSelect");
     useUpdateEffect(() => {
-      var _a2;
+      var _a2, _b2;
       const canAutoSelect = canAutoSelectRef.current;
-      if (!store)
-        return;
-      if (!open)
-        return;
-      if ((!autoSelect || !canAutoSelect) && !resetValueOnSelect)
-        return;
+      if (!store) return;
+      if (!open) return;
+      if ((!autoSelect || !canAutoSelect) && !resetValueOnSelect) return;
       const { baseElement, contentElement: contentElement2, activeId } = store.getState();
-      if (baseElement && !hasFocus(baseElement))
-        return;
+      if (baseElement && !hasFocus(baseElement)) return;
       if (contentElement2 == null ? void 0 : contentElement2.hasAttribute("data-placing")) {
         const observer = new MutationObserver(forceValueUpdate);
         observer.observe(contentElement2, { attributeFilter: ["data-placing"] });
@@ -33031,11 +32931,11 @@ var useCombobox = createHook(
       }
       if (autoSelect && canAutoSelect) {
         const userAutoSelectId = getAutoSelectIdProp(items);
-        const autoSelectId = userAutoSelectId !== void 0 ? userAutoSelectId : store.first();
+        const autoSelectId = userAutoSelectId !== void 0 ? userAutoSelectId : (_a2 = getDefaultAutoSelectId(items)) != null ? _a2 : store.first();
         autoSelectIdRef.current = autoSelectId;
         store.move(autoSelectId != null ? autoSelectId : null);
       } else {
-        const element = (_a2 = store.item(activeId)) == null ? void 0 : _a2.element;
+        const element = (_b2 = store.item(activeId)) == null ? void 0 : _b2.element;
         if (element && "scrollIntoView" in element) {
           element.scrollIntoView({ block: "nearest", inline: "nearest" });
         }
@@ -33052,11 +32952,9 @@ var useCombobox = createHook(
       items
     ]);
     (0,external_React_.useEffect)(() => {
-      if (!inline)
-        return;
+      if (!inline) return;
       const combobox = ref.current;
-      if (!combobox)
-        return;
+      if (!combobox) return;
       const elements = [combobox, contentElement].filter(
         (value2) => !!value2
       );
@@ -33065,21 +32963,32 @@ var useCombobox = createHook(
           store == null ? void 0 : store.setValue(value);
         }
       };
-      elements.forEach((el) => el.addEventListener("focusout", onBlur2));
+      for (const element of elements) {
+        element.addEventListener("focusout", onBlur2);
+      }
       return () => {
-        elements.forEach((el) => el.removeEventListener("focusout", onBlur2));
+        for (const element of elements) {
+          element.removeEventListener("focusout", onBlur2);
+        }
       };
     }, [inline, contentElement, store, value]);
+    const canShow = (event) => {
+      const currentTarget = event.currentTarget;
+      return currentTarget.value.length >= showMinLength;
+    };
     const onChangeProp = props.onChange;
-    const showOnChangeProp = useBooleanEvent(showOnChange);
-    const setValueOnChangeProp = useBooleanEvent(setValueOnChange);
+    const showOnChangeProp = useBooleanEvent(showOnChange != null ? showOnChange : canShow);
+    const setValueOnChangeProp = useBooleanEvent(
+      // If the combobox is combined with tags, the value will be set by the tag
+      // input component.
+      setValueOnChange != null ? setValueOnChange : !store.tag
+    );
     const onChange = useEvent((event) => {
       onChangeProp == null ? void 0 : onChangeProp(event);
-      if (event.defaultPrevented)
-        return;
-      if (!store)
-        return;
-      const { value: value2, selectionStart, selectionEnd } = event.target;
+      if (event.defaultPrevented) return;
+      if (!store) return;
+      const currentTarget = event.currentTarget;
+      const { value: value2, selectionStart, selectionEnd } = currentTarget;
       const nativeEvent = event.nativeEvent;
       canAutoSelectRef.current = true;
       if (isInputEvent(nativeEvent)) {
@@ -33095,8 +33004,10 @@ var useCombobox = createHook(
       }
       if (setValueOnChangeProp(event)) {
         const isSameValue = value2 === store.getState().value;
-        (0,external_ReactDOM_namespaceObject.flushSync)(() => store == null ? void 0 : store.setValue(value2));
-        setSelectionRange(event.currentTarget, selectionStart, selectionEnd);
+        store.setValue(value2);
+        queueMicrotask(() => {
+          setSelectionRange(currentTarget, selectionStart, selectionEnd);
+        });
         if (inline && autoSelect && isSameValue) {
           forceValueUpdate();
         }
@@ -33113,10 +33024,8 @@ var useCombobox = createHook(
       canAutoSelectRef.current = true;
       composingRef.current = false;
       onCompositionEndProp == null ? void 0 : onCompositionEndProp(event);
-      if (event.defaultPrevented)
-        return;
-      if (!autoSelect)
-        return;
+      if (event.defaultPrevented) return;
+      if (!autoSelect) return;
       forceValueUpdate();
     });
     const onMouseDownProp = props.onMouseDown;
@@ -33124,17 +33033,13 @@ var useCombobox = createHook(
       blurActiveItemOnClick != null ? blurActiveItemOnClick : () => !!(store == null ? void 0 : store.getState().includesBaseElement)
     );
     const setValueOnClickProp = useBooleanEvent(setValueOnClick);
-    const showOnClickProp = useBooleanEvent(showOnClick);
+    const showOnClickProp = useBooleanEvent(showOnClick != null ? showOnClick : canShow);
     const onMouseDown = useEvent((event) => {
       onMouseDownProp == null ? void 0 : onMouseDownProp(event);
-      if (event.defaultPrevented)
-        return;
-      if (event.button)
-        return;
-      if (event.ctrlKey)
-        return;
-      if (!store)
-        return;
+      if (event.defaultPrevented) return;
+      if (event.button) return;
+      if (event.ctrlKey) return;
+      if (!store) return;
       if (blurActiveItemOnClickProp(event)) {
         store.setActiveId(null);
       }
@@ -33146,29 +33051,21 @@ var useCombobox = createHook(
       }
     });
     const onKeyDownProp = props.onKeyDown;
-    const showOnKeyPressProp = useBooleanEvent(showOnKeyPress);
+    const showOnKeyPressProp = useBooleanEvent(showOnKeyPress != null ? showOnKeyPress : canShow);
     const onKeyDown = useEvent((event) => {
       onKeyDownProp == null ? void 0 : onKeyDownProp(event);
       if (!event.repeat) {
         canAutoSelectRef.current = false;
       }
-      if (event.defaultPrevented)
-        return;
-      if (event.ctrlKey)
-        return;
-      if (event.altKey)
-        return;
-      if (event.shiftKey)
-        return;
-      if (event.metaKey)
-        return;
-      if (!store)
-        return;
+      if (event.defaultPrevented) return;
+      if (event.ctrlKey) return;
+      if (event.altKey) return;
+      if (event.shiftKey) return;
+      if (event.metaKey) return;
+      if (!store) return;
       const { open: open2, activeId } = store.getState();
-      if (open2)
-        return;
-      if (activeId !== null)
-        return;
+      if (open2) return;
+      if (activeId !== null) return;
       if (event.key === "ArrowUp" || event.key === "ArrowDown") {
         if (showOnKeyPressProp(event)) {
           event.preventDefault();
@@ -33180,13 +33077,12 @@ var useCombobox = createHook(
     const onBlur = useEvent((event) => {
       canAutoSelectRef.current = false;
       onBlurProp == null ? void 0 : onBlurProp(event);
-      if (event.defaultPrevented)
-        return;
+      if (event.defaultPrevented) return;
     });
     const id = useId(props.id);
     const ariaAutoComplete = isAriaAutoCompleteValue(autoComplete) ? autoComplete : void 0;
     const isActiveItem = store.useState((state) => state.activeId === null);
-    props = _4R3V3JGP_spreadProps(_4R3V3JGP_spreadValues({
+    props = _3YLGPPWQ_spreadProps(_3YLGPPWQ_spreadValues({
       id,
       role: "combobox",
       "aria-autocomplete": ariaAutoComplete,
@@ -33203,22 +33099,20 @@ var useCombobox = createHook(
       onKeyDown,
       onBlur
     });
-    props = useComposite(_4R3V3JGP_spreadProps(_4R3V3JGP_spreadValues({
+    props = useComposite(_3YLGPPWQ_spreadProps(_3YLGPPWQ_spreadValues({
       store,
       focusable
     }, props), {
       // Enable inline autocomplete when the user moves from the combobox input
       // to an item.
       moveOnKeyPress: (event) => {
-        if (isFalsyBooleanCallback(moveOnKeyPress, event))
-          return false;
-        if (inline)
-          setCanInline(true);
+        if (isFalsyBooleanCallback(moveOnKeyPress, event)) return false;
+        if (inline) setCanInline(true);
         return true;
       }
     }));
-    props = usePopoverAnchor(_4R3V3JGP_spreadValues({ store }, props));
-    return _4R3V3JGP_spreadValues({ autoComplete: "off" }, props);
+    props = usePopoverAnchor(_3YLGPPWQ_spreadValues({ store }, props));
+    return _3YLGPPWQ_spreadValues({ autoComplete: "off" }, props);
   }
 );
 var Combobox = forwardRef2(function Combobox2(props) {
@@ -33227,7 +33121,7 @@ var Combobox = forwardRef2(function Combobox2(props) {
 });
 
 
-;// CONCATENATED MODULE: ./packages/dataviews/node_modules/@ariakit/react-core/esm/__chunks/RQZGFHI2.js
+;// CONCATENATED MODULE: ./packages/dataviews/node_modules/@ariakit/react-core/esm/__chunks/BSEL4YAF.js
 "use client";
 
 
@@ -33241,12 +33135,12 @@ var Combobox = forwardRef2(function Combobox2(props) {
 
 
 
-var RQZGFHI2_TagName = "div";
+var BSEL4YAF_TagName = "div";
 function afterTimeout(timeoutMs, cb) {
   const timeoutId = setTimeout(cb, timeoutMs);
   return () => clearTimeout(timeoutId);
 }
-function RQZGFHI2_afterPaint(cb) {
+function BSEL4YAF_afterPaint(cb) {
   let raf = requestAnimationFrame(() => {
     raf = requestAnimationFrame(cb);
   });
@@ -33255,9 +33149,8 @@ function RQZGFHI2_afterPaint(cb) {
 function parseCSSTime(...times) {
   return times.join(", ").split(", ").reduce((longestTime, currentTimeString) => {
     const multiplier = currentTimeString.endsWith("ms") ? 1 : 1e3;
-    const currentTime = parseFloat(currentTimeString || "0s") * multiplier;
-    if (currentTime > longestTime)
-      return currentTime;
+    const currentTime = Number.parseFloat(currentTimeString || "0s") * multiplier;
+    if (currentTime > longestTime) return currentTime;
     return longestTime;
   }, 0);
 }
@@ -33281,8 +33174,7 @@ var useDisclosureContent = createHook(function useDisclosureContent2(_a) {
   const contentElement = store.useState("contentElement");
   const otherElement = useStoreState(store.disclosure, "contentElement");
   useSafeLayoutEffect(() => {
-    if (!ref.current)
-      return;
+    if (!ref.current) return;
     store == null ? void 0 : store.setContentElement(ref.current);
   }, [store]);
   useSafeLayoutEffect(() => {
@@ -33292,37 +33184,31 @@ var useDisclosureContent = createHook(function useDisclosureContent2(_a) {
       return true;
     });
     return () => {
-      if (previousAnimated === void 0)
-        return;
+      if (previousAnimated === void 0) return;
       store == null ? void 0 : store.setState("animated", previousAnimated);
     };
   }, [store]);
   useSafeLayoutEffect(() => {
-    if (!animated)
-      return;
+    if (!animated) return;
     if (!(contentElement == null ? void 0 : contentElement.isConnected)) {
       setTransition(null);
       return;
     }
-    return RQZGFHI2_afterPaint(() => {
+    return BSEL4YAF_afterPaint(() => {
       setTransition(open ? "enter" : mounted ? "leave" : null);
     });
   }, [animated, contentElement, open, mounted]);
   useSafeLayoutEffect(() => {
-    if (!store)
-      return;
-    if (!animated)
-      return;
+    if (!store) return;
+    if (!animated) return;
     const stopAnimation = () => store == null ? void 0 : store.setState("animating", false);
     const stopAnimationSync = () => (0,external_ReactDOM_namespaceObject.flushSync)(stopAnimation);
     if (!transition || !contentElement) {
       stopAnimation();
       return;
     }
-    if (transition === "leave" && open)
-      return;
-    if (transition === "enter" && !open)
-      return;
+    if (transition === "leave" && open) return;
+    if (transition === "enter" && !open) return;
     if (typeof animated === "number") {
       const timeout2 = animated;
       return afterTimeout(timeout2, stopAnimationSync);
@@ -33371,11 +33257,10 @@ var useDisclosureContent = createHook(function useDisclosureContent2(_a) {
   const hidden = isHidden(mounted, props.hidden, alwaysVisible);
   const styleProp = props.style;
   const style = (0,external_React_.useMemo)(() => {
-    if (hidden)
-      return _4R3V3JGP_spreadProps(_4R3V3JGP_spreadValues({}, styleProp), { display: "none" });
+    if (hidden) return _3YLGPPWQ_spreadProps(_3YLGPPWQ_spreadValues({}, styleProp), { display: "none" });
     return styleProp;
   }, [hidden, styleProp]);
-  props = _4R3V3JGP_spreadProps(_4R3V3JGP_spreadValues({
+  props = _3YLGPPWQ_spreadProps(_3YLGPPWQ_spreadValues({
     id,
     "data-open": open || void 0,
     "data-enter": transition === "enter" || void 0,
@@ -33389,7 +33274,7 @@ var useDisclosureContent = createHook(function useDisclosureContent2(_a) {
 });
 var DisclosureContentImpl = forwardRef2(function DisclosureContentImpl2(props) {
   const htmlProps = useDisclosureContent(props);
-  return createElement(RQZGFHI2_TagName, htmlProps);
+  return createElement(BSEL4YAF_TagName, htmlProps);
 });
 var DisclosureContent = forwardRef2(function DisclosureContent2(_a) {
   var _b = _a, {
@@ -33403,14 +33288,13 @@ var DisclosureContent = forwardRef2(function DisclosureContent2(_a) {
     store,
     (state) => !unmountOnHide || (state == null ? void 0 : state.mounted)
   );
-  if (mounted === false)
-    return null;
-  return /* @__PURE__ */ (0,external_ReactJSXRuntime_namespaceObject.jsx)(DisclosureContentImpl, _4R3V3JGP_spreadValues({}, props));
+  if (mounted === false) return null;
+  return /* @__PURE__ */ (0,external_ReactJSXRuntime_namespaceObject.jsx)(DisclosureContentImpl, _3YLGPPWQ_spreadValues({}, props));
 });
 
 
 
-;// CONCATENATED MODULE: ./packages/dataviews/node_modules/@ariakit/react-core/esm/__chunks/Y3BYYHRY.js
+;// CONCATENATED MODULE: ./packages/dataviews/node_modules/@ariakit/react-core/esm/__chunks/6ZVAPMHT.js
 "use client";
 
 
@@ -33422,39 +33306,65 @@ var DisclosureContent = forwardRef2(function DisclosureContent2(_a) {
 
 
 
-var Y3BYYHRY_TagName = "div";
+var _6ZVAPMHT_TagName = "div";
 var useComboboxList = createHook(
   function useComboboxList2(_a) {
     var _b = _a, { store, alwaysVisible } = _b, props = __objRest(_b, ["store", "alwaysVisible"]);
-    const context = useComboboxProviderContext();
+    const scopedContext = useComboboxScopedContext(true);
+    const context = useComboboxContext();
     store = store || context;
+    const scopedContextSameStore = !!store && store === scopedContext;
     invariant(
       store,
        false && 0
     );
     const ref = (0,external_React_.useRef)(null);
     const id = useId(props.id);
-    props = useWrapElement(
-      props,
-      (element) => /* @__PURE__ */ (0,external_ReactJSXRuntime_namespaceObject.jsx)(ComboboxScopedContextProvider, { value: store, children: element }),
-      [store]
-    );
     const mounted = store.useState("mounted");
     const hidden = isHidden(mounted, props.hidden, alwaysVisible);
-    const style = hidden ? _4R3V3JGP_spreadProps(_4R3V3JGP_spreadValues({}, props.style), { display: "none" }) : props.style;
+    const style = hidden ? _3YLGPPWQ_spreadProps(_3YLGPPWQ_spreadValues({}, props.style), { display: "none" }) : props.style;
     const multiSelectable = store.useState(
       (state) => Array.isArray(state.selectedValue)
     );
     const role = useAttribute(ref, "role", props.role);
     const isCompositeRole = role === "listbox" || role === "tree" || role === "grid";
     const ariaMultiSelectable = isCompositeRole ? multiSelectable || void 0 : void 0;
-    props = _4R3V3JGP_spreadProps(_4R3V3JGP_spreadValues({
+    const [hasListboxInside, setHasListboxInside] = (0,external_React_.useState)(false);
+    const contentElement = store.useState("contentElement");
+    useSafeLayoutEffect(() => {
+      if (!mounted) return;
+      const element = ref.current;
+      if (!element) return;
+      if (contentElement !== element) return;
+      const callback = () => {
+        setHasListboxInside(!!element.querySelector("[role='listbox']"));
+      };
+      const observer = new MutationObserver(callback);
+      observer.observe(element, {
+        subtree: true,
+        childList: true,
+        attributeFilter: ["role"]
+      });
+      callback();
+      return () => observer.disconnect();
+    }, [mounted, contentElement]);
+    if (!hasListboxInside) {
+      props = _3YLGPPWQ_spreadValues({
+        role: "listbox",
+        "aria-multiselectable": ariaMultiSelectable
+      }, props);
+    }
+    props = useWrapElement(
+      props,
+      (element) => /* @__PURE__ */ (0,external_ReactJSXRuntime_namespaceObject.jsx)(ComboboxScopedContextProvider, { value: store, children: /* @__PURE__ */ (0,external_ReactJSXRuntime_namespaceObject.jsx)(ComboboxListRoleContext.Provider, { value: role, children: element }) }),
+      [store, role]
+    );
+    const setContentElement = id && (!scopedContext || !scopedContextSameStore) ? store.setContentElement : null;
+    props = _3YLGPPWQ_spreadProps(_3YLGPPWQ_spreadValues({
       id,
-      hidden,
-      role: "listbox",
-      "aria-multiselectable": ariaMultiSelectable
+      hidden
     }, props), {
-      ref: useMergeRefs(id ? store.setContentElement : null, ref, props.ref),
+      ref: useMergeRefs(setContentElement, ref, props.ref),
       style
     });
     return removeUndefinedValues(props);
@@ -33462,28 +33372,180 @@ var useComboboxList = createHook(
 );
 var ComboboxList = forwardRef2(function ComboboxList2(props) {
   const htmlProps = useComboboxList(props);
-  return createElement(Y3BYYHRY_TagName, htmlProps);
+  return createElement(_6ZVAPMHT_TagName, htmlProps);
 });
 
 
 
-;// CONCATENATED MODULE: ./packages/dataviews/node_modules/@ariakit/react-core/esm/__chunks/KSZPJCUA.js
+;// CONCATENATED MODULE: ./packages/dataviews/node_modules/@ariakit/react-core/esm/__chunks/OBZMLI6J.js
 "use client";
 
 
 
 
 
-// src/command/command.ts
+// src/composite/composite-hover.tsx
+
+
+
+
+var OBZMLI6J_TagName = "div";
+function getMouseDestination(event) {
+  const relatedTarget = event.relatedTarget;
+  if ((relatedTarget == null ? void 0 : relatedTarget.nodeType) === Node.ELEMENT_NODE) {
+    return relatedTarget;
+  }
+  return null;
+}
+function hoveringInside(event) {
+  const nextElement = getMouseDestination(event);
+  if (!nextElement) return false;
+  return contains(event.currentTarget, nextElement);
+}
+var symbol = Symbol("composite-hover");
+function movingToAnotherItem(event) {
+  let dest = getMouseDestination(event);
+  if (!dest) return false;
+  do {
+    if (PBFD2E7P_hasOwnProperty(dest, symbol) && dest[symbol]) return true;
+    dest = dest.parentElement;
+  } while (dest);
+  return false;
+}
+var useCompositeHover = createHook(
+  function useCompositeHover2(_a) {
+    var _b = _a, {
+      store,
+      focusOnHover = true,
+      blurOnHoverEnd = !!focusOnHover
+    } = _b, props = __objRest(_b, [
+      "store",
+      "focusOnHover",
+      "blurOnHoverEnd"
+    ]);
+    const context = useCompositeContext();
+    store = store || context;
+    invariant(
+      store,
+       false && 0
+    );
+    const isMouseMoving = useIsMouseMoving();
+    const onMouseMoveProp = props.onMouseMove;
+    const focusOnHoverProp = useBooleanEvent(focusOnHover);
+    const onMouseMove = useEvent((event) => {
+      onMouseMoveProp == null ? void 0 : onMouseMoveProp(event);
+      if (event.defaultPrevented) return;
+      if (!isMouseMoving()) return;
+      if (!focusOnHoverProp(event)) return;
+      if (!hasFocusWithin(event.currentTarget)) {
+        const baseElement = store == null ? void 0 : store.getState().baseElement;
+        if (baseElement && !hasFocus(baseElement)) {
+          baseElement.focus();
+        }
+      }
+      store == null ? void 0 : store.setActiveId(event.currentTarget.id);
+    });
+    const onMouseLeaveProp = props.onMouseLeave;
+    const blurOnHoverEndProp = useBooleanEvent(blurOnHoverEnd);
+    const onMouseLeave = useEvent((event) => {
+      var _a2;
+      onMouseLeaveProp == null ? void 0 : onMouseLeaveProp(event);
+      if (event.defaultPrevented) return;
+      if (!isMouseMoving()) return;
+      if (hoveringInside(event)) return;
+      if (movingToAnotherItem(event)) return;
+      if (!focusOnHoverProp(event)) return;
+      if (!blurOnHoverEndProp(event)) return;
+      store == null ? void 0 : store.setActiveId(null);
+      (_a2 = store == null ? void 0 : store.getState().baseElement) == null ? void 0 : _a2.focus();
+    });
+    const ref = (0,external_React_.useCallback)((element) => {
+      if (!element) return;
+      element[symbol] = true;
+    }, []);
+    props = _3YLGPPWQ_spreadProps(_3YLGPPWQ_spreadValues({}, props), {
+      ref: useMergeRefs(ref, props.ref),
+      onMouseMove,
+      onMouseLeave
+    });
+    return removeUndefinedValues(props);
+  }
+);
+var CompositeHover = memo2(
+  forwardRef2(function CompositeHover2(props) {
+    const htmlProps = useCompositeHover(props);
+    return createElement(OBZMLI6J_TagName, htmlProps);
+  })
+);
+
+
+
+;// CONCATENATED MODULE: ./packages/dataviews/node_modules/@ariakit/react-core/esm/__chunks/PLQDTVXM.js
+"use client";
 
 
 
 
 
-var KSZPJCUA_TagName = "button";
+// src/collection/collection-item.tsx
+
+
+var PLQDTVXM_TagName = "div";
+var useCollectionItem = createHook(
+  function useCollectionItem2(_a) {
+    var _b = _a, {
+      store,
+      shouldRegisterItem = true,
+      getItem = identity,
+      element: element
+    } = _b, props = __objRest(_b, [
+      "store",
+      "shouldRegisterItem",
+      "getItem",
+      // @ts-expect-error This prop may come from a collection renderer.
+      "element"
+    ]);
+    const context = useCollectionContext();
+    store = store || context;
+    const id = useId(props.id);
+    const ref = (0,external_React_.useRef)(element);
+    (0,external_React_.useEffect)(() => {
+      const element2 = ref.current;
+      if (!id) return;
+      if (!element2) return;
+      if (!shouldRegisterItem) return;
+      const item = getItem({ id, element: element2 });
+      return store == null ? void 0 : store.renderItem(item);
+    }, [id, shouldRegisterItem, getItem, store]);
+    props = _3YLGPPWQ_spreadProps(_3YLGPPWQ_spreadValues({}, props), {
+      ref: useMergeRefs(ref, props.ref)
+    });
+    return removeUndefinedValues(props);
+  }
+);
+var CollectionItem = forwardRef2(function CollectionItem2(props) {
+  const htmlProps = useCollectionItem(props);
+  return createElement(PLQDTVXM_TagName, htmlProps);
+});
+
+
+
+;// CONCATENATED MODULE: ./packages/dataviews/node_modules/@ariakit/react-core/esm/__chunks/NAXN2XAB.js
+"use client";
+
+
+
+
+
+// src/command/command.tsx
+
+
+
+
+
+var NAXN2XAB_TagName = "button";
 function isNativeClick(event) {
-  if (!event.isTrusted)
-    return false;
+  if (!event.isTrusted) return false;
   const element = event.currentTarget;
   if (event.key === "Enter") {
     return isButton(element) || element.tagName === "SUMMARY" || element.tagName === "A";
@@ -33493,7 +33555,7 @@ function isNativeClick(event) {
   }
   return false;
 }
-var KSZPJCUA_symbol = Symbol("command");
+var NAXN2XAB_symbol = Symbol("command");
 var useCommand = createHook(
   function useCommand2(_a) {
     var _b = _a, { clickOnEnter = true, clickOnSpace = true } = _b, props = __objRest(_b, ["clickOnEnter", "clickOnSpace"]);
@@ -33504,30 +33566,23 @@ var useCommand = createHook(
       () => !!tagName && isButton({ tagName, type })
     );
     (0,external_React_.useEffect)(() => {
-      if (!ref.current)
-        return;
+      if (!ref.current) return;
       setIsNativeButton(isButton(ref.current));
     }, []);
     const [active, setActive] = (0,external_React_.useState)(false);
     const activeRef = (0,external_React_.useRef)(false);
     const disabled = disabledFromProps(props);
-    const [isDuplicate, metadataProps] = useMetadataProps(props, KSZPJCUA_symbol, true);
+    const [isDuplicate, metadataProps] = useMetadataProps(props, NAXN2XAB_symbol, true);
     const onKeyDownProp = props.onKeyDown;
     const onKeyDown = useEvent((event) => {
       onKeyDownProp == null ? void 0 : onKeyDownProp(event);
       const element = event.currentTarget;
-      if (event.defaultPrevented)
-        return;
-      if (isDuplicate)
-        return;
-      if (disabled)
-        return;
-      if (!isSelfTarget(event))
-        return;
-      if (RRSZHCH6_isTextField(element))
-        return;
-      if (element.isContentEditable)
-        return;
+      if (event.defaultPrevented) return;
+      if (isDuplicate) return;
+      if (disabled) return;
+      if (!isSelfTarget(event)) return;
+      if (isTextField(element)) return;
+      if (element.isContentEditable) return;
       const isEnter = clickOnEnter && event.key === "Enter";
       const isSpace = clickOnSpace && event.key === " ";
       const shouldPreventEnter = event.key === "Enter" && !clickOnEnter;
@@ -33561,14 +33616,10 @@ var useCommand = createHook(
     const onKeyUpProp = props.onKeyUp;
     const onKeyUp = useEvent((event) => {
       onKeyUpProp == null ? void 0 : onKeyUpProp(event);
-      if (event.defaultPrevented)
-        return;
-      if (isDuplicate)
-        return;
-      if (disabled)
-        return;
-      if (event.metaKey)
-        return;
+      if (event.defaultPrevented) return;
+      if (isDuplicate) return;
+      if (disabled) return;
+      if (event.metaKey) return;
       const isSpace = clickOnSpace && event.key === " ";
       if (activeRef.current && isSpace) {
         activeRef.current = false;
@@ -33581,7 +33632,7 @@ var useCommand = createHook(
         }
       }
     });
-    props = _4R3V3JGP_spreadProps(_4R3V3JGP_spreadValues(_4R3V3JGP_spreadValues({
+    props = _3YLGPPWQ_spreadProps(_3YLGPPWQ_spreadValues(_3YLGPPWQ_spreadValues({
       "data-active": active || void 0,
       type: isNativeButton ? "button" : void 0
     }, metadataProps), props), {
@@ -33595,65 +33646,12 @@ var useCommand = createHook(
 );
 var Command = forwardRef2(function Command2(props) {
   const htmlProps = useCommand(props);
-  return createElement(KSZPJCUA_TagName, htmlProps);
+  return createElement(NAXN2XAB_TagName, htmlProps);
 });
 
 
 
-;// CONCATENATED MODULE: ./packages/dataviews/node_modules/@ariakit/react-core/esm/__chunks/7YKLTEOQ.js
-"use client";
-
-
-
-
-
-// src/collection/collection-item.ts
-
-
-var _7YKLTEOQ_TagName = "div";
-var useCollectionItem = createHook(
-  function useCollectionItem2(_a) {
-    var _b = _a, {
-      store,
-      shouldRegisterItem = true,
-      getItem = identity,
-      element: element
-    } = _b, props = __objRest(_b, [
-      "store",
-      "shouldRegisterItem",
-      "getItem",
-      // @ts-expect-error This prop may come from a collection renderer.
-      "element"
-    ]);
-    const context = useCollectionContext();
-    store = store || context;
-    const id = useId(props.id);
-    const ref = (0,external_React_.useRef)(element);
-    (0,external_React_.useEffect)(() => {
-      const element2 = ref.current;
-      if (!id)
-        return;
-      if (!element2)
-        return;
-      if (!shouldRegisterItem)
-        return;
-      const item = getItem({ id, element: element2 });
-      return store == null ? void 0 : store.renderItem(item);
-    }, [id, shouldRegisterItem, getItem, store]);
-    props = _4R3V3JGP_spreadProps(_4R3V3JGP_spreadValues({}, props), {
-      ref: useMergeRefs(ref, props.ref)
-    });
-    return removeUndefinedValues(props);
-  }
-);
-var CollectionItem = forwardRef2(function CollectionItem2(props) {
-  const htmlProps = useCollectionItem(props);
-  return createElement(_7YKLTEOQ_TagName, htmlProps);
-});
-
-
-
-;// CONCATENATED MODULE: ./packages/dataviews/node_modules/@ariakit/react-core/esm/__chunks/C6OBNQ4F.js
+;// CONCATENATED MODULE: ./packages/dataviews/node_modules/@ariakit/react-core/esm/__chunks/3CCTMYB6.js
 "use client";
 
 
@@ -33670,12 +33668,10 @@ var CollectionItem = forwardRef2(function CollectionItem2(props) {
 
 
 
-var C6OBNQ4F_TagName = "button";
+
+var _3CCTMYB6_TagName = "button";
 function isEditableElement(element) {
-  if (element.isContentEditable)
-    return true;
-  if (RRSZHCH6_isTextField(element))
-    return true;
+  if (isTextbox(element)) return true;
   return element.tagName === "INPUT" && !isButton(element);
 }
 function getNextPageOffset(scrollingElement, pageUp = false) {
@@ -33697,27 +33693,21 @@ function getItemOffset(itemElement, pageUp = false) {
 }
 function findNextPageItemId(element, store, next, pageUp = false) {
   var _a;
-  if (!store)
-    return;
-  if (!next)
-    return;
+  if (!store) return;
+  if (!next) return;
   const { renderedItems } = store.getState();
   const scrollingElement = getScrollingElement(element);
-  if (!scrollingElement)
-    return;
+  if (!scrollingElement) return;
   const nextPageOffset = getNextPageOffset(scrollingElement, pageUp);
   let id;
   let prevDifference;
   for (let i = 0; i < renderedItems.length; i += 1) {
     const previousId = id;
     id = next(i);
-    if (!id)
-      break;
-    if (id === previousId)
-      continue;
+    if (!id) break;
+    if (id === previousId) continue;
     const itemElement = (_a = getEnabledItem(store, id)) == null ? void 0 : _a.element;
-    if (!itemElement)
-      continue;
+    if (!itemElement) continue;
     const itemOffset = getItemOffset(itemElement, pageUp);
     const difference = itemOffset - nextPageOffset;
     const absDifference = Math.abs(difference);
@@ -33732,40 +33722,8 @@ function findNextPageItemId(element, store, next, pageUp = false) {
   return id;
 }
 function targetIsAnotherItem(event, store) {
-  if (isSelfTarget(event))
-    return false;
+  if (isSelfTarget(event)) return false;
   return isItem(store, event.target);
-}
-function useRole(ref, props) {
-  const roleProp = props.role;
-  const [role, setRole] = (0,external_React_.useState)(roleProp);
-  useSafeLayoutEffect(() => {
-    const element = ref.current;
-    if (!element)
-      return;
-    setRole(element.getAttribute("role") || roleProp);
-  }, [roleProp]);
-  return role;
-}
-function requiresAriaSelected(role) {
-  return role === "option" || role === "treeitem";
-}
-function supportsAriaSelected(role) {
-  if (role === "option")
-    return true;
-  if (role === "tab")
-    return true;
-  if (role === "treeitem")
-    return true;
-  if (role === "gridcell")
-    return true;
-  if (role === "row")
-    return true;
-  if (role === "columnheader")
-    return true;
-  if (role === "rowheader")
-    return true;
-  return false;
 }
 var useCompositeItem = createHook(
   function useCompositeItem2(_a) {
@@ -33794,21 +33752,17 @@ var useCompositeItem = createHook(
     const ref = (0,external_React_.useRef)(null);
     const row = (0,external_React_.useContext)(CompositeRowContext);
     const rowId = useStoreState(store, (state) => {
-      if (rowIdProp)
-        return rowIdProp;
-      if (!state)
-        return;
-      if (!(row == null ? void 0 : row.baseElement))
-        return;
-      if (row.baseElement !== state.baseElement)
-        return;
+      if (rowIdProp) return rowIdProp;
+      if (!state) return;
+      if (!(row == null ? void 0 : row.baseElement)) return;
+      if (row.baseElement !== state.baseElement) return;
       return row.id;
     });
     const disabled = disabledFromProps(props);
     const trulyDisabled = disabled && !props.accessibleWhenDisabled;
     const getItem = (0,external_React_.useCallback)(
       (item) => {
-        const nextItem = _4R3V3JGP_spreadProps(_4R3V3JGP_spreadValues({}, item), {
+        const nextItem = _3YLGPPWQ_spreadProps(_3YLGPPWQ_spreadValues({}, item), {
           id: id || item.id,
           rowId,
           disabled: !!trulyDisabled
@@ -33824,28 +33778,26 @@ var useCompositeItem = createHook(
     const hasFocusedComposite = (0,external_React_.useRef)(false);
     const onFocus = useEvent((event) => {
       onFocusProp == null ? void 0 : onFocusProp(event);
-      if (event.defaultPrevented)
-        return;
-      if (isPortalEvent(event))
-        return;
-      if (!id)
-        return;
-      if (!store)
-        return;
-      const { activeId, virtualFocus: virtualFocus2, baseElement: baseElement2 } = store.getState();
-      if (targetIsAnotherItem(event, store))
-        return;
-      if (activeId !== id) {
-        store.setActiveId(id);
+      if (event.defaultPrevented) return;
+      if (isPortalEvent(event)) return;
+      if (!id) return;
+      if (!store) return;
+      if (targetIsAnotherItem(event, store)) return;
+      const { virtualFocus, baseElement: baseElement2 } = store.getState();
+      store.setActiveId(id);
+      if (isTextbox(event.currentTarget)) {
+        selectTextField(event.currentTarget);
       }
-      if (!virtualFocus2)
-        return;
-      if (!isSelfTarget(event))
-        return;
-      if (isEditableElement(event.currentTarget))
-        return;
-      if (!(baseElement2 == null ? void 0 : baseElement2.isConnected))
-        return;
+      if (!virtualFocus) return;
+      if (!isSelfTarget(event)) return;
+      if (isEditableElement(event.currentTarget)) return;
+      if (!(baseElement2 == null ? void 0 : baseElement2.isConnected)) return;
+      if (isSafari() && event.currentTarget.hasAttribute("data-autofocus")) {
+        event.currentTarget.scrollIntoView({
+          block: "nearest",
+          inline: "nearest"
+        });
+      }
       hasFocusedComposite.current = true;
       const fromComposite = event.relatedTarget === baseElement2 || isItem(store, event.relatedTarget);
       if (fromComposite) {
@@ -33857,8 +33809,7 @@ var useCompositeItem = createHook(
     const onBlurCaptureProp = props.onBlurCapture;
     const onBlurCapture = useEvent((event) => {
       onBlurCaptureProp == null ? void 0 : onBlurCaptureProp(event);
-      if (event.defaultPrevented)
-        return;
+      if (event.defaultPrevented) return;
       const state = store == null ? void 0 : store.getState();
       if ((state == null ? void 0 : state.virtualFocus) && hasFocusedComposite.current) {
         hasFocusedComposite.current = false;
@@ -33871,12 +33822,9 @@ var useCompositeItem = createHook(
     const moveOnKeyPressProp = useBooleanEvent(moveOnKeyPress);
     const onKeyDown = useEvent((event) => {
       onKeyDownProp == null ? void 0 : onKeyDownProp(event);
-      if (event.defaultPrevented)
-        return;
-      if (!isSelfTarget(event))
-        return;
-      if (!store)
-        return;
+      if (event.defaultPrevented) return;
+      if (!isSelfTarget(event)) return;
+      if (!store) return;
       const { currentTarget } = event;
       const state = store.getState();
       const item = store.item(id);
@@ -33884,14 +33832,10 @@ var useCompositeItem = createHook(
       const isVertical = state.orientation !== "horizontal";
       const isHorizontal = state.orientation !== "vertical";
       const canHomeEnd = () => {
-        if (isGrid)
-          return true;
-        if (isHorizontal)
-          return true;
-        if (!state.baseElement)
-          return true;
-        if (!RRSZHCH6_isTextField(state.baseElement))
-          return true;
+        if (isGrid) return true;
+        if (isHorizontal) return true;
+        if (!state.baseElement) return true;
+        if (!isTextField(state.baseElement)) return true;
         return false;
       };
       const keyMap = {
@@ -33900,16 +33844,14 @@ var useCompositeItem = createHook(
         ArrowDown: (isGrid || isVertical) && store.down,
         ArrowLeft: (isGrid || isHorizontal) && store.previous,
         Home: () => {
-          if (!canHomeEnd())
-            return;
+          if (!canHomeEnd()) return;
           if (!isGrid || event.ctrlKey) {
             return store == null ? void 0 : store.first();
           }
           return store == null ? void 0 : store.previous(-1);
         },
         End: () => {
-          if (!canHomeEnd())
-            return;
+          if (!canHomeEnd()) return;
           if (!isGrid || event.ctrlKey) {
             return store == null ? void 0 : store.last();
           }
@@ -33924,10 +33866,20 @@ var useCompositeItem = createHook(
       };
       const action = keyMap[event.key];
       if (action) {
+        if (isTextbox(currentTarget)) {
+          const selection = getTextboxSelection(currentTarget);
+          const isLeft = isHorizontal && event.key === "ArrowLeft";
+          const isRight = isHorizontal && event.key === "ArrowRight";
+          const isUp = isVertical && event.key === "ArrowUp";
+          const isDown = isVertical && event.key === "ArrowDown";
+          if (isRight || isDown) {
+            const { length: valueLength } = getTextboxValue(currentTarget);
+            if (selection.end !== valueLength) return;
+          } else if ((isLeft || isUp) && selection.start !== 0) return;
+        }
         const nextId = action();
         if (preventScrollOnKeyDownProp(event) || nextId !== void 0) {
-          if (!moveOnKeyPressProp(event))
-            return;
+          if (!moveOnKeyPressProp(event)) return;
           event.preventDefault();
           store.move(nextId);
         }
@@ -33950,53 +33902,31 @@ var useCompositeItem = createHook(
       store,
       (state) => !!state && state.activeId === id
     );
-    const virtualFocus = useStoreState(store, "virtualFocus");
-    const role = useRole(ref, props);
-    let ariaSelected;
-    if (isActiveItem) {
-      if (requiresAriaSelected(role)) {
-        ariaSelected = true;
-      } else if (virtualFocus && supportsAriaSelected(role)) {
-        ariaSelected = true;
-      }
-    }
     const ariaSetSize = useStoreState(store, (state) => {
-      if (ariaSetSizeProp != null)
-        return ariaSetSizeProp;
-      if (!state)
-        return;
-      if (!(row == null ? void 0 : row.ariaSetSize))
-        return;
-      if (row.baseElement !== state.baseElement)
-        return;
+      if (ariaSetSizeProp != null) return ariaSetSizeProp;
+      if (!state) return;
+      if (!(row == null ? void 0 : row.ariaSetSize)) return;
+      if (row.baseElement !== state.baseElement) return;
       return row.ariaSetSize;
     });
     const ariaPosInSet = useStoreState(store, (state) => {
-      if (ariaPosInSetProp != null)
-        return ariaPosInSetProp;
-      if (!state)
-        return;
-      if (!(row == null ? void 0 : row.ariaPosInSet))
-        return;
-      if (row.baseElement !== state.baseElement)
-        return;
+      if (ariaPosInSetProp != null) return ariaPosInSetProp;
+      if (!state) return;
+      if (!(row == null ? void 0 : row.ariaPosInSet)) return;
+      if (row.baseElement !== state.baseElement) return;
       const itemsInRow = state.renderedItems.filter(
         (item) => item.rowId === rowId
       );
       return row.ariaPosInSet + itemsInRow.findIndex((item) => item.id === id);
     });
     const isTabbable = useStoreState(store, (state) => {
-      if (!(state == null ? void 0 : state.renderedItems.length))
-        return true;
-      if (state.virtualFocus)
-        return false;
-      if (tabbable)
-        return true;
+      if (!(state == null ? void 0 : state.renderedItems.length)) return true;
+      if (state.virtualFocus) return false;
+      if (tabbable) return true;
       return state.activeId === id;
     });
-    props = _4R3V3JGP_spreadProps(_4R3V3JGP_spreadValues({
+    props = _3YLGPPWQ_spreadProps(_3YLGPPWQ_spreadValues({
       id,
-      "aria-selected": ariaSelected,
       "data-active-item": isActiveItem || void 0
     }, props), {
       ref: useMergeRefs(ref, props.ref),
@@ -34006,22 +33936,22 @@ var useCompositeItem = createHook(
       onKeyDown
     });
     props = useCommand(props);
-    props = useCollectionItem(_4R3V3JGP_spreadProps(_4R3V3JGP_spreadValues({
+    props = useCollectionItem(_3YLGPPWQ_spreadProps(_3YLGPPWQ_spreadValues({
       store
     }, props), {
       getItem,
-      shouldRegisterItem: !!id ? props.shouldRegisterItem : false
+      shouldRegisterItem: id ? props.shouldRegisterItem : false
     }));
-    return removeUndefinedValues(_4R3V3JGP_spreadProps(_4R3V3JGP_spreadValues({}, props), {
+    return removeUndefinedValues(_3YLGPPWQ_spreadProps(_3YLGPPWQ_spreadValues({}, props), {
       "aria-setsize": ariaSetSize,
       "aria-posinset": ariaPosInSet
     }));
   }
 );
-var C6OBNQ4F_CompositeItem = memo2(
+var CompositeItem = memo2(
   forwardRef2(function CompositeItem2(props) {
     const htmlProps = useCompositeItem(props);
-    return createElement(C6OBNQ4F_TagName, htmlProps);
+    return createElement(_3CCTMYB6_TagName, htmlProps);
   })
 );
 
@@ -34057,14 +33987,22 @@ var C6OBNQ4F_CompositeItem = memo2(
 
 var combobox_item_TagName = "div";
 function isSelected(storeValue, itemValue) {
-  if (itemValue == null)
-    return;
-  if (storeValue == null)
-    return false;
+  if (itemValue == null) return;
+  if (storeValue == null) return false;
   if (Array.isArray(storeValue)) {
     return storeValue.includes(itemValue);
   }
   return storeValue === itemValue;
+}
+function getItemRole(popupRole) {
+  var _a;
+  const itemRoleByPopupRole = {
+    menu: "menuitem",
+    listbox: "option",
+    tree: "treeitem"
+  };
+  const key = popupRole;
+  return (_a = itemRoleByPopupRole[key]) != null ? _a : "option";
 }
 var useComboboxItem = createHook(
   function useComboboxItem2(_a) {
@@ -34072,8 +34010,9 @@ var useComboboxItem = createHook(
       store,
       value,
       hideOnClick,
-      selectValueOnClick = true,
       setValueOnClick,
+      selectValueOnClick = true,
+      resetValueOnSelect,
       focusOnHover = false,
       moveOnKeyPress = true,
       getItem: getItemProp
@@ -34081,12 +34020,14 @@ var useComboboxItem = createHook(
       "store",
       "value",
       "hideOnClick",
-      "selectValueOnClick",
       "setValueOnClick",
+      "selectValueOnClick",
+      "resetValueOnSelect",
       "focusOnHover",
       "moveOnKeyPress",
       "getItem"
     ]);
+    var _a2;
     const context = useComboboxScopedContext();
     store = store || context;
     invariant(
@@ -34095,7 +34036,7 @@ var useComboboxItem = createHook(
     );
     const getItem = (0,external_React_.useCallback)(
       (item) => {
-        const nextItem = _4R3V3JGP_spreadProps(_4R3V3JGP_spreadValues({}, item), { value });
+        const nextItem = _3YLGPPWQ_spreadProps(_3YLGPPWQ_spreadValues({}, item), { value });
         if (getItemProp) {
           return getItemProp(nextItem);
         }
@@ -34106,25 +34047,31 @@ var useComboboxItem = createHook(
     const multiSelectable = store.useState(
       (state) => Array.isArray(state.selectedValue)
     );
+    const selected = store.useState(
+      (state) => isSelected(state.selectedValue, value)
+    );
+    const resetValueOnSelectState = store.useState("resetValueOnSelect");
     setValueOnClick = setValueOnClick != null ? setValueOnClick : !multiSelectable;
     hideOnClick = hideOnClick != null ? hideOnClick : value != null && !multiSelectable;
     const onClickProp = props.onClick;
     const setValueOnClickProp = useBooleanEvent(setValueOnClick);
     const selectValueOnClickProp = useBooleanEvent(selectValueOnClick);
+    const resetValueOnSelectProp = useBooleanEvent(
+      (_a2 = resetValueOnSelect != null ? resetValueOnSelect : resetValueOnSelectState) != null ? _a2 : multiSelectable
+    );
     const hideOnClickProp = useBooleanEvent(hideOnClick);
     const onClick = useEvent((event) => {
       onClickProp == null ? void 0 : onClickProp(event);
-      if (event.defaultPrevented)
-        return;
-      if (isDownloading(event))
-        return;
-      if (isOpeningInNewTab(event))
-        return;
+      if (event.defaultPrevented) return;
+      if (isDownloading(event)) return;
+      if (isOpeningInNewTab(event)) return;
       if (value != null) {
         if (selectValueOnClickProp(event)) {
+          if (resetValueOnSelectProp(event)) {
+            store == null ? void 0 : store.resetValue();
+          }
           store == null ? void 0 : store.setSelectedValue((prevValue) => {
-            if (!Array.isArray(prevValue))
-              return value;
+            if (!Array.isArray(prevValue)) return value;
             if (prevValue.includes(value)) {
               return prevValue.filter((v) => v !== value);
             }
@@ -34142,26 +34089,20 @@ var useComboboxItem = createHook(
     const onKeyDownProp = props.onKeyDown;
     const onKeyDown = useEvent((event) => {
       onKeyDownProp == null ? void 0 : onKeyDownProp(event);
-      if (event.defaultPrevented)
-        return;
+      if (event.defaultPrevented) return;
       const baseElement = store == null ? void 0 : store.getState().baseElement;
-      if (!baseElement)
-        return;
-      if (hasFocus(baseElement))
-        return;
+      if (!baseElement) return;
+      if (hasFocus(baseElement)) return;
       const printable = event.key.length === 1;
       if (printable || event.key === "Backspace" || event.key === "Delete") {
         queueMicrotask(() => baseElement.focus());
-        if (RRSZHCH6_isTextField(baseElement)) {
+        if (isTextField(baseElement)) {
           store == null ? void 0 : store.setValue(baseElement.value);
         }
       }
     });
-    const selected = store.useState(
-      (state) => isSelected(state.selectedValue, value)
-    );
     if (multiSelectable && selected != null) {
-      props = _4R3V3JGP_spreadValues({
+      props = _3YLGPPWQ_spreadValues({
         "aria-selected": selected
       }, props);
     }
@@ -34170,16 +34111,16 @@ var useComboboxItem = createHook(
       (element) => /* @__PURE__ */ (0,external_ReactJSXRuntime_namespaceObject.jsx)(ComboboxItemValueContext.Provider, { value, children: /* @__PURE__ */ (0,external_ReactJSXRuntime_namespaceObject.jsx)(ComboboxItemCheckedContext.Provider, { value: selected != null ? selected : false, children: element }) }),
       [value, selected]
     );
-    const contentElement = store.useState("contentElement");
-    props = _4R3V3JGP_spreadProps(_4R3V3JGP_spreadValues({
-      role: getPopupItemRole(contentElement),
+    const popupRole = (0,external_React_.useContext)(ComboboxListRoleContext);
+    props = _3YLGPPWQ_spreadProps(_3YLGPPWQ_spreadValues({
+      role: getItemRole(popupRole),
       children: value
     }, props), {
       onClick,
       onKeyDown
     });
     const moveOnKeyPressProp = useBooleanEvent(moveOnKeyPress);
-    props = useCompositeItem(_4R3V3JGP_spreadProps(_4R3V3JGP_spreadValues({
+    props = useCompositeItem(_3YLGPPWQ_spreadProps(_3YLGPPWQ_spreadValues({
       store
     }, props), {
       getItem,
@@ -34187,15 +34128,14 @@ var useComboboxItem = createHook(
       // with the keyboard so the Combobox component can enable inline
       // autocompletion.
       moveOnKeyPress: (event) => {
-        if (!moveOnKeyPressProp(event))
-          return false;
+        if (!moveOnKeyPressProp(event)) return false;
         const moveEvent = new Event("combobox-item-move");
         const baseElement = store == null ? void 0 : store.getState().baseElement;
         baseElement == null ? void 0 : baseElement.dispatchEvent(moveEvent);
         return true;
       }
     }));
-    props = useCompositeHover(_4R3V3JGP_spreadValues({ store, focusOnHover }, props));
+    props = useCompositeHover(_3YLGPPWQ_spreadValues({ store, focusOnHover }, props));
     return props;
   }
 );
@@ -34220,7 +34160,9 @@ var ComboboxItem = memo2(
 
 
 
+
 // src/combobox/combobox-item-value.tsx
+
 
 
 
@@ -34228,47 +34170,85 @@ var combobox_item_value_TagName = "span";
 function normalizeValue(value) {
   return normalizeString(value).toLowerCase();
 }
-function splitValue(itemValue, userValue) {
-  userValue = normalizeValue(userValue);
-  let index = normalizeValue(itemValue).indexOf(userValue);
-  const parts = [];
-  while (index !== -1) {
-    if (index !== 0) {
-      parts.push(
-        /* @__PURE__ */ (0,external_ReactJSXRuntime_namespaceObject.jsx)("span", { "data-autocomplete-value": "", children: itemValue.substr(0, index) }, parts.length)
-      );
+function getOffsets(string, values) {
+  const offsets = [];
+  for (const value of values) {
+    let pos = 0;
+    const length = value.length;
+    while (string.indexOf(value, pos) !== -1) {
+      const index = string.indexOf(value, pos);
+      if (index !== -1) {
+        offsets.push([index, length]);
+      }
+      pos = index + 1;
     }
-    parts.push(
-      /* @__PURE__ */ (0,external_ReactJSXRuntime_namespaceObject.jsx)("span", { "data-user-value": "", children: itemValue.substr(index, userValue.length) }, parts.length)
-    );
-    itemValue = itemValue.substr(index + userValue.length);
-    index = normalizeValue(itemValue).indexOf(userValue);
   }
-  if (itemValue) {
-    parts.push(
-      /* @__PURE__ */ (0,external_ReactJSXRuntime_namespaceObject.jsx)("span", { "data-autocomplete-value": "", children: itemValue }, parts.length)
+  return offsets;
+}
+function filterOverlappingOffsets(offsets) {
+  return offsets.filter(([offset, length], i, arr) => {
+    return !arr.some(
+      ([o, l], j) => j !== i && o <= offset && o + l >= offset + length
     );
+  });
+}
+function sortOffsets(offsets) {
+  return offsets.sort(([a], [b]) => a - b);
+}
+function splitValue(itemValue, userValue) {
+  if (!itemValue) return itemValue;
+  if (!userValue) return itemValue;
+  const userValues = _7PRQYBBV_toArray(userValue).filter(Boolean).map(normalizeValue);
+  const parts = [];
+  const span = (value, autocomplete = false) => /* @__PURE__ */ (0,external_ReactJSXRuntime_namespaceObject.jsx)(
+    "span",
+    {
+      "data-autocomplete-value": autocomplete ? "" : void 0,
+      "data-user-value": autocomplete ? void 0 : "",
+      children: value
+    },
+    parts.length
+  );
+  const offsets = sortOffsets(
+    filterOverlappingOffsets(
+      // Convert userValues into a set to avoid duplicates
+      getOffsets(normalizeValue(itemValue), new Set(userValues))
+    )
+  );
+  if (!offsets.length) {
+    parts.push(span(itemValue, true));
+    return parts;
   }
+  const [firstOffset] = offsets[0];
+  const values = [
+    itemValue.slice(0, firstOffset),
+    ...offsets.flatMap(([offset, length], i) => {
+      var _a;
+      const value = itemValue.slice(offset, offset + length);
+      const nextOffset = (_a = offsets[i + 1]) == null ? void 0 : _a[0];
+      const nextValue = itemValue.slice(offset + length, nextOffset);
+      return [value, nextValue];
+    })
+  ];
+  values.forEach((value, i) => {
+    if (!value) return;
+    parts.push(span(value, i % 2 === 0));
+  });
   return parts;
 }
 var useComboboxItemValue = createHook(function useComboboxItemValue2(_a) {
-  var _b = _a, { store, value } = _b, props = __objRest(_b, ["store", "value"]);
+  var _b = _a, { store, value, userValue } = _b, props = __objRest(_b, ["store", "value", "userValue"]);
   const context = useComboboxScopedContext();
   store = store || context;
   const itemContext = (0,external_React_.useContext)(ComboboxItemValueContext);
   const itemValue = value != null ? value : itemContext;
-  invariant(
-    store,
-     false && 0
-  );
-  const stateValue = store.useState(
-    (state) => itemValue && state.value ? state.value : void 0
-  );
-  const children = (0,external_React_.useMemo)(
-    () => itemValue && stateValue ? splitValue(itemValue, stateValue) : itemValue,
-    [itemValue, stateValue]
-  );
-  props = _4R3V3JGP_spreadValues({
+  const inputValue = useStoreState(store, (state) => userValue != null ? userValue : state == null ? void 0 : state.value);
+  const children = (0,external_React_.useMemo)(() => {
+    if (!itemValue) return;
+    if (!inputValue) return itemValue;
+    return splitValue(itemValue, inputValue);
+  }, [itemValue, inputValue]);
+  props = _3YLGPPWQ_spreadValues({
     children
   }, props);
   return removeUndefinedValues(props);
@@ -34279,9 +34259,6 @@ var ComboboxItemValue = forwardRef2(function ComboboxItemValue2(props) {
 });
 
 
-// EXTERNAL MODULE: ./node_modules/remove-accents/index.js
-var remove_accents = __webpack_require__(4793);
-var remove_accents_default = /*#__PURE__*/__webpack_require__.n(remove_accents);
 ;// CONCATENATED MODULE: ./packages/dataviews/build-module/components/dataviews-filters/search-widget.js
 /**
  * External dependencies
@@ -34299,17 +34276,12 @@ var remove_accents_default = /*#__PURE__*/__webpack_require__.n(remove_accents);
 
 
 
+
 /**
  * Internal dependencies
  */
 
 
-
-const {
-  CompositeV2: search_widget_Composite,
-  CompositeItemV2: search_widget_CompositeItem,
-  useCompositeStoreV2: search_widget_useCompositeStore
-} = build_module_lock_unlock_unlock(external_wp_components_namespaceObject.privateApis);
 const radioCheck = /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_primitives_namespaceObject.SVG, {
   xmlns: "http://www.w3.org/2000/svg",
   viewBox: "0 0 24 24",
@@ -34319,7 +34291,7 @@ const radioCheck = /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)
     r: 3
   })
 });
-function normalizeSearchInput(input = '') {
+function search_widget_normalizeSearchInput(input = '') {
   return remove_accents_default()(input.trim().toLowerCase());
 }
 const search_widget_EMPTY_ARRAY = [];
@@ -34344,38 +34316,45 @@ const getNewValue = (filterDefinition, currentFilter, value) => {
   }
   return [value];
 };
+function generateFilterElementCompositeItemId(prefix, filterElementValue) {
+  return `${prefix}-${filterElementValue}`;
+}
 function ListBox({
   view,
   filter,
   onChangeView
 }) {
-  const compositeStore = search_widget_useCompositeStore({
-    virtualFocus: true,
-    focusLoop: true,
-    // When we have no or just one operator, we can set the first item as active.
-    // We do that by passing `undefined` to `defaultActiveId`. Otherwise, we set it to `null`,
-    // so the first item is not selected, since the focus is on the operators control.
-    defaultActiveId: filter.operators?.length === 1 ? undefined : null
-  });
+  const baseId = (0,external_wp_compose_namespaceObject.useInstanceId)(ListBox, 'dataviews-filter-list-box');
+  const [activeCompositeId, setActiveCompositeId] = (0,external_wp_element_namespaceObject.useState)(
+  // When there are one or less operators, the first item is set as active
+  // (by setting the initial `activeId` to `undefined`).
+  // With 2 or more operators, the focus is moved on the operators control
+  // (by setting the initial `activeId` to `null`), meaning that there won't
+  // be an active item initially. Focus is then managed via the
+  // `onFocusVisible` callback.
+  filter.operators?.length === 1 ? undefined : null);
   const currentFilter = view.filters?.find(f => f.field === filter.field);
   const currentValue = getCurrentValue(filter, currentFilter);
-  return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(search_widget_Composite, {
-    store: compositeStore,
+  return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.Composite, {
+    virtualFocus: true,
+    focusLoop: true,
+    activeId: activeCompositeId,
+    setActiveId: setActiveCompositeId,
     role: "listbox",
     className: "dataviews-filters__search-widget-listbox",
     "aria-label": (0,external_wp_i18n_namespaceObject.sprintf)( /* translators: List of items for a filter. 1: Filter name. e.g.: "List of: Author". */
     (0,external_wp_i18n_namespaceObject.__)('List of: %1$s'), filter.name),
     onFocusVisible: () => {
-      if (!compositeStore.getState().activeId) {
-        compositeStore.move(compositeStore.first());
+      // `onFocusVisible` needs the `Composite` component to be focusable,
+      // which is implicitly achieved via the `virtualFocus` prop.
+      if (!activeCompositeId && filter.elements.length) {
+        setActiveCompositeId(generateFilterElementCompositeItemId(baseId, filter.elements[0].value));
       }
     },
-    render: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(CompositeTypeahead, {
-      store: compositeStore
-    }),
-    children: filter.elements.map(element => /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsxs)(CompositeHover, {
-      store: compositeStore,
-      render: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(search_widget_CompositeItem, {
+    render: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.Composite.Typeahead, {}),
+    children: filter.elements.map(element => /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsxs)(external_wp_components_namespaceObject.Composite.Hover, {
+      render: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.Composite.Item, {
+        id: generateFilterElementCompositeItemId(baseId, element.value),
         render: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)("div", {
           "aria-label": element.label,
           role: "option",
@@ -34411,11 +34390,8 @@ function ListBox({
         }), !filter.singleSelection && currentValue.includes(element.value) && /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.Icon, {
           icon: library_check
         })]
-      }), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsxs)("span", {
-        children: [element.label, !!element.description && /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)("span", {
-          className: "dataviews-filters__search-widget-listitem-description",
-          children: element.description
-        })]
+      }), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)("span", {
+        children: element.label
       })]
     }, element.value))
   });
@@ -34430,11 +34406,10 @@ function search_widget_ComboboxList({
   const currentFilter = view.filters?.find(_filter => _filter.field === filter.field);
   const currentValue = getCurrentValue(filter, currentFilter);
   const matches = (0,external_wp_element_namespaceObject.useMemo)(() => {
-    const normalizedSearch = normalizeSearchInput(deferredSearchValue);
-    return filter.elements.filter(item => normalizeSearchInput(item.label).includes(normalizedSearch));
+    const normalizedSearch = search_widget_normalizeSearchInput(deferredSearchValue);
+    return filter.elements.filter(item => search_widget_normalizeSearchInput(item.label).includes(normalizedSearch));
   }, [filter.elements, deferredSearchValue]);
   return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsxs)(ComboboxProvider, {
-    resetValueOnSelect: false,
     selectedValue: currentValue,
     setSelectedValue: value => {
       var _view$filters3, _view$filters4;
@@ -34481,6 +34456,7 @@ function search_widget_ComboboxList({
       alwaysVisible: true,
       children: [matches.map(element => {
         return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsxs)(ComboboxItem, {
+          resetValueOnSelect: false,
           value: element.value,
           className: "dataviews-filters__search-widget-listitem",
           hideOnClick: false,
@@ -34736,6 +34712,16 @@ function FilterSummary({
   });
 }
 
+;// CONCATENATED MODULE: ./packages/dataviews/build-module/lock-unlock.js
+/**
+ * WordPress dependencies
+ */
+
+const {
+  lock: lock_unlock_lock,
+  unlock: lock_unlock_unlock
+} = (0,external_wp_privateApis_namespaceObject.__dangerousOptInToUnstableAPIsOnlyForCoreModules)('I acknowledge private features are not for use in themes or plugins and doing so will break in the next version of WordPress.', '@wordpress/dataviews');
+
 ;// CONCATENATED MODULE: ./packages/dataviews/build-module/components/dataviews-filters/add-filter.js
 /**
  * External dependencies
@@ -34754,34 +34740,20 @@ function FilterSummary({
 
 
 const {
-  DropdownMenuV2: add_filter_DropdownMenu,
-  DropdownMenuItemV2: add_filter_DropdownMenuItem,
-  DropdownMenuItemLabelV2: add_filter_DropdownMenuItemLabel
-} = build_module_lock_unlock_unlock(external_wp_components_namespaceObject.privateApis);
-function AddFilter({
+  DropdownMenuV2: add_filter_DropdownMenuV2
+} = lock_unlock_unlock(external_wp_components_namespaceObject.privateApis);
+function AddFilterDropdownMenu({
   filters,
   view,
   onChangeView,
-  setOpenedFilter
-}, ref) {
-  if (!filters.length || filters.every(({
-    isPrimary
-  }) => isPrimary)) {
-    return null;
-  }
+  setOpenedFilter,
+  trigger
+}) {
   const inactiveFilters = filters.filter(filter => !filter.isVisible);
-  return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(add_filter_DropdownMenu, {
-    trigger: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.Button, {
-      accessibleWhenDisabled: true,
-      size: "compact",
-      className: "dataviews-filters__button",
-      variant: "tertiary",
-      disabled: !inactiveFilters.length,
-      ref: ref,
-      children: (0,external_wp_i18n_namespaceObject.__)('Add filter')
-    }),
+  return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(add_filter_DropdownMenuV2, {
+    trigger: trigger,
     children: inactiveFilters.map(filter => {
-      return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(add_filter_DropdownMenuItem, {
+      return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(add_filter_DropdownMenuV2.Item, {
         onClick: () => {
           setOpenedFilter(filter.field);
           onChangeView({
@@ -34794,11 +34766,39 @@ function AddFilter({
             }]
           });
         },
-        children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(add_filter_DropdownMenuItemLabel, {
+        children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(add_filter_DropdownMenuV2.ItemLabel, {
           children: filter.name
         })
       }, filter.field);
     })
+  });
+}
+function AddFilter({
+  filters,
+  view,
+  onChangeView,
+  setOpenedFilter
+}, ref) {
+  if (!filters.length || filters.every(({
+    isPrimary
+  }) => isPrimary)) {
+    return null;
+  }
+  const inactiveFilters = filters.filter(filter => !filter.isVisible);
+  return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(AddFilterDropdownMenu, {
+    trigger: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.Button, {
+      accessibleWhenDisabled: true,
+      size: "compact",
+      className: "dataviews-filters-button",
+      variant: "tertiary",
+      disabled: !inactiveFilters.length,
+      ref: ref,
+      children: (0,external_wp_i18n_namespaceObject.__)('Add filter')
+    }),
+    filters,
+    view,
+    onChangeView,
+    setOpenedFilter
   });
 }
 /* harmony default export */ const add_filter = ((0,external_wp_element_namespaceObject.forwardRef)(AddFilter));
@@ -34870,6 +34870,8 @@ function sanitizeOperators(field) {
 
 
 
+
+
 /**
  * Internal dependencies
  */
@@ -34880,6 +34882,97 @@ function sanitizeOperators(field) {
 
 
 
+
+function useFilters(fields, view) {
+  return (0,external_wp_element_namespaceObject.useMemo)(() => {
+    const filters = [];
+    fields.forEach(field => {
+      if (!field.elements?.length) {
+        return;
+      }
+      const operators = sanitizeOperators(field);
+      if (operators.length === 0) {
+        return;
+      }
+      const isPrimary = !!field.filterBy?.isPrimary;
+      filters.push({
+        field: field.id,
+        name: field.label,
+        elements: field.elements,
+        singleSelection: operators.some(op => [constants_OPERATOR_IS, constants_OPERATOR_IS_NOT].includes(op)),
+        operators,
+        isVisible: isPrimary || !!view.filters?.some(f => f.field === field.id && ALL_OPERATORS.includes(f.operator)),
+        isPrimary
+      });
+    });
+    // Sort filters by primary property. We need the primary filters to be first.
+    // Then we sort by name.
+    filters.sort((a, b) => {
+      if (a.isPrimary && !b.isPrimary) {
+        return -1;
+      }
+      if (!a.isPrimary && b.isPrimary) {
+        return 1;
+      }
+      return a.name.localeCompare(b.name);
+    });
+    return filters;
+  }, [fields, view]);
+}
+function FilterVisibilityToggle({
+  filters,
+  view,
+  onChangeView,
+  setOpenedFilter,
+  isShowingFilter,
+  setIsShowingFilter
+}) {
+  const onChangeViewWithFilterVisibility = (0,external_wp_element_namespaceObject.useCallback)(_view => {
+    onChangeView(_view);
+    setIsShowingFilter(true);
+  }, [onChangeView, setIsShowingFilter]);
+  const visibleFilters = filters.filter(filter => filter.isVisible);
+  const hasVisibleFilters = !!visibleFilters.length;
+  if (filters.length === 0) {
+    return null;
+  }
+  if (!hasVisibleFilters) {
+    return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(AddFilterDropdownMenu, {
+      filters: filters,
+      view: view,
+      onChangeView: onChangeViewWithFilterVisibility,
+      setOpenedFilter: setOpenedFilter,
+      trigger: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.Button, {
+        className: "dataviews-filters__visibility-toggle",
+        size: "compact",
+        icon: library_funnel,
+        label: (0,external_wp_i18n_namespaceObject.__)('Add filter'),
+        isPressed: false,
+        "aria-expanded": false
+      })
+    });
+  }
+  return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsxs)("div", {
+    className: "dataviews-filters__container-visibility-toggle",
+    children: [/*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.Button, {
+      className: "dataviews-filters__visibility-toggle",
+      size: "compact",
+      icon: library_funnel,
+      label: (0,external_wp_i18n_namespaceObject.__)('Toggle filter display'),
+      onClick: () => {
+        if (!isShowingFilter) {
+          setOpenedFilter(null);
+        }
+        setIsShowingFilter(!isShowingFilter);
+      },
+      isPressed: isShowingFilter,
+      "aria-expanded": isShowingFilter
+    }), hasVisibleFilters && !!view.filters?.length && /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)("span", {
+      className: "dataviews-filters-toggle__count",
+      children: view.filters?.length
+    })]
+  });
+}
 function Filters() {
   const {
     fields,
@@ -34889,37 +34982,7 @@ function Filters() {
     setOpenedFilter
   } = (0,external_wp_element_namespaceObject.useContext)(dataviews_context);
   const addFilterRef = (0,external_wp_element_namespaceObject.useRef)(null);
-  const filters = [];
-  fields.forEach(field => {
-    if (!field.elements?.length) {
-      return;
-    }
-    const operators = sanitizeOperators(field);
-    if (operators.length === 0) {
-      return;
-    }
-    const isPrimary = !!field.filterBy?.isPrimary;
-    filters.push({
-      field: field.id,
-      name: field.label,
-      elements: field.elements,
-      singleSelection: operators.some(op => [constants_OPERATOR_IS, constants_OPERATOR_IS_NOT].includes(op)),
-      operators,
-      isVisible: isPrimary || !!view.filters?.some(f => f.field === field.id && ALL_OPERATORS.includes(f.operator)),
-      isPrimary
-    });
-  });
-  // Sort filters by primary property. We need the primary filters to be first.
-  // Then we sort by name.
-  filters.sort((a, b) => {
-    if (a.isPrimary && !b.isPrimary) {
-      return -1;
-    }
-    if (!a.isPrimary && b.isPrimary) {
-      return 1;
-    }
-    return a.name.localeCompare(b.name);
-  });
+  const filters = useFilters(fields, view);
   const addFilter = /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(add_filter, {
     filters: filters,
     view: view,
@@ -34927,10 +34990,11 @@ function Filters() {
     ref: addFilterRef,
     setOpenedFilter: setOpenedFilter
   }, "add-filter");
-  const filterComponents = [...filters.map(filter => {
-    if (!filter.isVisible) {
-      return null;
-    }
+  const visibleFilters = filters.filter(filter => filter.isVisible);
+  if (visibleFilters.length === 0) {
+    return null;
+  }
+  const filterComponents = [...visibleFilters.map(filter => {
     return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(FilterSummary, {
       filter: filter,
       view: view,
@@ -34939,18 +35003,17 @@ function Filters() {
       openedFilter: openedFilter
     }, filter.field);
   }), addFilter];
-  if (filterComponents.length > 1) {
-    filterComponents.push( /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(ResetFilter, {
-      filters: filters,
-      view: view,
-      onChangeView: onChangeView
-    }, "reset-filters"));
-  }
+  filterComponents.push( /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(ResetFilter, {
+    filters: filters,
+    view: view,
+    onChangeView: onChangeView
+  }, "reset-filters"));
   return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.__experimentalHStack, {
     justify: "flex-start",
     style: {
       width: 'fit-content'
     },
+    className: "dataviews-filters__container",
     wrap: true,
     children: filterComponents
   });
@@ -35065,20 +35128,410 @@ function DataViewsSelectionCheckbox({
   });
 }
 
-;// CONCATENATED MODULE: ./packages/icons/build-module/library/funnel.js
+;// CONCATENATED MODULE: ./packages/dataviews/build-module/components/dataviews-item-actions/index.js
+/**
+ * External dependencies
+ */
+
 /**
  * WordPress dependencies
  */
 
 
-const funnel = /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_primitives_namespaceObject.SVG, {
-  viewBox: "0 0 24 24",
-  xmlns: "http://www.w3.org/2000/svg",
-  children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_primitives_namespaceObject.Path, {
-    d: "M10 17.5H14V16H10V17.5ZM6 6V7.5H18V6H6ZM8 12.5H16V11H8V12.5Z"
-  })
-});
-/* harmony default export */ const library_funnel = (funnel);
+
+
+
+
+/**
+ * Internal dependencies
+ */
+
+
+
+
+const {
+  DropdownMenuV2: dataviews_item_actions_DropdownMenuV2,
+  kebabCase: dataviews_item_actions_kebabCase
+} = lock_unlock_unlock(external_wp_components_namespaceObject.privateApis);
+function ButtonTrigger({
+  action,
+  onClick,
+  items
+}) {
+  const label = typeof action.label === 'string' ? action.label : action.label(items);
+  return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.Button, {
+    label: label,
+    icon: action.icon,
+    isDestructive: action.isDestructive,
+    size: "compact",
+    onClick: onClick
+  });
+}
+function DropdownMenuItemTrigger({
+  action,
+  onClick,
+  items
+}) {
+  const label = typeof action.label === 'string' ? action.label : action.label(items);
+  return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(dataviews_item_actions_DropdownMenuV2.Item, {
+    onClick: onClick,
+    hideOnClick: !('RenderModal' in action),
+    children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(dataviews_item_actions_DropdownMenuV2.ItemLabel, {
+      children: label
+    })
+  });
+}
+function ActionModal({
+  action,
+  items,
+  closeModal
+}) {
+  const label = typeof action.label === 'string' ? action.label : action.label(items);
+  return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.Modal, {
+    title: action.modalHeader || label,
+    __experimentalHideHeader: !!action.hideModalHeader,
+    onRequestClose: closeModal !== null && closeModal !== void 0 ? closeModal : () => {},
+    focusOnMount: "firstContentElement",
+    size: "small",
+    overlayClassName: `dataviews-action-modal dataviews-action-modal__${dataviews_item_actions_kebabCase(action.id)}`,
+    children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(action.RenderModal, {
+      items: items,
+      closeModal: closeModal
+    })
+  });
+}
+function ActionWithModal({
+  action,
+  items,
+  ActionTrigger,
+  isBusy
+}) {
+  const [isModalOpen, setIsModalOpen] = (0,external_wp_element_namespaceObject.useState)(false);
+  const actionTriggerProps = {
+    action,
+    onClick: () => {
+      setIsModalOpen(true);
+    },
+    items,
+    isBusy
+  };
+  return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsxs)(external_ReactJSXRuntime_namespaceObject.Fragment, {
+    children: [/*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(ActionTrigger, {
+      ...actionTriggerProps
+    }), isModalOpen && /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(ActionModal, {
+      action: action,
+      items: items,
+      closeModal: () => setIsModalOpen(false)
+    })]
+  });
+}
+function ActionsDropdownMenuGroup({
+  actions,
+  item
+}) {
+  const registry = (0,external_wp_data_namespaceObject.useRegistry)();
+  return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(dataviews_item_actions_DropdownMenuV2.Group, {
+    children: actions.map(action => {
+      if ('RenderModal' in action) {
+        return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(ActionWithModal, {
+          action: action,
+          items: [item],
+          ActionTrigger: DropdownMenuItemTrigger
+        }, action.id);
+      }
+      return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(DropdownMenuItemTrigger, {
+        action: action,
+        onClick: () => {
+          action.callback([item], {
+            registry
+          });
+        },
+        items: [item]
+      }, action.id);
+    })
+  });
+}
+function ItemActions({
+  item,
+  actions,
+  isCompact
+}) {
+  const registry = (0,external_wp_data_namespaceObject.useRegistry)();
+  const {
+    primaryActions,
+    eligibleActions
+  } = (0,external_wp_element_namespaceObject.useMemo)(() => {
+    // If an action is eligible for all items, doesn't need
+    // to provide the `isEligible` function.
+    const _eligibleActions = actions.filter(action => !action.isEligible || action.isEligible(item));
+    const _primaryActions = _eligibleActions.filter(action => action.isPrimary && !!action.icon);
+    return {
+      primaryActions: _primaryActions,
+      eligibleActions: _eligibleActions
+    };
+  }, [actions, item]);
+  if (isCompact) {
+    return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(CompactItemActions, {
+      item: item,
+      actions: eligibleActions
+    });
+  }
+  return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsxs)(external_wp_components_namespaceObject.__experimentalHStack, {
+    spacing: 1,
+    justify: "flex-end",
+    className: "dataviews-item-actions",
+    style: {
+      flexShrink: '0',
+      width: 'auto'
+    },
+    children: [!!primaryActions.length && primaryActions.map(action => {
+      if ('RenderModal' in action) {
+        return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(ActionWithModal, {
+          action: action,
+          items: [item],
+          ActionTrigger: ButtonTrigger
+        }, action.id);
+      }
+      return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(ButtonTrigger, {
+        action: action,
+        onClick: () => {
+          action.callback([item], {
+            registry
+          });
+        },
+        items: [item]
+      }, action.id);
+    }), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(CompactItemActions, {
+      item: item,
+      actions: eligibleActions
+    })]
+  });
+}
+function CompactItemActions({
+  item,
+  actions
+}) {
+  return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(dataviews_item_actions_DropdownMenuV2, {
+    trigger: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.Button, {
+      size: "compact",
+      icon: more_vertical,
+      label: (0,external_wp_i18n_namespaceObject.__)('Actions'),
+      accessibleWhenDisabled: true,
+      disabled: !actions.length,
+      className: "dataviews-all-actions-button"
+    }),
+    placement: "bottom-end",
+    children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(ActionsDropdownMenuGroup, {
+      actions: actions,
+      item: item
+    })
+  });
+}
+
+;// CONCATENATED MODULE: ./packages/dataviews/build-module/components/dataviews-bulk-actions/index.js
+/**
+ * WordPress dependencies
+ */
+
+
+
+
+
+
+/**
+ * Internal dependencies
+ */
+
+
+
+
+function useHasAPossibleBulkAction(actions, item) {
+  return (0,external_wp_element_namespaceObject.useMemo)(() => {
+    return actions.some(action => {
+      return action.supportsBulk && (!action.isEligible || action.isEligible(item));
+    });
+  }, [actions, item]);
+}
+function useSomeItemHasAPossibleBulkAction(actions, data) {
+  return (0,external_wp_element_namespaceObject.useMemo)(() => {
+    return data.some(item => {
+      return actions.some(action => {
+        return action.supportsBulk && (!action.isEligible || action.isEligible(item));
+      });
+    });
+  }, [actions, data]);
+}
+function BulkSelectionCheckbox({
+  selection,
+  onChangeSelection,
+  data,
+  actions,
+  getItemId
+}) {
+  const selectableItems = (0,external_wp_element_namespaceObject.useMemo)(() => {
+    return data.filter(item => {
+      return actions.some(action => action.supportsBulk && (!action.isEligible || action.isEligible(item)));
+    });
+  }, [data, actions]);
+  const selectedItems = data.filter(item => selection.includes(getItemId(item)) && selectableItems.includes(item));
+  const areAllSelected = selectedItems.length === selectableItems.length;
+  return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.CheckboxControl, {
+    className: "dataviews-view-table-selection-checkbox",
+    __nextHasNoMarginBottom: true,
+    checked: areAllSelected,
+    indeterminate: !areAllSelected && !!selectedItems.length,
+    onChange: () => {
+      if (areAllSelected) {
+        onChangeSelection([]);
+      } else {
+        onChangeSelection(selectableItems.map(item => getItemId(item)));
+      }
+    },
+    "aria-label": areAllSelected ? (0,external_wp_i18n_namespaceObject.__)('Deselect all') : (0,external_wp_i18n_namespaceObject.__)('Select all')
+  });
+}
+function ActionTrigger({
+  action,
+  onClick,
+  isBusy,
+  items
+}) {
+  const label = typeof action.label === 'string' ? action.label : action.label(items);
+  return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.Button, {
+    disabled: isBusy,
+    accessibleWhenDisabled: true,
+    label: label,
+    icon: action.icon,
+    isDestructive: action.isDestructive,
+    size: "compact",
+    onClick: onClick,
+    isBusy: isBusy,
+    tooltipPosition: "top"
+  });
+}
+const dataviews_bulk_actions_EMPTY_ARRAY = [];
+function ActionButton({
+  action,
+  selectedItems,
+  actionInProgress,
+  setActionInProgress
+}) {
+  const registry = (0,external_wp_data_namespaceObject.useRegistry)();
+  const selectedEligibleItems = (0,external_wp_element_namespaceObject.useMemo)(() => {
+    return selectedItems.filter(item => {
+      return !action.isEligible || action.isEligible(item);
+    });
+  }, [action, selectedItems]);
+  if ('RenderModal' in action) {
+    return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(ActionWithModal, {
+      action: action,
+      items: selectedEligibleItems,
+      ActionTrigger: ActionTrigger
+    }, action.id);
+  }
+  return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(ActionTrigger, {
+    action: action,
+    onClick: async () => {
+      setActionInProgress(action.id);
+      await action.callback(selectedItems, {
+        registry
+      });
+      setActionInProgress(null);
+    },
+    items: selectedEligibleItems,
+    isBusy: actionInProgress === action.id
+  }, action.id);
+}
+function renderFooterContent(data, actions, getItemId, selection, actionsToShow, selectedItems, actionInProgress, setActionInProgress, onChangeSelection) {
+  const message = selectedItems.length > 0 ? (0,external_wp_i18n_namespaceObject.sprintf)( /* translators: %d: number of items. */
+  (0,external_wp_i18n_namespaceObject._n)('%d Item selected', '%d Items selected', selectedItems.length), selectedItems.length) : (0,external_wp_i18n_namespaceObject.sprintf)( /* translators: %d: number of items. */
+  (0,external_wp_i18n_namespaceObject._n)('%d Item', '%d Items', data.length), data.length);
+  return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsxs)(external_wp_components_namespaceObject.__experimentalHStack, {
+    expanded: false,
+    className: "dataviews-bulk-actions-footer__container",
+    spacing: 3,
+    children: [/*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(BulkSelectionCheckbox, {
+      selection: selection,
+      onChangeSelection: onChangeSelection,
+      data: data,
+      actions: actions,
+      getItemId: getItemId
+    }), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)("span", {
+      className: "dataviews-bulk-actions-footer__item-count",
+      children: message
+    }), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsxs)(external_wp_components_namespaceObject.__experimentalHStack, {
+      className: "dataviews-bulk-actions-footer__action-buttons",
+      expanded: false,
+      spacing: 1,
+      children: [actionsToShow.map(action => {
+        return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(ActionButton, {
+          action: action,
+          selectedItems: selectedItems,
+          actionInProgress: actionInProgress,
+          setActionInProgress: setActionInProgress
+        }, action.id);
+      }), selectedItems.length > 0 && /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.Button, {
+        icon: close_small,
+        showTooltip: true,
+        tooltipPosition: "top",
+        size: "compact",
+        label: (0,external_wp_i18n_namespaceObject.__)('Cancel'),
+        disabled: !!actionInProgress,
+        accessibleWhenDisabled: false,
+        onClick: () => {
+          onChangeSelection(dataviews_bulk_actions_EMPTY_ARRAY);
+        }
+      })]
+    })]
+  });
+}
+function FooterContent({
+  selection,
+  actions,
+  onChangeSelection,
+  data,
+  getItemId
+}) {
+  const [actionInProgress, setActionInProgress] = (0,external_wp_element_namespaceObject.useState)(null);
+  const footerContent = (0,external_wp_element_namespaceObject.useRef)(null);
+  const bulkActions = (0,external_wp_element_namespaceObject.useMemo)(() => actions.filter(action => action.supportsBulk), [actions]);
+  const selectableItems = (0,external_wp_element_namespaceObject.useMemo)(() => {
+    return data.filter(item => {
+      return bulkActions.some(action => !action.isEligible || action.isEligible(item));
+    });
+  }, [data, bulkActions]);
+  const selectedItems = (0,external_wp_element_namespaceObject.useMemo)(() => {
+    return data.filter(item => selection.includes(getItemId(item)) && selectableItems.includes(item));
+  }, [selection, data, getItemId, selectableItems]);
+  const actionsToShow = (0,external_wp_element_namespaceObject.useMemo)(() => actions.filter(action => {
+    return action.supportsBulk && action.icon && selectedItems.some(item => !action.isEligible || action.isEligible(item));
+  }), [actions, selectedItems]);
+  if (!actionInProgress) {
+    if (footerContent.current) {
+      footerContent.current = null;
+    }
+    return renderFooterContent(data, actions, getItemId, selection, actionsToShow, selectedItems, actionInProgress, setActionInProgress, onChangeSelection);
+  } else if (!footerContent.current) {
+    footerContent.current = renderFooterContent(data, actions, getItemId, selection, actionsToShow, selectedItems, actionInProgress, setActionInProgress, onChangeSelection);
+  }
+  return footerContent.current;
+}
+function BulkActionsFooter() {
+  const {
+    data,
+    selection,
+    actions = dataviews_bulk_actions_EMPTY_ARRAY,
+    onChangeSelection,
+    getItemId
+  } = (0,external_wp_element_namespaceObject.useContext)(dataviews_context);
+  return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(FooterContent, {
+    selection: selection,
+    onChangeSelection: onChangeSelection,
+    data: data,
+    actions: actions,
+    getItemId: getItemId
+  });
+}
 
 ;// CONCATENATED MODULE: ./packages/icons/build-module/library/arrow-left.js
 /**
@@ -35125,7 +35578,7 @@ const unseen = /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(ext
 });
 /* harmony default export */ const library_unseen = (unseen);
 
-;// CONCATENATED MODULE: ./packages/dataviews/build-module/layouts/table/column-header-menu.js
+;// CONCATENATED MODULE: ./packages/dataviews/build-module/dataviews-layouts/table/column-header-menu.js
 /**
  * External dependencies
  */
@@ -35146,19 +35599,15 @@ const unseen = /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(ext
 
 
 
+
 const {
-  DropdownMenuV2: column_header_menu_DropdownMenu,
-  DropdownMenuGroupV2: column_header_menu_DropdownMenuGroup,
-  DropdownMenuItemV2: column_header_menu_DropdownMenuItem,
-  DropdownMenuRadioItemV2: DropdownMenuRadioItem,
-  DropdownMenuItemLabelV2: column_header_menu_DropdownMenuItemLabel,
-  DropdownMenuSeparatorV2: column_header_menu_DropdownMenuSeparator
-} = build_module_lock_unlock_unlock(external_wp_components_namespaceObject.privateApis);
+  DropdownMenuV2: column_header_menu_DropdownMenuV2
+} = lock_unlock_unlock(external_wp_components_namespaceObject.privateApis);
 function WithDropDownMenuSeparators({
   children
 }) {
   return external_wp_element_namespaceObject.Children.toArray(children).filter(Boolean).map((child, i) => /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsxs)(external_wp_element_namespaceObject.Fragment, {
-    children: [i > 0 && /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(column_header_menu_DropdownMenuSeparator, {}), child]
+    children: [i > 0 && /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(column_header_menu_DropdownMenuV2.Separator, {}), child]
   }, i));
 }
 const _HeaderMenu = (0,external_wp_element_namespaceObject.forwardRef)(function HeaderMenu({
@@ -35169,35 +35618,41 @@ const _HeaderMenu = (0,external_wp_element_namespaceObject.forwardRef)(function 
   onHide,
   setOpenedFilter
 }, ref) {
+  const visibleFieldIds = getVisibleFieldIds(view, fields);
+  const index = visibleFieldIds?.indexOf(fieldId);
+  const isSorted = view.sort?.field === fieldId;
+  let isHidable = false;
+  let isSortable = false;
+  let canAddFilter = false;
+  let header;
+  let operators = [];
   const combinedField = view.layout?.combinedFields?.find(f => f.id === fieldId);
-  const index = view.fields?.indexOf(fieldId);
-  if (!!combinedField) {
-    return combinedField.label;
-  }
   const field = fields.find(f => f.id === fieldId);
-  if (!field) {
-    return null;
+  if (!combinedField) {
+    if (!field) {
+      // No combined or regular field found.
+      return null;
+    }
+    isHidable = field.enableHiding !== false;
+    isSortable = field.enableSorting !== false;
+    header = field.header;
+    operators = sanitizeOperators(field);
+    // Filter can be added:
+    // 1. If the field is not already part of a view's filters.
+    // 2. If the field meets the type and operator requirements.
+    // 3. If it's not primary. If it is, it should be already visible.
+    canAddFilter = !view.filters?.some(_filter => fieldId === _filter.field) && !!field.elements?.length && !!operators.length && !field.filterBy?.isPrimary;
+  } else {
+    header = combinedField.header || combinedField.label;
   }
-  const isHidable = field.enableHiding !== false;
-  const isSortable = field.enableSorting !== false;
-  const isSorted = view.sort?.field === field.id;
-  const operators = sanitizeOperators(field);
-  // Filter can be added:
-  // 1. If the field is not already part of a view's filters.
-  // 2. If the field meets the type and operator requirements.
-  // 3. If it's not primary. If it is, it should be already visible.
-  const canAddFilter = !view.filters?.some(_filter => field.id === _filter.field) && !!field.elements?.length && !!operators.length && !field.filterBy?.isPrimary;
-  if (!isSortable && !isHidable && !canAddFilter) {
-    return field.label;
-  }
-  return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(column_header_menu_DropdownMenu, {
+  return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(column_header_menu_DropdownMenuV2, {
     align: "start",
     trigger: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsxs)(external_wp_components_namespaceObject.Button, {
       size: "compact",
       className: "dataviews-view-table-header-button",
       ref: ref,
       variant: "tertiary",
-      children: [field.label, view.sort && isSorted && /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)("span", {
+      children: [header, view.sort && isSorted && /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)("span", {
         "aria-hidden": "true",
         children: sortArrows[view.sort.direction]
       })]
@@ -35206,11 +35661,11 @@ const _HeaderMenu = (0,external_wp_element_namespaceObject.forwardRef)(function 
       minWidth: '240px'
     },
     children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsxs)(WithDropDownMenuSeparators, {
-      children: [isSortable && /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(column_header_menu_DropdownMenuGroup, {
+      children: [isSortable && /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(column_header_menu_DropdownMenuV2.Group, {
         children: SORTING_DIRECTIONS.map(direction => {
           const isChecked = view.sort && isSorted && view.sort.direction === direction;
-          const value = `${field.id}-${direction}`;
-          return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(DropdownMenuRadioItem, {
+          const value = `${fieldId}-${direction}`;
+          return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(column_header_menu_DropdownMenuV2.RadioItem, {
             // All sorting radio items share the same name, so that
             // selecting a sorting option automatically deselects the
             // previously selected one, even if it is displayed in
@@ -35223,88 +35678,81 @@ const _HeaderMenu = (0,external_wp_element_namespaceObject.forwardRef)(function 
               onChangeView({
                 ...view,
                 sort: {
-                  field: field.id,
+                  field: fieldId,
                   direction
                 }
               });
             },
-            children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(column_header_menu_DropdownMenuItemLabel, {
+            children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(column_header_menu_DropdownMenuV2.ItemLabel, {
               children: sortLabels[direction]
             })
           }, value);
         })
-      }), canAddFilter && /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(column_header_menu_DropdownMenuGroup, {
-        children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(column_header_menu_DropdownMenuItem, {
+      }), canAddFilter && /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(column_header_menu_DropdownMenuV2.Group, {
+        children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(column_header_menu_DropdownMenuV2.Item, {
           prefix: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.Icon, {
             icon: library_funnel
           }),
           onClick: () => {
-            setOpenedFilter(field.id);
+            setOpenedFilter(fieldId);
             onChangeView({
               ...view,
               page: 1,
               filters: [...(view.filters || []), {
-                field: field.id,
+                field: fieldId,
                 value: undefined,
                 operator: operators[0]
               }]
             });
           },
-          children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(column_header_menu_DropdownMenuItemLabel, {
+          children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(column_header_menu_DropdownMenuV2.ItemLabel, {
             children: (0,external_wp_i18n_namespaceObject.__)('Add filter')
           })
         })
-      }), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsxs)(column_header_menu_DropdownMenuGroup, {
-        children: [/*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(column_header_menu_DropdownMenuItem, {
+      }), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsxs)(column_header_menu_DropdownMenuV2.Group, {
+        children: [/*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(column_header_menu_DropdownMenuV2.Item, {
           prefix: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.Icon, {
             icon: arrow_left
           }),
           disabled: index < 1,
           onClick: () => {
-            var _view$fields$slice;
-            if (!view.fields || index < 1) {
-              return;
-            }
+            var _visibleFieldIds$slic;
             onChangeView({
               ...view,
-              fields: [...((_view$fields$slice = view.fields.slice(0, index - 1)) !== null && _view$fields$slice !== void 0 ? _view$fields$slice : []), field.id, view.fields[index - 1], ...view.fields.slice(index + 1)]
+              fields: [...((_visibleFieldIds$slic = visibleFieldIds.slice(0, index - 1)) !== null && _visibleFieldIds$slic !== void 0 ? _visibleFieldIds$slic : []), fieldId, visibleFieldIds[index - 1], ...visibleFieldIds.slice(index + 1)]
             });
           },
-          children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(column_header_menu_DropdownMenuItemLabel, {
+          children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(column_header_menu_DropdownMenuV2.ItemLabel, {
             children: (0,external_wp_i18n_namespaceObject.__)('Move left')
           })
-        }), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(column_header_menu_DropdownMenuItem, {
+        }), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(column_header_menu_DropdownMenuV2.Item, {
           prefix: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.Icon, {
             icon: arrow_right
           }),
-          disabled: !view.fields || index >= view.fields.length - 1,
+          disabled: index >= visibleFieldIds.length - 1,
           onClick: () => {
-            var _view$fields$slice2;
-            if (!view.fields || index >= view.fields.length - 1) {
-              return;
-            }
+            var _visibleFieldIds$slic2;
             onChangeView({
               ...view,
-              fields: [...((_view$fields$slice2 = view.fields.slice(0, index)) !== null && _view$fields$slice2 !== void 0 ? _view$fields$slice2 : []), view.fields[index + 1], field.id, ...view.fields.slice(index + 2)]
+              fields: [...((_visibleFieldIds$slic2 = visibleFieldIds.slice(0, index)) !== null && _visibleFieldIds$slic2 !== void 0 ? _visibleFieldIds$slic2 : []), visibleFieldIds[index + 1], fieldId, ...visibleFieldIds.slice(index + 2)]
             });
           },
-          children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(column_header_menu_DropdownMenuItemLabel, {
+          children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(column_header_menu_DropdownMenuV2.ItemLabel, {
             children: (0,external_wp_i18n_namespaceObject.__)('Move right')
           })
-        }), isHidable && /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(column_header_menu_DropdownMenuItem, {
+        }), isHidable && field && /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(column_header_menu_DropdownMenuV2.Item, {
           prefix: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.Icon, {
             icon: library_unseen
           }),
           onClick: () => {
-            const viewFields = view.fields || fields.map(f => f.id);
             onHide(field);
             onChangeView({
               ...view,
-              fields: viewFields.filter(id => id !== field.id)
+              fields: visibleFieldIds.filter(id => id !== fieldId)
             });
           },
-          children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(column_header_menu_DropdownMenuItemLabel, {
-            children: (0,external_wp_i18n_namespaceObject.__)('Hide')
+          children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(column_header_menu_DropdownMenuV2.ItemLabel, {
+            children: (0,external_wp_i18n_namespaceObject.__)('Hide column')
           })
         })]
       })]
@@ -35316,7 +35764,7 @@ const _HeaderMenu = (0,external_wp_element_namespaceObject.forwardRef)(function 
 const ColumnHeaderMenu = _HeaderMenu;
 /* harmony default export */ const column_header_menu = (ColumnHeaderMenu);
 
-;// CONCATENATED MODULE: ./packages/dataviews/build-module/layouts/table/index.js
+;// CONCATENATED MODULE: ./packages/dataviews/build-module/dataviews-layouts/table/index.js
 /**
  * External dependencies
  */
@@ -35340,35 +35788,7 @@ const ColumnHeaderMenu = _HeaderMenu;
 
 
 
-function BulkSelectionCheckbox({
-  selection,
-  onChangeSelection,
-  data,
-  actions,
-  getItemId
-}) {
-  const selectableItems = (0,external_wp_element_namespaceObject.useMemo)(() => {
-    return data.filter(item => {
-      return actions.some(action => action.supportsBulk && (!action.isEligible || action.isEligible(item)));
-    });
-  }, [data, actions]);
-  const selectedItems = data.filter(item => selection.includes(getItemId(item)) && selectableItems.includes(item));
-  const areAllSelected = selectedItems.length === selectableItems.length;
-  return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.CheckboxControl, {
-    className: "dataviews-view-table-selection-checkbox",
-    __nextHasNoMarginBottom: true,
-    checked: areAllSelected,
-    indeterminate: !areAllSelected && !!selectedItems.length,
-    onChange: () => {
-      if (areAllSelected) {
-        onChangeSelection([]);
-      } else {
-        onChangeSelection(selectableItems.map(item => getItemId(item)));
-      }
-    },
-    "aria-label": areAllSelected ? (0,external_wp_i18n_namespaceObject.__)('Deselect all') : (0,external_wp_i18n_namespaceObject.__)('Select all')
-  });
-}
+
 function TableColumn({
   column,
   fields,
@@ -35451,8 +35871,8 @@ function TableRow({
   // Will be set to true if `onTouchStart` fires. This happens before
   // `onClick` and can be used to exclude touchscreen devices from certain
   // behaviours.
-  const isTouchDevice = (0,external_wp_element_namespaceObject.useRef)(false);
-  const columns = view.fields || fields.map(f => f.id);
+  const isTouchDeviceRef = (0,external_wp_element_namespaceObject.useRef)(false);
+  const columns = getVisibleFieldIds(view, fields);
   return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsxs)("tr", {
     className: dist_clsx('dataviews-view-table__row', {
       'is-selected': hasPossibleBulkAction && isSelected,
@@ -35462,13 +35882,13 @@ function TableRow({
     onMouseEnter: handleMouseEnter,
     onMouseLeave: handleMouseLeave,
     onTouchStart: () => {
-      isTouchDevice.current = true;
+      isTouchDeviceRef.current = true;
     },
     onClick: () => {
       if (!hasPossibleBulkAction) {
         return;
       }
-      if (!isTouchDevice.current && document.getSelection()?.type !== 'Range') {
+      if (!isTouchDeviceRef.current && document.getSelection()?.type !== 'Range') {
         onChangeSelection(selection.includes(id) ? selection.filter(itemId => id !== itemId) : [id]);
       }
     },
@@ -35566,7 +35986,7 @@ function ViewTable({
     const fallback = hidden ? headerMenuRefs.current.get(hidden.fallback) : undefined;
     setNextHeaderMenuToFocus(fallback?.node);
   };
-  const columns = view.fields || fields.map(f => f.id);
+  const columns = getVisibleFieldIds(view, fields);
   const hasData = !!data?.length;
   const primaryField = fields.find(field => field.id === view.layout?.primaryField);
   return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsxs)(external_ReactJSXRuntime_namespaceObject.Fragment, {
@@ -35661,7 +36081,7 @@ function ViewTable({
 }
 /* harmony default export */ const table = (ViewTable);
 
-;// CONCATENATED MODULE: ./packages/dataviews/build-module/layouts/grid/index.js
+;// CONCATENATED MODULE: ./packages/dataviews/build-module/dataviews-layouts/grid/index.js
 /**
  * External dependencies
  */
@@ -35721,17 +36141,17 @@ function GridItem({
     children: [/*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)("div", {
       className: "dataviews-view-grid__media",
       children: renderedMediaField
+    }), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(DataViewsSelectionCheckbox, {
+      item: item,
+      selection: selection,
+      onChangeSelection: onChangeSelection,
+      getItemId: getItemId,
+      primaryField: primaryField,
+      disabled: !hasBulkAction
     }), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsxs)(external_wp_components_namespaceObject.__experimentalHStack, {
       justify: "space-between",
       className: "dataviews-view-grid__title-actions",
-      children: [/*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(DataViewsSelectionCheckbox, {
-        item: item,
-        selection: selection,
-        onChangeSelection: onChangeSelection,
-        getItemId: getItemId,
-        primaryField: primaryField,
-        disabled: !hasBulkAction
-      }), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.__experimentalHStack, {
+      children: [/*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.__experimentalHStack, {
         className: "dataviews-view-grid__primary-field",
         children: renderedPrimaryField
       }), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(ItemActions, {
@@ -35769,7 +36189,7 @@ function GridItem({
           children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsxs)(external_ReactJSXRuntime_namespaceObject.Fragment, {
             children: [/*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.FlexItem, {
               className: "dataviews-view-grid__field-name",
-              children: field.label
+              children: field.header
             }), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.FlexItem, {
               className: "dataviews-view-grid__field-value",
               style: {
@@ -35853,13 +36273,11 @@ function ViewGrid({
   });
 }
 
-;// CONCATENATED MODULE: ./packages/dataviews/build-module/layouts/list/index.js
+;// CONCATENATED MODULE: ./packages/dataviews/build-module/dataviews-layouts/list/index.js
 /**
  * External dependencies
  */
 
-// Import CompositeStore type, which is not exported from @wordpress/components.
-// eslint-disable-next-line no-restricted-imports
 
 /**
  * WordPress dependencies
@@ -35879,27 +36297,75 @@ function ViewGrid({
 
 
 const {
-  useCompositeStoreV2: list_useCompositeStore,
-  CompositeV2: list_Composite,
-  CompositeItemV2: list_CompositeItem,
-  CompositeRowV2: CompositeRow,
-  DropdownMenuV2: list_DropdownMenu
-} = build_module_lock_unlock_unlock(external_wp_components_namespaceObject.privateApis);
+  DropdownMenuV2: DropdownMenu
+} = lock_unlock_unlock(external_wp_components_namespaceObject.privateApis);
+function generateItemWrapperCompositeId(idPrefix) {
+  return `${idPrefix}-item-wrapper`;
+}
+function generatePrimaryActionCompositeId(idPrefix, primaryActionId) {
+  return `${idPrefix}-primary-action-${primaryActionId}`;
+}
+function generateDropdownTriggerCompositeId(idPrefix) {
+  return `${idPrefix}-dropdown`;
+}
+function PrimaryActionGridCell({
+  idPrefix,
+  primaryAction,
+  item
+}) {
+  const registry = (0,external_wp_data_namespaceObject.useRegistry)();
+  const [isModalOpen, setIsModalOpen] = (0,external_wp_element_namespaceObject.useState)(false);
+  const compositeItemId = generatePrimaryActionCompositeId(idPrefix, primaryAction.id);
+  const label = typeof primaryAction.label === 'string' ? primaryAction.label : primaryAction.label([item]);
+  return 'RenderModal' in primaryAction ? /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)("div", {
+    role: "gridcell",
+    children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.Composite.Item, {
+      id: compositeItemId,
+      render: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.Button, {
+        label: label,
+        icon: primaryAction.icon,
+        isDestructive: primaryAction.isDestructive,
+        size: "small",
+        onClick: () => setIsModalOpen(true)
+      }),
+      children: isModalOpen && /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(ActionModal, {
+        action: primaryAction,
+        items: [item],
+        closeModal: () => setIsModalOpen(false)
+      })
+    })
+  }, primaryAction.id) : /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)("div", {
+    role: "gridcell",
+    children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.Composite.Item, {
+      id: compositeItemId,
+      render: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.Button, {
+        label: label,
+        icon: primaryAction.icon,
+        isDestructive: primaryAction.isDestructive,
+        size: "small",
+        onClick: () => {
+          primaryAction.callback([item], {
+            registry
+          });
+        }
+      })
+    })
+  }, primaryAction.id);
+}
 function ListItem({
   actions,
-  id,
+  idPrefix,
   isSelected,
   item,
   mediaField,
   onSelect,
   primaryField,
-  store,
-  visibleFields
+  visibleFields,
+  onDropdownTriggerKeyDown
 }) {
-  const registry = (0,external_wp_data_namespaceObject.useRegistry)();
   const itemRef = (0,external_wp_element_namespaceObject.useRef)(null);
-  const labelId = `${id}-label`;
-  const descriptionId = `${id}-description`;
+  const labelId = `${idPrefix}-label`;
+  const descriptionId = `${idPrefix}-description`;
   const [isHovered, setIsHovered] = (0,external_wp_element_namespaceObject.useState)(false);
   const handleMouseEnter = () => {
     setIsHovered(true);
@@ -35929,8 +36395,6 @@ function ListItem({
       eligibleActions: _eligibleActions
     };
   }, [actions, item]);
-  const [isModalOpen, setIsModalOpen] = (0,external_wp_element_namespaceObject.useState)(false);
-  const primaryActionLabel = primaryAction && (typeof primaryAction.label === 'string' ? primaryAction.label : primaryAction.label([item]));
   const renderedMediaField = mediaField?.render ? /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(mediaField.render, {
     item: item
   }) : /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)("div", {
@@ -35939,7 +36403,7 @@ function ListItem({
   const renderedPrimaryField = primaryField?.render ? /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(primaryField.render, {
     item: item
   }) : null;
-  return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(CompositeRow, {
+  return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.Composite.Row, {
     ref: itemRef,
     render: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)("li", {}),
     role: "row",
@@ -35955,11 +36419,10 @@ function ListItem({
       spacing: 0,
       children: [/*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)("div", {
         role: "gridcell",
-        children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(list_CompositeItem, {
-          store: store,
+        children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.Composite.Item, {
           render: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)("div", {}),
           role: "button",
-          id: id,
+          id: generateItemWrapperCompositeId(idPrefix),
           "aria-pressed": isSelected,
           "aria-labelledby": labelId,
           "aria-describedby": descriptionId,
@@ -36007,62 +36470,22 @@ function ListItem({
           flexShrink: '0',
           width: 'auto'
         },
-        children: [primaryAction && 'RenderModal' in primaryAction && /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)("div", {
+        children: [primaryAction && /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(PrimaryActionGridCell, {
+          idPrefix: idPrefix,
+          primaryAction: primaryAction,
+          item: item
+        }), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)("div", {
           role: "gridcell",
-          children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(list_CompositeItem, {
-            store: store,
-            render: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.Button, {
-              label: primaryActionLabel,
-              icon: primaryAction.icon,
-              isDestructive: primaryAction.isDestructive,
-              size: "small",
-              onClick: () => setIsModalOpen(true)
-            }),
-            children: isModalOpen && /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(ActionModal, {
-              action: primaryAction,
-              items: [item],
-              closeModal: () => setIsModalOpen(false)
-            })
-          })
-        }), primaryAction && !('RenderModal' in primaryAction) && /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)("div", {
-          role: "gridcell",
-          children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(list_CompositeItem, {
-            store: store,
-            render: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.Button, {
-              label: primaryActionLabel,
-              icon: primaryAction.icon,
-              isDestructive: primaryAction.isDestructive,
-              size: "small",
-              onClick: () => {
-                primaryAction.callback([item], {
-                  registry
-                });
-              }
-            })
-          })
-        }, primaryAction.id), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)("div", {
-          role: "gridcell",
-          children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(list_DropdownMenu, {
-            trigger: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(list_CompositeItem, {
-              store: store,
+          children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(DropdownMenu, {
+            trigger: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.Composite.Item, {
+              id: generateDropdownTriggerCompositeId(idPrefix),
               render: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.Button, {
                 size: "small",
                 icon: more_vertical,
                 label: (0,external_wp_i18n_namespaceObject.__)('Actions'),
                 accessibleWhenDisabled: true,
                 disabled: !actions.length,
-                onKeyDown: event => {
-                  if (event.key === 'ArrowDown') {
-                    // Prevent the default behaviour (open dropdown menu) and go down.
-                    event.preventDefault();
-                    store.move(store.down());
-                  }
-                  if (event.key === 'ArrowUp') {
-                    // Prevent the default behavior (open dropdown menu) and go up.
-                    event.preventDefault();
-                    store.move(store.up());
-                  }
-                }
+                onKeyDown: onDropdownTriggerKeyDown
               })
             }),
             placement: "bottom-end",
@@ -36094,23 +36517,64 @@ function ViewList(props) {
   const viewFields = view.fields || fields.map(field => field.id);
   const visibleFields = fields.filter(field => viewFields.includes(field.id) && ![view.layout?.primaryField, view.layout?.mediaField].includes(field.id));
   const onSelect = item => onChangeSelection([getItemId(item)]);
-  const getItemDomId = (0,external_wp_element_namespaceObject.useCallback)(item => item ? `${baseId}-${getItemId(item)}` : undefined, [baseId, getItemId]);
-  const store = list_useCompositeStore({
-    defaultActiveId: getItemDomId(selectedItem)
-  });
+  const generateCompositeItemIdPrefix = (0,external_wp_element_namespaceObject.useCallback)(item => `${baseId}-${getItemId(item)}`, [baseId, getItemId]);
+  const isActiveCompositeItem = (0,external_wp_element_namespaceObject.useCallback)((item, idToCheck) => {
+    // All composite items use the same prefix in their IDs.
+    return idToCheck.startsWith(generateCompositeItemIdPrefix(item));
+  }, [generateCompositeItemIdPrefix]);
 
-  // Manage focused item, when the active one is removed from the list.
-  const isActiveIdInList = store.useState(state => state.items.some(item => item.id === state.activeId));
+  // Controlled state for the active composite item.
+  const [activeCompositeId, setActiveCompositeId] = (0,external_wp_element_namespaceObject.useState)(undefined);
+
+  // Update the active composite item when the selected item changes.
   (0,external_wp_element_namespaceObject.useEffect)(() => {
-    if (!isActiveIdInList) {
-      // Prefer going down, except if there is no item below (last item), then go up (last item in list).
-      if (store.down()) {
-        store.move(store.down());
-      } else if (store.up()) {
-        store.move(store.up());
-      }
+    if (selectedItem) {
+      setActiveCompositeId(generateItemWrapperCompositeId(generateCompositeItemIdPrefix(selectedItem)));
     }
-  }, [isActiveIdInList]);
+  }, [selectedItem, generateCompositeItemIdPrefix]);
+  const activeItemIndex = data.findIndex(item => isActiveCompositeItem(item, activeCompositeId !== null && activeCompositeId !== void 0 ? activeCompositeId : ''));
+  const previousActiveItemIndex = (0,external_wp_compose_namespaceObject.usePrevious)(activeItemIndex);
+  const isActiveIdInList = activeItemIndex !== -1;
+  const selectCompositeItem = (0,external_wp_element_namespaceObject.useCallback)((targetIndex, generateCompositeId) => {
+    // Clamping between 0 and data.length - 1 to avoid out of bounds.
+    const clampedIndex = Math.min(data.length - 1, Math.max(0, targetIndex));
+    if (!data[clampedIndex]) {
+      return;
+    }
+    const itemIdPrefix = generateCompositeItemIdPrefix(data[clampedIndex]);
+    const targetCompositeItemId = generateCompositeId(itemIdPrefix);
+    setActiveCompositeId(targetCompositeItemId);
+    document.getElementById(targetCompositeItemId)?.focus();
+  }, [data, generateCompositeItemIdPrefix]);
+
+  // Select a new active composite item when the current active item
+  // is removed from the list.
+  (0,external_wp_element_namespaceObject.useEffect)(() => {
+    const wasActiveIdInList = previousActiveItemIndex !== undefined && previousActiveItemIndex !== -1;
+    if (!isActiveIdInList && wasActiveIdInList) {
+      // By picking `previousActiveItemIndex` as the next item index, we are
+      // basically picking the item that would have been after the deleted one.
+      // If the previously active (and removed) item was the last of the list,
+      // we will select the item before it — which is the new last item.
+      selectCompositeItem(previousActiveItemIndex, generateItemWrapperCompositeId);
+    }
+  }, [isActiveIdInList, selectCompositeItem, previousActiveItemIndex]);
+
+  // Prevent the default behavior (open dropdown menu) and instead select the
+  // dropdown menu trigger on the previous/next row.
+  // https://github.com/ariakit/ariakit/issues/3768
+  const onDropdownTriggerKeyDown = (0,external_wp_element_namespaceObject.useCallback)(event => {
+    if (event.key === 'ArrowDown') {
+      // Select the dropdown menu trigger item in the next row.
+      event.preventDefault();
+      selectCompositeItem(activeItemIndex + 1, generateDropdownTriggerCompositeId);
+    }
+    if (event.key === 'ArrowUp') {
+      // Select the dropdown menu trigger item in the previous row.
+      event.preventDefault();
+      selectCompositeItem(activeItemIndex - 1, generateDropdownTriggerCompositeId);
+    }
+  }, [selectCompositeItem, activeItemIndex]);
   const hasData = data?.length;
   if (!hasData) {
     return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)("div", {
@@ -36123,30 +36587,31 @@ function ViewList(props) {
       })
     });
   }
-  return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(list_Composite, {
+  return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.Composite, {
     id: baseId,
     render: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)("ul", {}),
     className: "dataviews-view-list",
     role: "grid",
-    store: store,
+    activeId: activeCompositeId,
+    setActiveId: setActiveCompositeId,
     children: data.map(item => {
-      const id = getItemDomId(item);
+      const id = generateCompositeItemIdPrefix(item);
       return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(ListItem, {
-        id: id,
+        idPrefix: id,
         actions: actions,
         item: item,
         isSelected: item === selectedItem,
         onSelect: onSelect,
         mediaField: mediaField,
         primaryField: primaryField,
-        store: store,
-        visibleFields: visibleFields
+        visibleFields: visibleFields,
+        onDropdownTriggerKeyDown: onDropdownTriggerKeyDown
       }, id);
     })
   });
 }
 
-;// CONCATENATED MODULE: ./packages/dataviews/build-module/layouts/index.js
+;// CONCATENATED MODULE: ./packages/dataviews/build-module/dataviews-layouts/index.js
 /**
  * WordPress dependencies
  */
@@ -36176,7 +36641,7 @@ const VIEW_LAYOUTS = [{
   component: ViewList,
   icon: (0,external_wp_i18n_namespaceObject.isRTL)() ? format_list_bullets_rtl : format_list_bullets
 }];
-function getMandatoryFields(view) {
+function getNotHidableFieldIds(view) {
   if (view.type === 'table') {
     var _view$layout$combined;
     return [view.layout?.primaryField].concat((_view$layout$combined = view.layout?.combinedFields?.flatMap(field => field.children)) !== null && _view$layout$combined !== void 0 ? _view$layout$combined : []).filter(item => !!item);
@@ -36188,6 +36653,50 @@ function getMandatoryFields(view) {
     return [view.layout?.primaryField, view.layout?.mediaField].filter(item => !!item);
   }
   return [];
+}
+function getCombinedFieldIds(view) {
+  const combinedFields = [];
+  if (view.type === constants_LAYOUT_TABLE && view.layout?.combinedFields) {
+    view.layout.combinedFields.forEach(combination => {
+      combinedFields.push(...combination.children);
+    });
+  }
+  return combinedFields;
+}
+function getVisibleFieldIds(view, fields) {
+  const fieldsToExclude = getCombinedFieldIds(view);
+  if (view.fields) {
+    return view.fields.filter(id => !fieldsToExclude.includes(id));
+  }
+  const visibleFields = [];
+  if (view.type === constants_LAYOUT_TABLE && view.layout?.combinedFields) {
+    visibleFields.push(...view.layout.combinedFields.map(({
+      id
+    }) => id));
+  }
+  visibleFields.push(...fields.filter(({
+    id
+  }) => !fieldsToExclude.includes(id)).map(({
+    id
+  }) => id));
+  return visibleFields;
+}
+function getHiddenFieldIds(view, fields) {
+  const fieldsToExclude = [...getCombinedFieldIds(view), ...getVisibleFieldIds(view, fields)];
+
+  // The media field does not need to be in the view.fields to be displayed.
+  if (view.type === constants_LAYOUT_GRID && view.layout?.mediaField) {
+    fieldsToExclude.push(view.layout?.mediaField);
+  }
+  if (view.type === constants_LAYOUT_LIST && view.layout?.mediaField) {
+    fieldsToExclude.push(view.layout?.mediaField);
+  }
+  return fields.filter(({
+    id,
+    enableHiding
+  }) => !fieldsToExclude.includes(id) && enableHiding).map(({
+    id
+  }) => id);
 }
 
 ;// CONCATENATED MODULE: ./packages/dataviews/build-module/components/dataviews-layout/index.js
@@ -36265,37 +36774,45 @@ function DataViewsPagination() {
     return null;
   }
   const currentPage = (_view$page = view.page) !== null && _view$page !== void 0 ? _view$page : 1;
+  const pageSelectOptions = Array.from(Array(totalPages)).map((_, i) => {
+    const page = i + 1;
+    return {
+      value: page.toString(),
+      label: page.toString(),
+      'aria-label': currentPage === page ? (0,external_wp_i18n_namespaceObject.sprintf)(
+      // translators: Current page number in total number of pages
+      (0,external_wp_i18n_namespaceObject.__)('Page %1$s of %2$s'), currentPage, totalPages) : page.toString()
+    };
+  });
   return !!totalItems && totalPages !== 1 && /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsxs)(external_wp_components_namespaceObject.__experimentalHStack, {
     expanded: false,
-    spacing: 6,
-    justify: "end",
     className: "dataviews-pagination",
+    justify: "end",
+    spacing: 6,
     children: [/*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.__experimentalHStack, {
       justify: "flex-start",
       expanded: false,
-      spacing: 2,
-      className: "dataviews-pagination__page-selection",
+      spacing: 1,
+      className: "dataviews-pagination__page-select",
       children: (0,external_wp_element_namespaceObject.createInterpolateElement)((0,external_wp_i18n_namespaceObject.sprintf)(
-      // translators: %s: Total number of pages.
-      (0,external_wp_i18n_namespaceObject._x)('Page <CurrentPageControl /> of %s', 'paging'), totalPages), {
-        CurrentPageControl: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.SelectControl, {
+      // translators: 1: Current page number, 2: Total number of pages.
+      (0,external_wp_i18n_namespaceObject._x)('<div>Page</div>%1$s<div>of %2$s</div>', 'paging'), '<CurrentPage />', totalPages), {
+        div: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)("div", {
+          "aria-hidden": true
+        }),
+        CurrentPage: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.SelectControl, {
           "aria-label": (0,external_wp_i18n_namespaceObject.__)('Current page'),
-          value: view.page?.toString(),
-          options: Array.from(Array(totalPages)).map((_, i) => {
-            const page = i + 1;
-            return {
-              value: page.toString(),
-              label: page.toString()
-            };
-          }),
+          value: currentPage.toString(),
+          options: pageSelectOptions,
           onChange: newValue => {
             onChangeView({
               ...view,
               page: +newValue
             });
           },
-          size: "compact",
-          __nextHasNoMarginBottom: true
+          size: "small",
+          __nextHasNoMarginBottom: true,
+          variant: "minimal"
         })
       })
     }), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsxs)(external_wp_components_namespaceObject.__experimentalHStack, {
@@ -36309,7 +36826,7 @@ function DataViewsPagination() {
         disabled: currentPage === 1,
         accessibleWhenDisabled: true,
         label: (0,external_wp_i18n_namespaceObject.__)('Previous page'),
-        icon: library_previous,
+        icon: (0,external_wp_i18n_namespaceObject.isRTL)() ? library_next : library_previous,
         showTooltip: true,
         size: "compact",
         tooltipPosition: "top"
@@ -36321,7 +36838,7 @@ function DataViewsPagination() {
         disabled: currentPage >= totalPages,
         accessibleWhenDisabled: true,
         label: (0,external_wp_i18n_namespaceObject.__)('Next page'),
-        icon: library_next,
+        icon: (0,external_wp_i18n_namespaceObject.isRTL)() ? library_previous : library_next,
         showTooltip: true,
         size: "compact",
         tooltipPosition: "top"
@@ -36330,6 +36847,45 @@ function DataViewsPagination() {
   });
 }
 /* harmony default export */ const dataviews_pagination = ((0,external_wp_element_namespaceObject.memo)(DataViewsPagination));
+
+;// CONCATENATED MODULE: ./packages/dataviews/build-module/components/dataviews-footer/index.js
+/**
+ * WordPress dependencies
+ */
+
+
+
+/**
+ * Internal dependencies
+ */
+
+
+
+
+
+
+const dataviews_footer_EMPTY_ARRAY = [];
+function DataViewsFooter() {
+  const {
+    view,
+    paginationInfo: {
+      totalItems = 0,
+      totalPages
+    },
+    data,
+    actions = dataviews_footer_EMPTY_ARRAY
+  } = (0,external_wp_element_namespaceObject.useContext)(dataviews_context);
+  const hasBulkActions = useSomeItemHasAPossibleBulkAction(actions, data) && [constants_LAYOUT_TABLE, constants_LAYOUT_GRID].includes(view.type);
+  if (!totalItems || !totalPages || totalPages <= 1 && !hasBulkActions) {
+    return null;
+  }
+  return !!totalItems && /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsxs)(external_wp_components_namespaceObject.__experimentalHStack, {
+    expanded: false,
+    justify: "end",
+    className: "dataviews-footer",
+    children: [hasBulkActions && /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(BulkActionsFooter, {}), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(dataviews_pagination, {})]
+  });
+}
 
 ;// CONCATENATED MODULE: ./packages/dataviews/build-module/components/dataviews-search/index.js
 /**
@@ -36364,14 +36920,17 @@ const DataViewsSearch = (0,external_wp_element_namespaceObject.memo)(function Se
     viewRef.current = view;
   }, [onChangeView, view]);
   (0,external_wp_element_namespaceObject.useEffect)(() => {
-    onChangeViewRef.current({
-      ...viewRef.current,
-      page: 1,
-      search: debouncedSearch
-    });
+    if (debouncedSearch !== viewRef.current?.search) {
+      onChangeViewRef.current({
+        ...viewRef.current,
+        page: 1,
+        search: debouncedSearch
+      });
+    }
   }, [debouncedSearch]);
   const searchLabel = label || (0,external_wp_i18n_namespaceObject.__)('Search');
   return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.SearchControl, {
+    className: "dataviews-search",
     __nextHasNoMarginBottom: true,
     onChange: setSearch,
     value: search,
@@ -36381,6 +36940,36 @@ const DataViewsSearch = (0,external_wp_element_namespaceObject.memo)(function Se
   });
 });
 /* harmony default export */ const dataviews_search = (DataViewsSearch);
+
+;// CONCATENATED MODULE: ./packages/icons/build-module/library/chevron-up.js
+/**
+ * WordPress dependencies
+ */
+
+
+const chevronUp = /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_primitives_namespaceObject.SVG, {
+  viewBox: "0 0 24 24",
+  xmlns: "http://www.w3.org/2000/svg",
+  children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_primitives_namespaceObject.Path, {
+    d: "M6.5 12.4L12 8l5.5 4.4-.9 1.2L12 10l-4.5 3.6-1-1.2z"
+  })
+});
+/* harmony default export */ const chevron_up = (chevronUp);
+
+;// CONCATENATED MODULE: ./packages/icons/build-module/library/chevron-down.js
+/**
+ * WordPress dependencies
+ */
+
+
+const chevronDown = /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_primitives_namespaceObject.SVG, {
+  viewBox: "0 0 24 24",
+  xmlns: "http://www.w3.org/2000/svg",
+  children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_primitives_namespaceObject.Path, {
+    d: "M17.5 11.6L12 16l-5.5-4.4.9-1.2L12 14l4.5-3.6 1 1.2z"
+  })
+});
+/* harmony default export */ const chevron_down = (chevronDown);
 
 ;// CONCATENATED MODULE: ./packages/icons/build-module/library/cog.js
 /**
@@ -36399,311 +36988,12 @@ const cog = /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(extern
 });
 /* harmony default export */ const library_cog = (cog);
 
-;// CONCATENATED MODULE: ./packages/dataviews/build-module/components/dataviews-view-config/index.js
-/**
- * External dependencies
- */
-
+;// CONCATENATED MODULE: external ["wp","warning"]
+const external_wp_warning_namespaceObject = window["wp"]["warning"];
+;// CONCATENATED MODULE: ./packages/dataviews/build-module/dataviews-layouts/grid/density-picker.js
 /**
  * WordPress dependencies
  */
-
-
-
-
-
-/**
- * Internal dependencies
- */
-
-
-
-
-
-
-
-const {
-  DropdownMenuV2: dataviews_view_config_DropdownMenu,
-  DropdownMenuGroupV2: dataviews_view_config_DropdownMenuGroup,
-  DropdownMenuItemV2: dataviews_view_config_DropdownMenuItem,
-  DropdownMenuRadioItemV2: dataviews_view_config_DropdownMenuRadioItem,
-  DropdownMenuCheckboxItemV2: DropdownMenuCheckboxItem,
-  DropdownMenuItemLabelV2: dataviews_view_config_DropdownMenuItemLabel
-} = build_module_lock_unlock_unlock(external_wp_components_namespaceObject.privateApis);
-function ViewTypeMenu({
-  view,
-  onChangeView,
-  defaultLayouts = {
-    list: {},
-    grid: {},
-    table: {}
-  }
-}) {
-  const availableLayouts = Object.keys(defaultLayouts);
-  if (availableLayouts.length <= 1) {
-    return null;
-  }
-  return availableLayouts.map(layout => {
-    const config = VIEW_LAYOUTS.find(v => v.type === layout);
-    if (!config) {
-      return null;
-    }
-    return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(dataviews_view_config_DropdownMenuRadioItem, {
-      value: layout,
-      name: "view-actions-available-view",
-      checked: layout === view.type,
-      hideOnClick: true,
-      onChange: e => {
-        switch (e.target.value) {
-          case 'list':
-          case 'grid':
-          case 'table':
-            return onChangeView({
-              ...view,
-              type: e.target.value,
-              ...defaultLayouts[e.target.value]
-            });
-        }
-        throw new Error('Invalid dataview');
-      },
-      children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(dataviews_view_config_DropdownMenuItemLabel, {
-        children: config.label
-      })
-    }, layout);
-  });
-}
-const PAGE_SIZE_VALUES = [10, 20, 50, 100];
-function PageSizeMenu({
-  view,
-  onChangeView
-}) {
-  return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(dataviews_view_config_DropdownMenu, {
-    trigger: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(dataviews_view_config_DropdownMenuItem, {
-      suffix: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)("span", {
-        "aria-hidden": "true",
-        children: view.perPage
-      }),
-      children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(dataviews_view_config_DropdownMenuItemLabel, {
-        children: (0,external_wp_i18n_namespaceObject.__)('Items per page')
-      })
-    }),
-    children: PAGE_SIZE_VALUES.map(size => {
-      return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(dataviews_view_config_DropdownMenuRadioItem, {
-        value: size,
-        name: "view-actions-page-size",
-        checked: view.perPage === size,
-        onChange: () => {
-          onChangeView({
-            ...view,
-            // `e.target.value` holds the same value as `size` but as a string,
-            // so we use `size` directly to avoid parsing to int.
-            perPage: size,
-            page: 1
-          });
-        },
-        children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(dataviews_view_config_DropdownMenuItemLabel, {
-          children: size
-        })
-      }, size);
-    })
-  });
-}
-function FieldsVisibilityMenu({
-  view,
-  onChangeView,
-  fields
-}) {
-  const mandatoryFields = getMandatoryFields(view);
-  const hidableFields = fields.filter(field => field.enableHiding !== false && !mandatoryFields.includes(field.id));
-  const viewFields = view.fields || fields.map(field => field.id);
-  if (!hidableFields?.length) {
-    return null;
-  }
-  return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(dataviews_view_config_DropdownMenu, {
-    trigger: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(dataviews_view_config_DropdownMenuItem, {
-      children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(dataviews_view_config_DropdownMenuItemLabel, {
-        children: (0,external_wp_i18n_namespaceObject.__)('Fields')
-      })
-    }),
-    children: hidableFields?.map(field => {
-      return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(DropdownMenuCheckboxItem, {
-        value: field.id,
-        checked: viewFields.includes(field.id),
-        onChange: () => {
-          onChangeView({
-            ...view,
-            fields: viewFields.includes(field.id) ? viewFields.filter(id => id !== field.id) : [...viewFields, field.id]
-          });
-        },
-        children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(dataviews_view_config_DropdownMenuItemLabel, {
-          children: field.label
-        })
-      }, field.id);
-    })
-  });
-}
-function SortMenu({
-  fields,
-  view,
-  onChangeView
-}) {
-  const sortableFields = fields.filter(field => field.enableSorting !== false);
-  if (!sortableFields?.length) {
-    return null;
-  }
-  const currentSortedField = fields.find(field => field.id === view.sort?.field);
-  return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(dataviews_view_config_DropdownMenu, {
-    trigger: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(dataviews_view_config_DropdownMenuItem, {
-      suffix: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)("span", {
-        "aria-hidden": "true",
-        children: currentSortedField?.label
-      }),
-      children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(dataviews_view_config_DropdownMenuItemLabel, {
-        children: (0,external_wp_i18n_namespaceObject.__)('Sort by')
-      })
-    }),
-    children: sortableFields?.map(field => {
-      const sortedDirection = view.sort?.direction;
-      return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(dataviews_view_config_DropdownMenu, {
-        trigger: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(dataviews_view_config_DropdownMenuItem, {
-          children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(dataviews_view_config_DropdownMenuItemLabel, {
-            children: field.label
-          })
-        }),
-        style: {
-          minWidth: '220px'
-        },
-        children: SORTING_DIRECTIONS.map(direction => {
-          const isChecked = currentSortedField !== undefined && sortedDirection === direction && field.id === currentSortedField.id;
-          const value = `${field.id}-${direction}`;
-          return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(dataviews_view_config_DropdownMenuRadioItem, {
-            // All sorting radio items share the same name, so that
-            // selecting a sorting option automatically deselects the
-            // previously selected one, even if it is displayed in
-            // another submenu. The field and direction are passed via
-            // the `value` prop.
-            name: "view-actions-sorting",
-            value: value,
-            checked: isChecked,
-            onChange: () => {
-              onChangeView({
-                ...view,
-                sort: {
-                  field: field.id,
-                  direction
-                }
-              });
-            },
-            children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(dataviews_view_config_DropdownMenuItemLabel, {
-              children: sortLabels[direction]
-            })
-          }, value);
-        })
-      }, field.id);
-    })
-  });
-}
-function _DataViewsViewConfig({
-  defaultLayouts
-}) {
-  const {
-    view,
-    fields,
-    onChangeView
-  } = (0,external_wp_element_namespaceObject.useContext)(dataviews_context);
-  const activeView = VIEW_LAYOUTS.find(v => view.type === v.type);
-  return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_ReactJSXRuntime_namespaceObject.Fragment, {
-    children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsxs)(external_wp_components_namespaceObject.__experimentalHStack, {
-      spacing: 1,
-      expanded: false,
-      style: {
-        flexShrink: 0
-      },
-      children: [/*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(dataviews_view_config_DropdownMenu, {
-        trigger: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.Button, {
-          size: "compact",
-          icon: activeView?.icon,
-          label: (0,external_wp_i18n_namespaceObject.__)('Layout')
-        }),
-        children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(ViewTypeMenu, {
-          view: view,
-          onChangeView: onChangeView,
-          defaultLayouts: defaultLayouts
-        })
-      }), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(dataviews_view_config_DropdownMenu, {
-        trigger: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.Button, {
-          size: "compact",
-          icon: library_cog,
-          label: (0,external_wp_i18n_namespaceObject._x)('View options', 'View is used as a noun')
-        }),
-        children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsxs)(dataviews_view_config_DropdownMenuGroup, {
-          children: [/*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(SortMenu, {
-            fields: fields,
-            view: view,
-            onChangeView: onChangeView
-          }), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(FieldsVisibilityMenu, {
-            fields: fields,
-            view: view,
-            onChangeView: onChangeView
-          }), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(PageSizeMenu, {
-            view: view,
-            onChangeView: onChangeView
-          })]
-        })
-      })]
-    })
-  });
-}
-const DataViewsViewConfig = (0,external_wp_element_namespaceObject.memo)(_DataViewsViewConfig);
-/* harmony default export */ const dataviews_view_config = (DataViewsViewConfig);
-
-;// CONCATENATED MODULE: ./packages/dataviews/build-module/normalize-fields.js
-/**
- * Internal dependencies
- */
-
-/**
- * Apply default values and normalize the fields config.
- *
- * @param fields Fields config.
- * @return Normalized fields config.
- */
-function normalizeFields(fields) {
-  return fields.map(field => {
-    const getValue = field.getValue || (({
-      item
-    }) => item[field.id]);
-    return {
-      ...field,
-      label: field.label || field.id,
-      getValue,
-      render: field.render || getValue
-    };
-  });
-}
-
-;// CONCATENATED MODULE: ./packages/icons/build-module/library/line-solid.js
-/**
- * WordPress dependencies
- */
-
-
-const lineSolid = /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_primitives_namespaceObject.SVG, {
-  xmlns: "http://www.w3.org/2000/svg",
-  viewBox: "0 0 24 24",
-  children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_primitives_namespaceObject.Path, {
-    d: "M5 11.25h14v1.5H5z"
-  })
-});
-/* harmony default export */ const line_solid = (lineSolid);
-
-;// CONCATENATED MODULE: ./packages/dataviews/build-module/layouts/grid/density-picker.js
-/**
- * WordPress dependencies
- */
-
-
-
 
 
 
@@ -36759,18 +37049,6 @@ function useViewPortBreakpoint() {
   }
   return null;
 }
-
-// Value is number from 0 to 100 representing how big an item is in the grid
-// 100 being the biggest and 0 being the smallest.
-// The size is relative to the viewport size, if one a given viewport the
-// number of allowed items in a grid is 3 to 6 a 0 ( the smallest ) will mean that the grid will
-// have 6 items in a row, a 100 ( the biggest ) will mean that the grid will have 3 items in a row.
-// A value of 75 will mean that the grid will have 4 items in a row.
-function getRangeValue(density, breakValues) {
-  const inverseDensity = breakValues.max - density;
-  const max = breakValues.max - breakValues.min;
-  return Math.round(inverseDensity * 100 / max);
-}
 function DensityPicker({
   density,
   setDensity
@@ -36791,50 +37069,485 @@ function DensityPicker({
       return _density;
     });
   }, [setDensity, viewport]);
+  const breakValues = viewportBreaks[viewport || 'mobile'];
+  const densityToUse = density || breakValues.default;
+  const marks = (0,external_wp_element_namespaceObject.useMemo)(() => Array.from({
+    length: breakValues.max - breakValues.min + 1
+  }, (_, i) => {
+    return {
+      value: breakValues.min + i
+    };
+  }), [breakValues]);
   if (!viewport) {
     return null;
   }
-  const breakValues = viewportBreaks[viewport];
-  const densityToUse = density || breakValues.default;
-  const rangeValue = getRangeValue(densityToUse, breakValues);
-  const step = 100 / (breakValues.max - breakValues.min + 1);
-  return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsxs)(external_ReactJSXRuntime_namespaceObject.Fragment, {
-    children: [/*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.Button, {
+  return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.RangeControl, {
+    __nextHasNoMarginBottom: true,
+    __next40pxDefaultSize: true,
+    showTooltip: false,
+    label: (0,external_wp_i18n_namespaceObject.__)('Preview size'),
+    value: breakValues.max + breakValues.min - densityToUse,
+    marks: marks,
+    min: breakValues.min,
+    max: breakValues.max,
+    withInputField: false,
+    onChange: (value = 0) => {
+      setDensity(breakValues.max + breakValues.min - value);
+    },
+    step: 1
+  });
+}
+
+;// CONCATENATED MODULE: ./packages/dataviews/build-module/components/dataviews-view-config/index.js
+/**
+ * External dependencies
+ */
+
+/**
+ * WordPress dependencies
+ */
+
+
+
+
+
+
+/**
+ * Internal dependencies
+ */
+
+
+
+
+
+
+
+
+const {
+  DropdownMenuV2: dataviews_view_config_DropdownMenuV2
+} = lock_unlock_unlock(external_wp_components_namespaceObject.privateApis);
+function ViewTypeMenu({
+  defaultLayouts = {
+    list: {},
+    grid: {},
+    table: {}
+  }
+}) {
+  const {
+    view,
+    onChangeView
+  } = (0,external_wp_element_namespaceObject.useContext)(dataviews_context);
+  const availableLayouts = Object.keys(defaultLayouts);
+  if (availableLayouts.length <= 1) {
+    return null;
+  }
+  const activeView = VIEW_LAYOUTS.find(v => view.type === v.type);
+  return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(dataviews_view_config_DropdownMenuV2, {
+    trigger: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.Button, {
       size: "compact",
-      icon: line_solid,
-      disabled: rangeValue <= 0,
-      accessibleWhenDisabled: true,
-      label: (0,external_wp_i18n_namespaceObject.__)('Decrease size'),
-      onClick: () => {
-        setDensity(densityToUse + 1);
+      icon: activeView?.icon,
+      label: (0,external_wp_i18n_namespaceObject.__)('Layout')
+    }),
+    children: availableLayouts.map(layout => {
+      const config = VIEW_LAYOUTS.find(v => v.type === layout);
+      if (!config) {
+        return null;
       }
-    }), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.RangeControl, {
-      __nextHasNoMarginBottom: true,
-      showTooltip: false,
-      className: "dataviews-density-picker__range-control",
-      label: (0,external_wp_i18n_namespaceObject.__)('Item size'),
-      hideLabelFromVision: true,
-      value: rangeValue,
-      min: 0,
-      max: 100,
-      withInputField: false,
-      onChange: (value = 0) => {
-        const inverseValue = 100 - value;
-        setDensity(Math.round(inverseValue * (breakValues.max - breakValues.min) / 100 + breakValues.min));
-      },
-      step: step
-    }), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.Button, {
-      size: "compact",
-      icon: library_plus,
-      disabled: rangeValue >= 100,
-      accessibleWhenDisabled: true,
-      label: (0,external_wp_i18n_namespaceObject.__)('Increase size'),
-      onClick: () => {
-        setDensity(densityToUse - 1);
+      return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(dataviews_view_config_DropdownMenuV2.RadioItem, {
+        value: layout,
+        name: "view-actions-available-view",
+        checked: layout === view.type,
+        hideOnClick: true,
+        onChange: e => {
+          switch (e.target.value) {
+            case 'list':
+            case 'grid':
+            case 'table':
+              return onChangeView({
+                ...view,
+                type: e.target.value,
+                ...defaultLayouts[e.target.value]
+              });
+          }
+           false ? 0 : void 0;
+        },
+        children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(dataviews_view_config_DropdownMenuV2.ItemLabel, {
+          children: config.label
+        })
+      }, layout);
+    })
+  });
+}
+function SortFieldControl() {
+  const {
+    view,
+    fields,
+    onChangeView
+  } = (0,external_wp_element_namespaceObject.useContext)(dataviews_context);
+  const orderOptions = (0,external_wp_element_namespaceObject.useMemo)(() => {
+    const sortableFields = fields.filter(field => field.enableSorting !== false);
+    return sortableFields.map(field => {
+      return {
+        label: field.label,
+        value: field.id
+      };
+    });
+  }, [fields]);
+  return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.SelectControl, {
+    __nextHasNoMarginBottom: true,
+    __next40pxDefaultSize: true,
+    label: (0,external_wp_i18n_namespaceObject.__)('Sort by'),
+    value: view.sort?.field,
+    options: orderOptions,
+    onChange: value => {
+      onChangeView({
+        ...view,
+        sort: {
+          direction: view?.sort?.direction || 'desc',
+          field: value
+        }
+      });
+    }
+  });
+}
+function SortDirectionControl() {
+  const {
+    view,
+    fields,
+    onChangeView
+  } = (0,external_wp_element_namespaceObject.useContext)(dataviews_context);
+  const sortableFields = fields.filter(field => field.enableSorting !== false);
+  if (sortableFields.length === 0) {
+    return null;
+  }
+  let value = view.sort?.direction;
+  if (!value && view.sort?.field) {
+    value = 'desc';
+  }
+  return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.__experimentalToggleGroupControl, {
+    className: "dataviews-view-config__sort-direction",
+    __nextHasNoMarginBottom: true,
+    __next40pxDefaultSize: true,
+    isBlock: true,
+    label: (0,external_wp_i18n_namespaceObject.__)('Order'),
+    value: value,
+    onChange: newDirection => {
+      if (newDirection === 'asc' || newDirection === 'desc') {
+        onChangeView({
+          ...view,
+          sort: {
+            direction: newDirection,
+            field: view.sort?.field ||
+            // If there is no field assigned as the sorting field assign the first sortable field.
+            fields.find(field => field.enableSorting !== false)?.id || ''
+          }
+        });
+        return;
       }
+       false ? 0 : void 0;
+    },
+    children: SORTING_DIRECTIONS.map(direction => {
+      return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.__experimentalToggleGroupControlOptionIcon, {
+        value: direction,
+        icon: sortIcons[direction],
+        label: sortLabels[direction]
+      }, direction);
+    })
+  });
+}
+const PAGE_SIZE_VALUES = [10, 20, 50, 100];
+function ItemsPerPageControl() {
+  const {
+    view,
+    onChangeView
+  } = (0,external_wp_element_namespaceObject.useContext)(dataviews_context);
+  return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.__experimentalToggleGroupControl, {
+    __nextHasNoMarginBottom: true,
+    __next40pxDefaultSize: true,
+    isBlock: true,
+    label: (0,external_wp_i18n_namespaceObject.__)('Items per page'),
+    value: view.perPage || 10,
+    disabled: !view?.sort?.field,
+    onChange: newItemsPerPage => {
+      const newItemsPerPageNumber = typeof newItemsPerPage === 'number' || newItemsPerPage === undefined ? newItemsPerPage : parseInt(newItemsPerPage, 10);
+      onChangeView({
+        ...view,
+        perPage: newItemsPerPageNumber,
+        page: 1
+      });
+    },
+    children: PAGE_SIZE_VALUES.map(value => {
+      return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.__experimentalToggleGroupControlOption, {
+        value: value,
+        label: value.toString()
+      }, value);
+    })
+  });
+}
+function FieldItem({
+  field: {
+    id,
+    label,
+    index,
+    isVisible,
+    isHidable
+  },
+  fields,
+  view,
+  onChangeView
+}) {
+  const visibleFieldIds = getVisibleFieldIds(view, fields);
+  return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.__experimentalItem, {
+    children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsxs)(external_wp_components_namespaceObject.__experimentalHStack, {
+      expanded: true,
+      className: `dataviews-field-control__field dataviews-field-control__field-${id}`,
+      children: [/*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)("span", {
+        children: label
+      }), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsxs)(external_wp_components_namespaceObject.__experimentalHStack, {
+        justify: "flex-end",
+        expanded: false,
+        className: "dataviews-field-control__actions",
+        children: [view.type === constants_LAYOUT_TABLE && isVisible && /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsxs)(external_ReactJSXRuntime_namespaceObject.Fragment, {
+          children: [/*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.Button, {
+            disabled: index < 1,
+            accessibleWhenDisabled: true,
+            size: "compact",
+            onClick: () => {
+              var _visibleFieldIds$slic;
+              onChangeView({
+                ...view,
+                fields: [...((_visibleFieldIds$slic = visibleFieldIds.slice(0, index - 1)) !== null && _visibleFieldIds$slic !== void 0 ? _visibleFieldIds$slic : []), id, visibleFieldIds[index - 1], ...visibleFieldIds.slice(index + 1)]
+              });
+            },
+            icon: chevron_up,
+            label: (0,external_wp_i18n_namespaceObject.sprintf)( /* translators: %s: field label */
+            (0,external_wp_i18n_namespaceObject.__)('Move %s up'), label)
+          }), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.Button, {
+            disabled: index >= visibleFieldIds.length - 1,
+            accessibleWhenDisabled: true,
+            size: "compact",
+            onClick: () => {
+              var _visibleFieldIds$slic2;
+              onChangeView({
+                ...view,
+                fields: [...((_visibleFieldIds$slic2 = visibleFieldIds.slice(0, index)) !== null && _visibleFieldIds$slic2 !== void 0 ? _visibleFieldIds$slic2 : []), visibleFieldIds[index + 1], id, ...visibleFieldIds.slice(index + 2)]
+              });
+            },
+            icon: chevron_down,
+            label: (0,external_wp_i18n_namespaceObject.sprintf)( /* translators: %s: field label */
+            (0,external_wp_i18n_namespaceObject.__)('Move %s down'), label)
+          }), ' ']
+        }), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.Button, {
+          className: "dataviews-field-control__field-visibility-button",
+          disabled: !isHidable,
+          accessibleWhenDisabled: true,
+          size: "compact",
+          onClick: () => {
+            onChangeView({
+              ...view,
+              fields: isVisible ? visibleFieldIds.filter(fieldId => fieldId !== id) : [...visibleFieldIds, id]
+            });
+            // Focus the visibility button to avoid focus loss.
+            // Our code is safe against the component being unmounted, so we don't need to worry about cleaning the timeout.
+            // eslint-disable-next-line @wordpress/react-no-unsafe-timeout
+            setTimeout(() => {
+              const element = document.querySelector(`.dataviews-field-control__field-${id} .dataviews-field-control__field-visibility-button`);
+              if (element instanceof HTMLElement) {
+                element.focus();
+              }
+            }, 50);
+          },
+          icon: isVisible ? library_seen : library_unseen,
+          label: isVisible ? (0,external_wp_i18n_namespaceObject.sprintf)( /* translators: %s: field label */
+          (0,external_wp_i18n_namespaceObject.__)('Hide %s'), label) : (0,external_wp_i18n_namespaceObject.sprintf)( /* translators: %s: field label */
+          (0,external_wp_i18n_namespaceObject.__)('Show %s'), label)
+        })]
+      })]
+    })
+  }, id);
+}
+function FieldControl() {
+  const {
+    view,
+    fields,
+    onChangeView
+  } = (0,external_wp_element_namespaceObject.useContext)(dataviews_context);
+  const visibleFieldIds = (0,external_wp_element_namespaceObject.useMemo)(() => getVisibleFieldIds(view, fields), [view, fields]);
+  const hiddenFieldIds = (0,external_wp_element_namespaceObject.useMemo)(() => getHiddenFieldIds(view, fields), [view, fields]);
+  const notHidableFieldIds = (0,external_wp_element_namespaceObject.useMemo)(() => getNotHidableFieldIds(view), [view]);
+  const visibleFields = fields.filter(({
+    id
+  }) => visibleFieldIds.includes(id)).map(({
+    id,
+    label,
+    enableHiding
+  }) => {
+    return {
+      id,
+      label,
+      index: visibleFieldIds.indexOf(id),
+      isVisible: true,
+      isHidable: notHidableFieldIds.includes(id) ? false : enableHiding
+    };
+  });
+  if (view.type === constants_LAYOUT_TABLE && view.layout?.combinedFields) {
+    view.layout.combinedFields.forEach(({
+      id,
+      label
+    }) => {
+      visibleFields.push({
+        id,
+        label,
+        index: visibleFieldIds.indexOf(id),
+        isVisible: true,
+        isHidable: notHidableFieldIds.includes(id)
+      });
+    });
+  }
+  visibleFields.sort((a, b) => a.index - b.index);
+  const hiddenFields = fields.filter(({
+    id
+  }) => hiddenFieldIds.includes(id)).map(({
+    id,
+    label,
+    enableHiding
+  }, index) => {
+    return {
+      id,
+      label,
+      index,
+      isVisible: false,
+      isHidable: enableHiding
+    };
+  });
+  if (!visibleFields?.length && !hiddenFields?.length) {
+    return null;
+  }
+  return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsxs)(external_wp_components_namespaceObject.__experimentalVStack, {
+    spacing: 6,
+    className: "dataviews-field-control",
+    children: [!!visibleFields?.length && /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.__experimentalItemGroup, {
+      isBordered: true,
+      isSeparated: true,
+      children: visibleFields.map(field => /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(FieldItem, {
+        field: field,
+        fields: fields,
+        view: view,
+        onChangeView: onChangeView
+      }, field.id))
+    }), !!hiddenFields?.length && /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_ReactJSXRuntime_namespaceObject.Fragment, {
+      children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsxs)(external_wp_components_namespaceObject.__experimentalVStack, {
+        spacing: 4,
+        children: [/*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.BaseControl.VisualLabel, {
+          style: {
+            margin: 0
+          },
+          children: (0,external_wp_i18n_namespaceObject.__)('Hidden')
+        }), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.__experimentalItemGroup, {
+          isBordered: true,
+          isSeparated: true,
+          children: hiddenFields.map(field => /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(FieldItem, {
+            field: field,
+            fields: fields,
+            view: view,
+            onChangeView: onChangeView
+          }, field.id))
+        })]
+      })
     })]
   });
 }
+function SettingsSection({
+  title,
+  description,
+  children
+}) {
+  return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsxs)(external_wp_components_namespaceObject.__experimentalGrid, {
+    columns: 12,
+    className: "dataviews-settings-section",
+    gap: 4,
+    children: [/*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsxs)("div", {
+      className: "dataviews-settings-section__sidebar",
+      children: [/*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.__experimentalHeading, {
+        level: 2,
+        className: "dataviews-settings-section__title",
+        children: title
+      }), description && /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.__experimentalText, {
+        variant: "muted",
+        className: "dataviews-settings-section__description",
+        children: description
+      })]
+    }), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.__experimentalGrid, {
+      columns: 8,
+      gap: 4,
+      className: "dataviews-settings-section__content",
+      children: children
+    })]
+  });
+}
+function DataviewsViewConfigContent({
+  density,
+  setDensity
+}) {
+  const {
+    view
+  } = (0,external_wp_element_namespaceObject.useContext)(dataviews_context);
+  return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsxs)(external_wp_components_namespaceObject.__experimentalVStack, {
+    className: "dataviews-view-config",
+    spacing: 6,
+    children: [/*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsxs)(SettingsSection, {
+      title: (0,external_wp_i18n_namespaceObject.__)('Appearance'),
+      children: [/*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsxs)(external_wp_components_namespaceObject.__experimentalHStack, {
+        expanded: true,
+        className: "is-divided-in-two",
+        children: [/*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(SortFieldControl, {}), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(SortDirectionControl, {})]
+      }), view.type === constants_LAYOUT_GRID && /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(DensityPicker, {
+        density: density,
+        setDensity: setDensity
+      }), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(ItemsPerPageControl, {})]
+    }), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(SettingsSection, {
+      title: (0,external_wp_i18n_namespaceObject.__)('Properties'),
+      children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(FieldControl, {})
+    })]
+  });
+}
+function _DataViewsViewConfig({
+  density,
+  setDensity,
+  defaultLayouts = {
+    list: {},
+    grid: {},
+    table: {}
+  }
+}) {
+  return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsxs)(external_ReactJSXRuntime_namespaceObject.Fragment, {
+    children: [/*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(ViewTypeMenu, {
+      defaultLayouts: defaultLayouts
+    }), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.Dropdown, {
+      popoverProps: {
+        placement: 'bottom-end',
+        offset: 9
+      },
+      contentClassName: "dataviews-view-config",
+      renderToggle: ({
+        onToggle
+      }) => {
+        return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.Button, {
+          size: "compact",
+          icon: library_cog,
+          label: (0,external_wp_i18n_namespaceObject._x)('View options', 'View is used as a noun'),
+          onClick: onToggle
+        });
+      },
+      renderContent: () => /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(DataviewsViewConfigContent, {
+        density: density,
+        setDensity: setDensity
+      })
+    })]
+  });
+}
+const DataViewsViewConfig = (0,external_wp_element_namespaceObject.memo)(_DataViewsViewConfig);
+/* harmony default export */ const dataviews_view_config = (DataViewsViewConfig);
 
 ;// CONCATENATED MODULE: ./packages/dataviews/build-module/components/dataviews/index.js
 /**
@@ -36850,10 +37563,6 @@ function DensityPicker({
 /**
  * Internal dependencies
  */
-
-
-
-
 
 
 
@@ -36898,6 +37607,8 @@ function DataViews({
   const _selection = (0,external_wp_element_namespaceObject.useMemo)(() => {
     return selection.filter(id => data.some(item => getItemId(item) === id));
   }, [selection, data, getItemId]);
+  const filters = useFilters(_fields, view);
+  const [isShowingFilter, setIsShowingFilter] = (0,external_wp_element_namespaceObject.useState)(() => (filters || []).some(filter => filter.isPrimary));
   return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(dataviews_context.Provider, {
     value: {
       view,
@@ -36918,29 +37629,36 @@ function DataViews({
       className: "dataviews-wrapper",
       children: [/*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsxs)(external_wp_components_namespaceObject.__experimentalHStack, {
         alignment: "top",
-        justify: "start",
+        justify: "space-between",
         className: "dataviews__view-actions",
+        spacing: 1,
         children: [/*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsxs)(external_wp_components_namespaceObject.__experimentalHStack, {
           justify: "start",
-          className: "dataviews-filters__container",
-          wrap: true,
+          expanded: false,
+          className: "dataviews__search",
           children: [search && /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(dataviews_search, {
             label: searchLabel
-          }), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(dataviews_filters, {})]
-        }), view.type === constants_LAYOUT_GRID && /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(DensityPicker, {
-          density: density,
-          setDensity: setDensity
-        }), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(BulkActions, {}), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsxs)(external_wp_components_namespaceObject.__experimentalHStack, {
+          }), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(FilterVisibilityToggle, {
+            filters: filters,
+            view: view,
+            onChangeView: onChangeView,
+            setOpenedFilter: setOpenedFilter,
+            setIsShowingFilter: setIsShowingFilter,
+            isShowingFilter: isShowingFilter
+          })]
+        }), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsxs)(external_wp_components_namespaceObject.__experimentalHStack, {
           spacing: 1,
           expanded: false,
           style: {
             flexShrink: 0
           },
           children: [/*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(dataviews_view_config, {
-            defaultLayouts: defaultLayouts
+            defaultLayouts: defaultLayouts,
+            density: density,
+            setDensity: setDensity
           }), header]
         })]
-      }), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(DataViewsLayout, {}), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(dataviews_pagination, {}), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(BulkActionsToolbar, {})]
+      }), isShowingFilter && /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(dataviews_filters, {}), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(DataViewsLayout, {}), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(DataViewsFooter, {})]
     })
   });
 }
@@ -37026,7 +37744,7 @@ function Header({
 
 const {
   NavigableRegion: page_NavigableRegion
-} = lock_unlock_unlock(external_wp_editor_namespaceObject.privateApis);
+} = unlock(external_wp_editor_namespaceObject.privateApis);
 function Page({
   title,
   subTitle,
@@ -37219,87 +37937,77 @@ function useDefaultViews({
     return getPostType(postType)?.labels;
   }, [postType]);
   return (0,external_wp_element_namespaceObject.useMemo)(() => {
-    return {
-      [postType]: [{
-        title: labels?.all_items || (0,external_wp_i18n_namespaceObject.__)('All items'),
-        slug: 'all',
-        icon: library_pages,
-        view: DEFAULT_POST_BASE
-      }, {
-        title: (0,external_wp_i18n_namespaceObject.__)('Published'),
-        slug: 'published',
-        icon: library_published,
-        view: {
-          ...DEFAULT_POST_BASE,
-          filters: [{
-            field: 'status',
-            operator: OPERATOR_IS_ANY,
-            value: 'publish'
-          }]
-        }
-      }, {
-        title: (0,external_wp_i18n_namespaceObject.__)('Scheduled'),
-        slug: 'future',
-        icon: library_scheduled,
-        view: {
-          ...DEFAULT_POST_BASE,
-          filters: [{
-            field: 'status',
-            operator: OPERATOR_IS_ANY,
-            value: 'future'
-          }]
-        }
-      }, {
-        title: (0,external_wp_i18n_namespaceObject.__)('Drafts'),
-        slug: 'drafts',
-        icon: library_drafts,
-        view: {
-          ...DEFAULT_POST_BASE,
-          filters: [{
-            field: 'status',
-            operator: OPERATOR_IS_ANY,
-            value: 'draft'
-          }]
-        }
-      }, {
-        title: (0,external_wp_i18n_namespaceObject.__)('Pending'),
-        slug: 'pending',
-        icon: library_pending,
-        view: {
-          ...DEFAULT_POST_BASE,
-          filters: [{
-            field: 'status',
-            operator: OPERATOR_IS_ANY,
-            value: 'pending'
-          }]
-        }
-      }, {
-        title: (0,external_wp_i18n_namespaceObject.__)('Private'),
-        slug: 'private',
-        icon: not_allowed,
-        view: {
-          ...DEFAULT_POST_BASE,
-          filters: [{
-            field: 'status',
-            operator: OPERATOR_IS_ANY,
-            value: 'private'
-          }]
-        }
-      }, {
-        title: (0,external_wp_i18n_namespaceObject.__)('Trash'),
-        slug: 'trash',
-        icon: library_trash,
-        view: {
-          ...DEFAULT_POST_BASE,
-          filters: [{
-            field: 'status',
-            operator: OPERATOR_IS_ANY,
-            value: 'trash'
-          }]
-        }
+    return [{
+      title: labels?.all_items || (0,external_wp_i18n_namespaceObject.__)('All items'),
+      slug: 'all',
+      icon: library_pages,
+      view: DEFAULT_POST_BASE
+    }, {
+      title: (0,external_wp_i18n_namespaceObject.__)('Published'),
+      slug: 'published',
+      icon: library_published,
+      view: DEFAULT_POST_BASE,
+      filters: [{
+        field: 'status',
+        operator: OPERATOR_IS_ANY,
+        value: 'publish'
       }]
-    };
-  }, [labels, postType]);
+    }, {
+      title: (0,external_wp_i18n_namespaceObject.__)('Scheduled'),
+      slug: 'future',
+      icon: library_scheduled,
+      view: DEFAULT_POST_BASE,
+      filters: [{
+        field: 'status',
+        operator: OPERATOR_IS_ANY,
+        value: 'future'
+      }]
+    }, {
+      title: (0,external_wp_i18n_namespaceObject.__)('Drafts'),
+      slug: 'drafts',
+      icon: library_drafts,
+      view: DEFAULT_POST_BASE,
+      filters: [{
+        field: 'status',
+        operator: OPERATOR_IS_ANY,
+        value: 'draft'
+      }]
+    }, {
+      title: (0,external_wp_i18n_namespaceObject.__)('Pending'),
+      slug: 'pending',
+      icon: library_pending,
+      view: DEFAULT_POST_BASE,
+      filters: [{
+        field: 'status',
+        operator: OPERATOR_IS_ANY,
+        value: 'pending'
+      }]
+    }, {
+      title: (0,external_wp_i18n_namespaceObject.__)('Private'),
+      slug: 'private',
+      icon: not_allowed,
+      view: DEFAULT_POST_BASE,
+      filters: [{
+        field: 'status',
+        operator: OPERATOR_IS_ANY,
+        value: 'private'
+      }]
+    }, {
+      title: (0,external_wp_i18n_namespaceObject.__)('Trash'),
+      slug: 'trash',
+      icon: library_trash,
+      view: {
+        ...DEFAULT_POST_BASE,
+        type: LAYOUT_TABLE,
+        layout: defaultLayouts[LAYOUT_TABLE].layout
+      },
+      filters: [{
+        field: 'status',
+        operator: OPERATOR_IS_ANY,
+        value: 'trash'
+      }]
+    }];
+  }, [labels]);
 }
 
 ;// CONCATENATED MODULE: ./packages/edit-site/build-module/components/add-new-post/index.js
@@ -37375,9 +38083,10 @@ function AddNewPostModal({
     children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)("form", {
       onSubmit: createPost,
       children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsxs)(external_wp_components_namespaceObject.__experimentalVStack, {
-        spacing: 3,
+        spacing: 4,
         children: [/*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.TextControl, {
           __next40pxDefaultSize: true,
+          __nextHasNoMarginBottom: true,
           label: (0,external_wp_i18n_namespaceObject.__)('Title'),
           onChange: setTitle,
           placeholder: (0,external_wp_i18n_namespaceObject.__)('No title'),
@@ -37443,7 +38152,7 @@ const pencil = /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(ext
 
 const {
   useHistory: dataviews_actions_useHistory
-} = lock_unlock_unlock(external_wp_router_namespaceObject.privateApis);
+} = unlock(external_wp_router_namespaceObject.privateApis);
 const useEditPostAction = () => {
   const history = dataviews_actions_useHistory();
   return (0,external_wp_element_namespaceObject.useMemo)(() => ({
@@ -37545,23 +38254,28 @@ function Media({
 const STATUSES = [{
   value: 'draft',
   label: (0,external_wp_i18n_namespaceObject.__)('Draft'),
-  icon: library_drafts
+  icon: library_drafts,
+  description: (0,external_wp_i18n_namespaceObject.__)('Not ready to publish.')
 }, {
   value: 'future',
   label: (0,external_wp_i18n_namespaceObject.__)('Scheduled'),
-  icon: library_scheduled
+  icon: library_scheduled,
+  description: (0,external_wp_i18n_namespaceObject.__)('Publish automatically on a chosen date.')
 }, {
   value: 'pending',
   label: (0,external_wp_i18n_namespaceObject.__)('Pending Review'),
-  icon: library_pending
+  icon: library_pending,
+  description: (0,external_wp_i18n_namespaceObject.__)('Waiting for review before publishing.')
 }, {
   value: 'private',
   label: (0,external_wp_i18n_namespaceObject.__)('Private'),
-  icon: not_allowed
+  icon: not_allowed,
+  description: (0,external_wp_i18n_namespaceObject.__)('Only visible to site admins and editors.')
 }, {
   value: 'publish',
   label: (0,external_wp_i18n_namespaceObject.__)('Published'),
-  icon: library_published
+  icon: library_published,
+  description: (0,external_wp_i18n_namespaceObject.__)('Visible to everyone.')
 }, {
   value: 'trash',
   label: (0,external_wp_i18n_namespaceObject.__)('Trash'),
@@ -37704,15 +38418,16 @@ function usePostFields(viewType) {
       item
     }) => {
       const addLink = [LAYOUT_TABLE, LAYOUT_GRID].includes(viewType) && item.status !== 'trash';
+      const renderedTitle = typeof item.title === 'string' ? item.title : item.title?.rendered;
       const title = addLink ? /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(Link, {
         params: {
           postId: item.id,
           postType: item.type,
           canvas: 'edit'
         },
-        children: (0,external_wp_htmlEntities_namespaceObject.decodeEntities)(item.title?.rendered) || (0,external_wp_i18n_namespaceObject.__)('(no title)')
+        children: (0,external_wp_htmlEntities_namespaceObject.decodeEntities)(renderedTitle) || (0,external_wp_i18n_namespaceObject.__)('(no title)')
       }) : /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)("span", {
-        children: (0,external_wp_htmlEntities_namespaceObject.decodeEntities)(item.title?.rendered) || (0,external_wp_i18n_namespaceObject.__)('(no title)')
+        children: (0,external_wp_htmlEntities_namespaceObject.decodeEntities)(renderedTitle) || (0,external_wp_i18n_namespaceObject.__)('(no title)')
       });
       let suffix = '';
       if (item.id === frontPageId) {
@@ -37737,9 +38452,7 @@ function usePostFields(viewType) {
   }, {
     label: (0,external_wp_i18n_namespaceObject.__)('Author'),
     id: 'author',
-    getValue: ({
-      item
-    }) => item._embedded?.author[0]?.name,
+    type: 'integer',
     elements: authors?.map(({
       id,
       name
@@ -37747,20 +38460,19 @@ function usePostFields(viewType) {
       value: id,
       label: name
     })) || [],
-    render: PostAuthorField
+    render: PostAuthorField,
+    sort: (a, b, direction) => {
+      const nameA = a._embedded?.author?.[0]?.name || '';
+      const nameB = b._embedded?.author?.[0]?.name || '';
+      return direction === 'asc' ? nameA.localeCompare(nameB) : nameB.localeCompare(nameA);
+    }
   }, {
     label: (0,external_wp_i18n_namespaceObject.__)('Status'),
     id: 'status',
-    getValue: ({
-      item
-    }) => {
-      var _STATUSES$find$label;
-      return (_STATUSES$find$label = STATUSES.find(({
-        value
-      }) => value === item.status)?.label) !== null && _STATUSES$find$label !== void 0 ? _STATUSES$find$label : item.status;
-    },
+    type: 'text',
     elements: STATUSES,
     render: PostStatusField,
+    Edit: 'radio',
     enableSorting: false,
     filterBy: {
       operators: [OPERATOR_IS_ANY]
@@ -37768,6 +38480,7 @@ function usePostFields(viewType) {
   }, {
     label: (0,external_wp_i18n_namespaceObject.__)('Date'),
     id: 'date',
+    type: 'datetime',
     render: ({
       item
     }) => {
@@ -37787,21 +38500,21 @@ function usePostFields(viewType) {
           time: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)("time", {})
         });
       }
+      const isPublished = item.status === 'publish';
+      if (isPublished) {
+        return (0,external_wp_element_namespaceObject.createInterpolateElement)((0,external_wp_i18n_namespaceObject.sprintf)( /* translators: %s: page creation time */
+        (0,external_wp_i18n_namespaceObject.__)('<span>Published: <time>%s</time></span>'), getFormattedDate(item.date)), {
+          span: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)("span", {}),
+          time: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)("time", {})
+        });
+      }
 
-      // Pending & Published posts show the modified date if it's newer.
+      // Pending posts show the modified date if it's newer.
       const dateToDisplay = (0,external_wp_date_namespaceObject.getDate)(item.modified) > (0,external_wp_date_namespaceObject.getDate)(item.date) ? item.modified : item.date;
       const isPending = item.status === 'pending';
       if (isPending) {
         return (0,external_wp_element_namespaceObject.createInterpolateElement)((0,external_wp_i18n_namespaceObject.sprintf)( /* translators: %s: the newest of created or modified date for the page */
         (0,external_wp_i18n_namespaceObject.__)('<span>Modified: <time>%s</time></span>'), getFormattedDate(dateToDisplay)), {
-          span: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)("span", {}),
-          time: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)("time", {})
-        });
-      }
-      const isPublished = item.status === 'publish';
-      if (isPublished) {
-        return (0,external_wp_element_namespaceObject.createInterpolateElement)((0,external_wp_i18n_namespaceObject.sprintf)( /* translators: %s: the newest of created or modified date for the page */
-        (0,external_wp_i18n_namespaceObject.__)('<span>Published: <time>%s</time></span>'), getFormattedDate(dateToDisplay)), {
           span: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)("span", {}),
           time: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)("time", {})
         });
@@ -37812,6 +38525,24 @@ function usePostFields(viewType) {
         children: getFormattedDate(item.date)
       });
     }
+  }, {
+    id: 'comment_status',
+    label: (0,external_wp_i18n_namespaceObject.__)('Discussion'),
+    type: 'text',
+    Edit: 'radio',
+    enableSorting: false,
+    filterBy: {
+      operators: []
+    },
+    elements: [{
+      value: 'open',
+      label: (0,external_wp_i18n_namespaceObject.__)('Open'),
+      description: (0,external_wp_i18n_namespaceObject.__)('Visitors can add new comments and replies.')
+    }, {
+      value: 'closed',
+      label: (0,external_wp_i18n_namespaceObject.__)('Closed'),
+      description: (0,external_wp_i18n_namespaceObject.__)('Visitors cannot add new comments or replies. Existing comments remain visible.')
+    }]
   }], [authors, viewType, frontPageId, postsPageId]);
   return {
     isLoading: isLoadingAuthors,
@@ -37850,12 +38581,44 @@ function usePostFields(viewType) {
 
 const {
   usePostActions
-} = lock_unlock_unlock(external_wp_editor_namespaceObject.privateApis);
+} = unlock(external_wp_editor_namespaceObject.privateApis);
 const {
   useLocation: post_list_useLocation,
   useHistory: post_list_useHistory
-} = lock_unlock_unlock(external_wp_router_namespaceObject.privateApis);
+} = unlock(external_wp_router_namespaceObject.privateApis);
+const {
+  useEntityRecordsWithPermissions
+} = unlock(external_wp_coreData_namespaceObject.privateApis);
 const post_list_EMPTY_ARRAY = [];
+const getDefaultView = (defaultViews, activeView) => {
+  return defaultViews.find(({
+    slug
+  }) => slug === activeView)?.view;
+};
+const getCustomView = editedEntityRecord => {
+  if (!editedEntityRecord?.content) {
+    return undefined;
+  }
+  const content = JSON.parse(editedEntityRecord.content);
+  if (!content) {
+    return undefined;
+  }
+  return {
+    ...content,
+    layout: defaultLayouts[content.type]?.layout
+  };
+};
+
+/**
+ * This function abstracts working with default & custom views by
+ * providing a [ state, setState ] tuple based on the URL parameters.
+ *
+ * Consumers use the provided tuple to work with state
+ * and don't have to deal with the specifics of default & custom views.
+ *
+ * @param {string} postType Post type to retrieve default views for.
+ * @return {Array} The [ state, setState ] tuple.
+ */
 function useView(postType) {
   const {
     params: {
@@ -37865,75 +38628,87 @@ function useView(postType) {
     }
   } = post_list_useLocation();
   const history = post_list_useHistory();
-  const DEFAULT_VIEWS = useDefaultViews({
+  const defaultViews = useDefaultViews({
     postType
   });
-  const selectedDefaultView = (0,external_wp_element_namespaceObject.useMemo)(() => {
-    const defaultView = isCustom === 'false' && DEFAULT_VIEWS[postType].find(({
-      slug
-    }) => slug === activeView)?.view;
-    if (isCustom === 'false' && layout) {
-      return {
-        ...defaultView,
-        type: layout,
-        layout: defaultLayouts[layout]?.layout
-      };
-    }
-    return defaultView;
-  }, [isCustom, activeView, layout, postType, DEFAULT_VIEWS]);
-  const [view, setView] = (0,external_wp_element_namespaceObject.useState)(selectedDefaultView);
-  (0,external_wp_element_namespaceObject.useEffect)(() => {
-    if (selectedDefaultView) {
-      setView(selectedDefaultView);
-    }
-  }, [selectedDefaultView]);
-  const editedViewRecord = (0,external_wp_data_namespaceObject.useSelect)(select => {
+  const {
+    editEntityRecord
+  } = (0,external_wp_data_namespaceObject.useDispatch)(external_wp_coreData_namespaceObject.store);
+  const editedEntityRecord = (0,external_wp_data_namespaceObject.useSelect)(select => {
     if (isCustom !== 'true') {
-      return;
+      return undefined;
     }
     const {
       getEditedEntityRecord
     } = select(external_wp_coreData_namespaceObject.store);
-    const dataviewRecord = getEditedEntityRecord('postType', 'wp_dataviews', Number(activeView));
-    return dataviewRecord;
+    return getEditedEntityRecord('postType', 'wp_dataviews', Number(activeView));
   }, [activeView, isCustom]);
-  const {
-    editEntityRecord
-  } = (0,external_wp_data_namespaceObject.useDispatch)(external_wp_coreData_namespaceObject.store);
-  const customView = (0,external_wp_element_namespaceObject.useMemo)(() => {
-    const storedView = editedViewRecord?.content && JSON.parse(editedViewRecord?.content);
-    if (!storedView) {
-      return storedView;
+  const [view, setView] = (0,external_wp_element_namespaceObject.useState)(() => {
+    let initialView;
+    if (isCustom === 'true') {
+      var _getCustomView;
+      initialView = (_getCustomView = getCustomView(editedEntityRecord)) !== null && _getCustomView !== void 0 ? _getCustomView : {
+        type: layout !== null && layout !== void 0 ? layout : LAYOUT_LIST
+      };
+    } else {
+      var _getDefaultView;
+      initialView = (_getDefaultView = getDefaultView(defaultViews, activeView)) !== null && _getDefaultView !== void 0 ? _getDefaultView : {
+        type: layout !== null && layout !== void 0 ? layout : LAYOUT_LIST
+      };
     }
+    const type = layout !== null && layout !== void 0 ? layout : initialView.type;
     return {
-      ...storedView,
-      layout: defaultLayouts[storedView?.type]?.layout
+      ...initialView,
+      type
     };
-  }, [editedViewRecord?.content]);
-  const setCustomView = (0,external_wp_element_namespaceObject.useCallback)(viewToSet => {
-    editEntityRecord('postType', 'wp_dataviews', editedViewRecord?.id, {
-      content: JSON.stringify(viewToSet)
-    });
-  }, [editEntityRecord, editedViewRecord?.id]);
-  const setDefaultViewAndUpdateUrl = (0,external_wp_element_namespaceObject.useCallback)(viewToSet => {
-    if (viewToSet.type !== view?.type) {
-      const {
-        params
-      } = history.getLocationWithParams();
+  });
+  const setViewWithUrlUpdate = (0,external_wp_element_namespaceObject.useCallback)(newView => {
+    const {
+      params
+    } = history.getLocationWithParams();
+    if (newView.type === LAYOUT_LIST && !params?.layout) {
+      // Skip updating the layout URL param if
+      // it is not present and the newView.type is LAYOUT_LIST.
+    } else if (newView.type !== params?.layout) {
       history.push({
         ...params,
-        layout: viewToSet.type
+        layout: newView.type
       });
     }
-    setView(viewToSet);
-  }, [history, view?.type]);
-  if (isCustom === 'false') {
-    return [view, setDefaultViewAndUpdateUrl];
-  } else if (isCustom === 'true' && customView) {
-    return [customView, setCustomView];
-  }
-  // Loading state where no the view was not found on custom views or default views.
-  return [DEFAULT_VIEWS[postType][0].view, setDefaultViewAndUpdateUrl];
+    setView(newView);
+    if (isCustom === 'true' && editedEntityRecord?.id) {
+      editEntityRecord('postType', 'wp_dataviews', editedEntityRecord?.id, {
+        content: JSON.stringify(newView)
+      });
+    }
+  }, [history, isCustom, editEntityRecord, editedEntityRecord?.id]);
+
+  // When layout URL param changes, update the view type
+  // without affecting any other config.
+  (0,external_wp_element_namespaceObject.useEffect)(() => {
+    setView(prevView => ({
+      ...prevView,
+      type: layout !== null && layout !== void 0 ? layout : LAYOUT_LIST
+    }));
+  }, [layout]);
+
+  // When activeView or isCustom URL parameters change, reset the view.
+  (0,external_wp_element_namespaceObject.useEffect)(() => {
+    let newView;
+    if (isCustom === 'true') {
+      newView = getCustomView(editedEntityRecord);
+    } else {
+      newView = getDefaultView(defaultViews, activeView);
+    }
+    if (newView) {
+      const type = layout !== null && layout !== void 0 ? layout : newView.type;
+      setView({
+        ...newView,
+        type
+      });
+    }
+  }, [activeView, isCustom, layout, defaultViews, editedEntityRecord]);
+  return [view, setViewWithUrlUpdate, setViewWithUrlUpdate];
 }
 const DEFAULT_STATUSES = 'draft,future,pending,private,publish'; // All but 'trash'.
 
@@ -37943,13 +38718,18 @@ function getItemId(item) {
 function PostList({
   postType
 }) {
-  var _postId$split, _records$map, _usePrevious;
+  var _postId$split, _data$map, _usePrevious;
   const [view, setView] = useView(postType);
+  const defaultViews = useDefaultViews({
+    postType
+  });
   const history = post_list_useHistory();
   const location = post_list_useLocation();
   const {
     postId,
-    quickEdit = false
+    quickEdit = false,
+    isCustom,
+    activeView = 'all'
   } = location.params;
   const [selection, setSelection] = (0,external_wp_element_namespaceObject.useState)((_postId$split = postId?.split(',')) !== null && _postId$split !== void 0 ? _postId$split : []);
   const onChangeSelection = (0,external_wp_element_namespaceObject.useCallback)(items => {
@@ -37965,9 +38745,29 @@ function PostList({
       });
     }
   }, [history]);
+  const getActiveViewFilters = (views, match) => {
+    var _found$filters;
+    const found = views.find(({
+      slug
+    }) => slug === match);
+    return (_found$filters = found?.filters) !== null && _found$filters !== void 0 ? _found$filters : [];
+  };
+  const {
+    isLoading: isLoadingFields,
+    fields: _fields
+  } = post_fields(view.type);
+  const fields = (0,external_wp_element_namespaceObject.useMemo)(() => {
+    const activeViewFilters = getActiveViewFilters(defaultViews, activeView).map(({
+      field
+    }) => field);
+    return _fields.map(field => ({
+      ...field,
+      elements: activeViewFilters.includes(field.id) ? [] : field.elements
+    }));
+  }, [_fields, defaultViews, activeView]);
   const queryArgs = (0,external_wp_element_namespaceObject.useMemo)(() => {
     const filters = {};
-    view.filters.forEach(filter => {
+    view.filters?.forEach(filter => {
       if (filter.field === 'status' && filter.operator === OPERATOR_IS_ANY) {
         filters.status = filter.value;
       }
@@ -37977,6 +38777,20 @@ function PostList({
         filters.author_exclude = filter.value;
       }
     });
+
+    // The bundled views want data filtered without displaying the filter.
+    const activeViewFilters = getActiveViewFilters(defaultViews, activeView);
+    activeViewFilters.forEach(filter => {
+      if (filter.field === 'status' && filter.operator === OPERATOR_IS_ANY) {
+        filters.status = filter.value;
+      }
+      if (filter.field === 'author' && filter.operator === OPERATOR_IS_ANY) {
+        filters.author = filter.value;
+      } else if (filter.field === 'author' && filter.operator === OPERATOR_IS_NONE) {
+        filters.author_exclude = filter.value;
+      }
+    });
+
     // We want to provide a different default item for the status filter
     // than the REST API provides.
     if (!filters.status || filters.status === '') {
@@ -37991,14 +38805,26 @@ function PostList({
       search: view.search,
       ...filters
     };
-  }, [view]);
+  }, [view, activeView, defaultViews]);
   const {
     records,
-    isResolving: isLoadingMainEntities,
+    isResolving: isLoadingData,
     totalItems,
     totalPages
-  } = (0,external_wp_coreData_namespaceObject.useEntityRecords)('postType', postType, queryArgs);
-  const ids = (_records$map = records?.map(record => getItemId(record))) !== null && _records$map !== void 0 ? _records$map : [];
+  } = useEntityRecordsWithPermissions('postType', postType, queryArgs);
+
+  // The REST API sort the authors by ID, but we want to sort them by name.
+  const data = (0,external_wp_element_namespaceObject.useMemo)(() => {
+    if (!isLoadingFields && view?.sort?.field === 'author') {
+      return filterSortAndPaginate(records, {
+        sort: {
+          ...view.sort
+        }
+      }, fields).data;
+    }
+    return records;
+  }, [records, fields, isLoadingFields, view?.sort]);
+  const ids = (_data$map = data?.map(record => getItemId(record))) !== null && _data$map !== void 0 ? _data$map : [];
   const prevIds = (_usePrevious = (0,external_wp_compose_namespaceObject.usePrevious)(ids)) !== null && _usePrevious !== void 0 ? _usePrevious : [];
   const deletedIds = prevIds.filter(id => !ids.includes(id));
   const postIdWasDeleted = deletedIds.includes(postId);
@@ -38050,10 +38876,6 @@ function PostList({
     });
     closeModal();
   };
-  const {
-    isLoading: isLoadingFields,
-    fields
-  } = post_fields(view.type);
   return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(Page, {
     title: labels?.name,
     actions: labels?.add_new_item && canCreateRecord && /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsxs)(external_ReactJSXRuntime_namespaceObject.Fragment, {
@@ -38072,8 +38894,8 @@ function PostList({
       paginationInfo: paginationInfo,
       fields: fields,
       actions: actions,
-      data: records || post_list_EMPTY_ARRAY,
-      isLoading: isLoadingMainEntities || isLoadingFields,
+      data: data || post_list_EMPTY_ARRAY,
+      isLoading: isLoadingData || isLoadingFields,
       view: view,
       onChangeView: setView,
       selection: selection,
@@ -38084,7 +38906,7 @@ function PostList({
         size: "compact",
         isPressed: quickEdit,
         icon: drawer_right,
-        label: !quickEdit ? (0,external_wp_i18n_namespaceObject.__)('Show quick edit sidebar') : (0,external_wp_i18n_namespaceObject.__)('Close quick edit sidebar'),
+        label: (0,external_wp_i18n_namespaceObject.__)('Toggle details panel'),
         onClick: () => {
           history.push({
             ...location.params,
@@ -38092,222 +38914,8 @@ function PostList({
           });
         }
       })
-    })
+    }, activeView + isCustom)
   });
-}
-
-;// CONCATENATED MODULE: ./packages/dataviews/build-module/filter-and-sort-data-view.js
-/**
- * External dependencies
- */
-
-
-/**
- * Internal dependencies
- */
-
-
-function filter_and_sort_data_view_normalizeSearchInput(input = '') {
-  return remove_accents_default()(input.trim().toLowerCase());
-}
-const filter_and_sort_data_view_EMPTY_ARRAY = [];
-
-/**
- * Applies the filtering, sorting and pagination to the raw data based on the view configuration.
- *
- * @param data   Raw data.
- * @param view   View config.
- * @param fields Fields config.
- *
- * @return Filtered, sorted and paginated data.
- */
-function filterSortAndPaginate(data, view, fields) {
-  if (!data) {
-    return {
-      data: filter_and_sort_data_view_EMPTY_ARRAY,
-      paginationInfo: {
-        totalItems: 0,
-        totalPages: 0
-      }
-    };
-  }
-  const _fields = normalizeFields(fields);
-  let filteredData = [...data];
-  // Handle global search.
-  if (view.search) {
-    const normalizedSearch = filter_and_sort_data_view_normalizeSearchInput(view.search);
-    filteredData = filteredData.filter(item => {
-      return _fields.filter(field => field.enableGlobalSearch).map(field => {
-        return filter_and_sort_data_view_normalizeSearchInput(field.getValue({
-          item
-        }));
-      }).some(field => field.includes(normalizedSearch));
-    });
-  }
-  if (view.filters && view.filters?.length > 0) {
-    view.filters.forEach(filter => {
-      const field = _fields.find(_field => _field.id === filter.field);
-      if (field) {
-        if (filter.operator === constants_OPERATOR_IS_ANY && filter?.value?.length > 0) {
-          filteredData = filteredData.filter(item => {
-            const fieldValue = field.getValue({
-              item
-            });
-            if (Array.isArray(fieldValue)) {
-              return filter.value.some(filterValue => fieldValue.includes(filterValue));
-            } else if (typeof fieldValue === 'string') {
-              return filter.value.includes(fieldValue);
-            }
-            return false;
-          });
-        } else if (filter.operator === constants_OPERATOR_IS_NONE && filter?.value?.length > 0) {
-          filteredData = filteredData.filter(item => {
-            const fieldValue = field.getValue({
-              item
-            });
-            if (Array.isArray(fieldValue)) {
-              return !filter.value.some(filterValue => fieldValue.includes(filterValue));
-            } else if (typeof fieldValue === 'string') {
-              return !filter.value.includes(fieldValue);
-            }
-            return false;
-          });
-        } else if (filter.operator === OPERATOR_IS_ALL && filter?.value?.length > 0) {
-          filteredData = filteredData.filter(item => {
-            return filter.value.every(value => {
-              return field.getValue({
-                item
-              })?.includes(value);
-            });
-          });
-        } else if (filter.operator === OPERATOR_IS_NOT_ALL && filter?.value?.length > 0) {
-          filteredData = filteredData.filter(item => {
-            return filter.value.every(value => {
-              return !field.getValue({
-                item
-              })?.includes(value);
-            });
-          });
-        } else if (filter.operator === constants_OPERATOR_IS) {
-          filteredData = filteredData.filter(item => {
-            return filter.value === field.getValue({
-              item
-            });
-          });
-        } else if (filter.operator === constants_OPERATOR_IS_NOT) {
-          filteredData = filteredData.filter(item => {
-            return filter.value !== field.getValue({
-              item
-            });
-          });
-        }
-      }
-    });
-  }
-
-  // Handle sorting.
-  if (view.sort) {
-    const fieldId = view.sort.field;
-    const fieldToSort = _fields.find(field => {
-      return field.id === fieldId;
-    });
-    if (fieldToSort) {
-      filteredData.sort((a, b) => {
-        var _fieldToSort$getValue, _fieldToSort$getValue2;
-        const valueA = (_fieldToSort$getValue = fieldToSort.getValue({
-          item: a
-        })) !== null && _fieldToSort$getValue !== void 0 ? _fieldToSort$getValue : '';
-        const valueB = (_fieldToSort$getValue2 = fieldToSort.getValue({
-          item: b
-        })) !== null && _fieldToSort$getValue2 !== void 0 ? _fieldToSort$getValue2 : '';
-        if (typeof valueA === 'number' && typeof valueB === 'number') {
-          return view.sort?.direction === 'asc' ? valueA - valueB : valueB - valueA;
-        }
-        return view.sort?.direction === 'asc' ? valueA.localeCompare(valueB) : valueB.localeCompare(valueA);
-      });
-    }
-  }
-
-  // Handle pagination.
-  let totalItems = filteredData.length;
-  let totalPages = 1;
-  if (view.page !== undefined && view.perPage !== undefined) {
-    const start = (view.page - 1) * view.perPage;
-    totalItems = filteredData?.length || 0;
-    totalPages = Math.ceil(totalItems / view.perPage);
-    filteredData = filteredData?.slice(start, start + view.perPage);
-  }
-  return {
-    data: filteredData,
-    paginationInfo: {
-      totalItems,
-      totalPages
-    }
-  };
-}
-
-;// CONCATENATED MODULE: ./packages/icons/build-module/library/lock-small.js
-/**
- * WordPress dependencies
- */
-
-
-const lockSmall = /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_primitives_namespaceObject.SVG, {
-  viewBox: "0 0 24 24",
-  xmlns: "http://www.w3.org/2000/svg",
-  children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_primitives_namespaceObject.Path, {
-    fillRule: "evenodd",
-    clipRule: "evenodd",
-    d: "M15 11h-.2V9c0-1.5-1.2-2.8-2.8-2.8S9.2 7.5 9.2 9v2H9c-.6 0-1 .4-1 1v4c0 .6.4 1 1 1h6c.6 0 1-.4 1-1v-4c0-.6-.4-1-1-1zm-1.8 0h-2.5V9c0-.7.6-1.2 1.2-1.2s1.2.6 1.2 1.2v2z"
-  })
-});
-/* harmony default export */ const lock_small = (lockSmall);
-
-;// CONCATENATED MODULE: external ["wp","priorityQueue"]
-const external_wp_priorityQueue_namespaceObject = window["wp"]["priorityQueue"];
-;// CONCATENATED MODULE: ./packages/edit-site/build-module/components/async/index.js
-/**
- * WordPress dependencies
- */
-
-
-const blockPreviewQueue = (0,external_wp_priorityQueue_namespaceObject.createQueue)();
-
-/**
- * Renders a component at the next idle time.
- * @param {*} props
- */
-function Async({
-  children,
-  placeholder
-}) {
-  const [shouldRender, setShouldRender] = (0,external_wp_element_namespaceObject.useState)(false);
-
-  // In the future, we could try to use startTransition here, but currently
-  // react will batch all transitions, which means all previews will be
-  // rendered at the same time.
-  // https://react.dev/reference/react/startTransition#caveats
-  // > If there are multiple ongoing Transitions, React currently batches them
-  // > together. This is a limitation that will likely be removed in a future
-  // > release.
-
-  (0,external_wp_element_namespaceObject.useEffect)(() => {
-    const context = {};
-    blockPreviewQueue.add(context, () => {
-      // Synchronously run all renders so it consumes timeRemaining.
-      // See https://github.com/WordPress/gutenberg/pull/48238
-      (0,external_wp_element_namespaceObject.flushSync)(() => {
-        setShouldRender(true);
-      });
-    });
-    return () => {
-      blockPreviewQueue.cancel(context);
-    };
-  }, []);
-  if (!shouldRender) {
-    return placeholder;
-  }
-  return children;
 }
 
 ;// CONCATENATED MODULE: ./packages/edit-site/build-module/components/page-patterns/utils.js
@@ -38332,7 +38940,7 @@ function usePatternSettings() {
   const storedSettings = (0,external_wp_data_namespaceObject.useSelect)(select => {
     const {
       getSettings
-    } = lock_unlock_unlock(select(store));
+    } = unlock(select(store));
     return getSettings();
   }, []);
   const settingsBlockPatterns = (_storedSettings$__exp = storedSettings.__experimentalAdditionalBlockPatterns) !== null && _storedSettings$__exp !== void 0 ? _storedSettings$__exp :
@@ -38369,7 +38977,7 @@ const {
   extractWords,
   getNormalizedSearchTerms,
   normalizeString: search_items_normalizeString
-} = lock_unlock_unlock(external_wp_blockEditor_namespaceObject.privateApis);
+} = unlock(external_wp_blockEditor_namespaceObject.privateApis);
 
 /**
  * Internal dependencies
@@ -38506,6 +39114,7 @@ function getItemSearchRank(item, searchTerm, config) {
 
 
 
+
 /**
  * Internal dependencies
  */
@@ -38558,7 +39167,7 @@ const selectThemePatterns = (0,external_wp_data_namespaceObject.createSelector)(
   var _settings$__experimen;
   const {
     getSettings
-  } = lock_unlock_unlock(select(store));
+  } = unlock(select(store));
   const {
     isResolving: isResolvingSelector
   } = select(external_wp_coreData_namespaceObject.store);
@@ -38577,7 +39186,7 @@ const selectThemePatterns = (0,external_wp_data_namespaceObject.createSelector)(
     patterns,
     isResolving: isResolvingSelector('getBlockPatterns')
   };
-}, select => [select(external_wp_coreData_namespaceObject.store).getBlockPatterns(), select(external_wp_coreData_namespaceObject.store).isResolving('getBlockPatterns'), lock_unlock_unlock(select(store)).getSettings()]);
+}, select => [select(external_wp_coreData_namespaceObject.store).getBlockPatterns(), select(external_wp_coreData_namespaceObject.store).isResolving('getBlockPatterns'), unlock(select(store)).getSettings()]);
 const selectPatterns = (0,external_wp_data_namespaceObject.createSelector)((select, categoryId, syncStatus, search = '') => {
   const {
     patterns: themePatterns,
@@ -38655,6 +39264,31 @@ const selectUserPatterns = (0,external_wp_data_namespaceObject.createSelector)((
 }), select(external_wp_coreData_namespaceObject.store).isResolving('getEntityRecords', ['postType', PATTERN_TYPES.user, {
   per_page: -1
 }]), select(external_wp_coreData_namespaceObject.store).getUserPatternCategories()]);
+function useAugmentPatternsWithPermissions(patterns) {
+  const idsAndTypes = (0,external_wp_element_namespaceObject.useMemo)(() => {
+    var _patterns$filter$map;
+    return (_patterns$filter$map = patterns?.filter(record => record.type !== PATTERN_TYPES.theme).map(record => [record.type, record.id])) !== null && _patterns$filter$map !== void 0 ? _patterns$filter$map : [];
+  }, [patterns]);
+  const permissions = (0,external_wp_data_namespaceObject.useSelect)(select => {
+    const {
+      getEntityRecordPermissions
+    } = unlock(select(external_wp_coreData_namespaceObject.store));
+    return idsAndTypes.reduce((acc, [type, id]) => {
+      acc[id] = getEntityRecordPermissions('postType', type, id);
+      return acc;
+    }, {});
+  }, [idsAndTypes]);
+  return (0,external_wp_element_namespaceObject.useMemo)(() => {
+    var _patterns$map;
+    return (_patterns$map = patterns?.map(record => {
+      var _permissions$record$i;
+      return {
+        ...record,
+        permissions: (_permissions$record$i = permissions?.[record.id]) !== null && _permissions$record$i !== void 0 ? _permissions$record$i : {}
+      };
+    })) !== null && _patterns$map !== void 0 ? _patterns$map : [];
+  }, [patterns, permissions]);
+}
 const usePatterns = (postType, categoryId, {
   search = '',
   syncStatus
@@ -38746,14 +39380,14 @@ const upload = /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(ext
 
 const {
   useHistory: add_new_pattern_useHistory
-} = lock_unlock_unlock(external_wp_router_namespaceObject.privateApis);
+} = unlock(external_wp_router_namespaceObject.privateApis);
 const {
   CreatePatternModal,
   useAddPatternCategory
-} = lock_unlock_unlock(external_wp_patterns_namespaceObject.privateApis);
+} = unlock(external_wp_patterns_namespaceObject.privateApis);
 const {
   CreateTemplatePartModal
-} = lock_unlock_unlock(external_wp_editor_namespaceObject.privateApis);
+} = unlock(external_wp_editor_namespaceObject.privateApis);
 function AddNewPattern() {
   const history = add_new_pattern_useHistory();
   const [showPatternModal, setShowPatternModal] = (0,external_wp_element_namespaceObject.useState)(false);
@@ -38761,7 +39395,7 @@ function AddNewPattern() {
   // eslint-disable-next-line @wordpress/no-unused-vars-before-return
   const {
     createPatternFromFile
-  } = lock_unlock_unlock((0,external_wp_data_namespaceObject.useDispatch)(external_wp_patterns_namespaceObject.store));
+  } = unlock((0,external_wp_data_namespaceObject.useDispatch)(external_wp_patterns_namespaceObject.store));
   const {
     createSuccessNotice,
     createErrorNotice
@@ -38890,7 +39524,12 @@ function AddNewPattern() {
           // When we're not handling template parts, we should
           // add or create the proper pattern category.
           if (postType !== TEMPLATE_PART_POST_TYPE) {
-            const currentCategory = categoryMap.values().find(term => term.name === categoryId);
+            /*
+             * categoryMap.values() returns an iterator.
+             * Iterator.prototype.find() is not yet widely supported.
+             * Convert to array to use the Array.prototype.find method.
+             */
+            const currentCategory = Array.from(categoryMap.values()).find(term => term.name === categoryId);
             if (currentCategory) {
               currentCategoryId = currentCategory.id || (await findOrCreateTerm(currentCategory.label));
             }
@@ -38942,7 +39581,7 @@ function useDefaultPatternCategories() {
     var _settings$__experimen;
     const {
       getSettings
-    } = lock_unlock_unlock(select(store));
+    } = unlock(select(store));
     const settings = getSettings();
     return (_settings$__experimen = settings.__experimentalAdditionalBlockPatternCategories) !== null && _settings$__experimen !== void 0 ? _settings$__experimen : settings.__experimentalBlockPatternCategories;
   });
@@ -38970,7 +39609,7 @@ function useThemePatterns() {
     var _getSettings$__experi;
     const {
       getSettings
-    } = lock_unlock_unlock(select(store));
+    } = unlock(select(store));
     return (_getSettings$__experi = getSettings().__experimentalAdditionalBlockPatterns) !== null && _getSettings$__experi !== void 0 ? _getSettings$__experi : getSettings().__experimentalBlockPatterns;
   });
   const restBlockPatterns = (0,external_wp_data_namespaceObject.useSelect)(select => select(external_wp_coreData_namespaceObject.store).getBlockPatterns());
@@ -39100,7 +39739,7 @@ function usePatternCategories() {
 
 const {
   RenamePatternCategoryModal
-} = lock_unlock_unlock(external_wp_patterns_namespaceObject.privateApis);
+} = unlock(external_wp_patterns_namespaceObject.privateApis);
 function RenameCategoryMenuItem({
   category,
   onClose
@@ -39167,7 +39806,7 @@ function RenameModal({
 
 const {
   useHistory: delete_category_menu_item_useHistory
-} = lock_unlock_unlock(external_wp_router_namespaceObject.privateApis);
+} = unlock(external_wp_router_namespaceObject.privateApis);
 function DeleteCategoryMenuItem({
   category,
   onClose
@@ -39327,6 +39966,70 @@ function PatternsHeader({
   });
 }
 
+;// CONCATENATED MODULE: ./packages/icons/build-module/library/lock-small.js
+/**
+ * WordPress dependencies
+ */
+
+
+const lockSmall = /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_primitives_namespaceObject.SVG, {
+  viewBox: "0 0 24 24",
+  xmlns: "http://www.w3.org/2000/svg",
+  children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_primitives_namespaceObject.Path, {
+    fillRule: "evenodd",
+    clipRule: "evenodd",
+    d: "M15 11h-.2V9c0-1.5-1.2-2.8-2.8-2.8S9.2 7.5 9.2 9v2H9c-.6 0-1 .4-1 1v4c0 .6.4 1 1 1h6c.6 0 1-.4 1-1v-4c0-.6-.4-1-1-1zm-1.8 0h-2.5V9c0-.7.6-1.2 1.2-1.2s1.2.6 1.2 1.2v2z"
+  })
+});
+/* harmony default export */ const lock_small = (lockSmall);
+
+;// CONCATENATED MODULE: external ["wp","priorityQueue"]
+const external_wp_priorityQueue_namespaceObject = window["wp"]["priorityQueue"];
+;// CONCATENATED MODULE: ./packages/edit-site/build-module/components/async/index.js
+/**
+ * WordPress dependencies
+ */
+
+
+const blockPreviewQueue = (0,external_wp_priorityQueue_namespaceObject.createQueue)();
+
+/**
+ * Renders a component at the next idle time.
+ * @param {*} props
+ */
+function Async({
+  children,
+  placeholder
+}) {
+  const [shouldRender, setShouldRender] = (0,external_wp_element_namespaceObject.useState)(false);
+
+  // In the future, we could try to use startTransition here, but currently
+  // react will batch all transitions, which means all previews will be
+  // rendered at the same time.
+  // https://react.dev/reference/react/startTransition#caveats
+  // > If there are multiple ongoing Transitions, React currently batches them
+  // > together. This is a limitation that will likely be removed in a future
+  // > release.
+
+  (0,external_wp_element_namespaceObject.useEffect)(() => {
+    const context = {};
+    blockPreviewQueue.add(context, () => {
+      // Synchronously run all renders so it consumes timeRemaining.
+      // See https://github.com/WordPress/gutenberg/pull/48238
+      (0,external_wp_element_namespaceObject.flushSync)(() => {
+        setShouldRender(true);
+      });
+    });
+    return () => {
+      blockPreviewQueue.cancel(context);
+    };
+  }, []);
+  if (!shouldRender) {
+    return placeholder;
+  }
+  return children;
+}
+
 ;// CONCATENATED MODULE: ./packages/icons/build-module/library/plugins.js
 /**
  * WordPress dependencies
@@ -39443,7 +40146,7 @@ function useAddedBy(postType, postId) {
   }, [postType, postId]);
 }
 
-;// CONCATENATED MODULE: ./packages/edit-site/build-module/components/page-patterns/index.js
+;// CONCATENATED MODULE: ./packages/edit-site/build-module/components/page-patterns/fields.js
 /**
  * External dependencies
  */
@@ -39456,6 +40159,224 @@ function useAddedBy(postType, postId) {
 
 
 
+
+
+
+
+/**
+ * Internal dependencies
+ */
+
+
+
+
+
+
+
+
+const {
+  useGlobalStyle: fields_useGlobalStyle
+} = unlock(external_wp_blockEditor_namespaceObject.privateApis);
+function PreviewWrapper({
+  item,
+  onClick,
+  ariaDescribedBy,
+  children
+}) {
+  return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)("button", {
+    className: "page-patterns-preview-field__button",
+    type: "button",
+    onClick: item.type !== PATTERN_TYPES.theme ? onClick : undefined,
+    "aria-label": item.title,
+    "aria-describedby": ariaDescribedBy,
+    "aria-disabled": item.type === PATTERN_TYPES.theme,
+    children: children
+  });
+}
+function PreviewField({
+  item
+}) {
+  const descriptionId = (0,external_wp_element_namespaceObject.useId)();
+  const description = item.description || item?.excerpt?.raw;
+  const isUserPattern = item.type === PATTERN_TYPES.user;
+  const isTemplatePart = item.type === TEMPLATE_PART_POST_TYPE;
+  const [backgroundColor] = fields_useGlobalStyle('color.background');
+  const {
+    onClick
+  } = useLink({
+    postType: item.type,
+    postId: isUserPattern || isTemplatePart ? item.id : item.name,
+    canvas: 'edit'
+  });
+  const blocks = (0,external_wp_element_namespaceObject.useMemo)(() => {
+    var _item$blocks;
+    return (_item$blocks = item.blocks) !== null && _item$blocks !== void 0 ? _item$blocks : (0,external_wp_blocks_namespaceObject.parse)(item.content.raw, {
+      __unstableSkipMigrationLogs: true
+    });
+  }, [item?.content?.raw, item.blocks]);
+  const isEmpty = !blocks?.length;
+  return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsxs)("div", {
+    className: "page-patterns-preview-field",
+    style: {
+      backgroundColor
+    },
+    children: [/*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsxs)(PreviewWrapper, {
+      item: item,
+      onClick: onClick,
+      ariaDescribedBy: !!description ? descriptionId : undefined,
+      children: [isEmpty && isTemplatePart && (0,external_wp_i18n_namespaceObject.__)('Empty template part'), isEmpty && !isTemplatePart && (0,external_wp_i18n_namespaceObject.__)('Empty pattern'), !isEmpty && /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(Async, {
+        children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_blockEditor_namespaceObject.BlockPreview, {
+          blocks: blocks,
+          viewportWidth: item.viewportWidth
+        })
+      })]
+    }), !!description && /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)("div", {
+      hidden: true,
+      id: descriptionId,
+      children: description
+    })]
+  });
+}
+const previewField = {
+  label: (0,external_wp_i18n_namespaceObject.__)('Preview'),
+  id: 'preview',
+  render: PreviewField,
+  enableSorting: false
+};
+function TitleField({
+  item
+}) {
+  const isUserPattern = item.type === PATTERN_TYPES.user;
+  const isTemplatePart = item.type === TEMPLATE_PART_POST_TYPE;
+  const {
+    onClick
+  } = useLink({
+    postType: item.type,
+    postId: isUserPattern || isTemplatePart ? item.id : item.name,
+    canvas: 'edit'
+  });
+  const title = (0,external_wp_htmlEntities_namespaceObject.decodeEntities)(defaultGetTitle(item));
+  return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsxs)(external_wp_components_namespaceObject.__experimentalHStack, {
+    alignment: "center",
+    justify: "flex-start",
+    spacing: 2,
+    children: [/*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.Flex, {
+      as: "div",
+      gap: 0,
+      justify: "flex-start",
+      className: "edit-site-patterns__pattern-title",
+      children: item.type === PATTERN_TYPES.theme ? title : /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.Button
+      // TODO: Switch to `true` (40px size) if possible
+      , {
+        __next40pxDefaultSize: false,
+        variant: "link",
+        onClick: onClick
+        // Required for the grid's roving tab index system.
+        // See https://github.com/WordPress/gutenberg/pull/51898#discussion_r1243399243.
+        ,
+        tabIndex: "-1",
+        children: title
+      })
+    }), item.type === PATTERN_TYPES.theme && /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.Tooltip, {
+      placement: "top",
+      text: (0,external_wp_i18n_namespaceObject.__)('This pattern cannot be edited.'),
+      children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(build_module_icon, {
+        className: "edit-site-patterns__pattern-lock-icon",
+        icon: lock_small,
+        size: 24
+      })
+    })]
+  });
+}
+const titleField = {
+  label: (0,external_wp_i18n_namespaceObject.__)('Title'),
+  id: 'title',
+  getValue: ({
+    item
+  }) => item.title?.raw || item.title,
+  render: TitleField,
+  enableHiding: false
+};
+const SYNC_FILTERS = [{
+  value: PATTERN_SYNC_TYPES.full,
+  label: (0,external_wp_i18n_namespaceObject._x)('Synced', 'pattern (singular)'),
+  description: (0,external_wp_i18n_namespaceObject.__)('Patterns that are kept in sync across the site.')
+}, {
+  value: PATTERN_SYNC_TYPES.unsynced,
+  label: (0,external_wp_i18n_namespaceObject._x)('Not synced', 'pattern (singular)'),
+  description: (0,external_wp_i18n_namespaceObject.__)('Patterns that can be changed freely without affecting the site.')
+}];
+const patternStatusField = {
+  label: (0,external_wp_i18n_namespaceObject.__)('Sync status'),
+  id: 'sync-status',
+  render: ({
+    item
+  }) => {
+    const syncStatus = 'wp_pattern_sync_status' in item ? item.wp_pattern_sync_status || PATTERN_SYNC_TYPES.full : PATTERN_SYNC_TYPES.unsynced;
+    // User patterns can have their sync statuses checked directly.
+    // Non-user patterns are all unsynced for the time being.
+    return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)("span", {
+      className: `edit-site-patterns__field-sync-status-${syncStatus}`,
+      children: SYNC_FILTERS.find(({
+        value
+      }) => value === syncStatus).label
+    });
+  },
+  elements: SYNC_FILTERS,
+  filterBy: {
+    operators: [OPERATOR_IS],
+    isPrimary: true
+  },
+  enableSorting: false
+};
+function AuthorField({
+  item
+}) {
+  const [isImageLoaded, setIsImageLoaded] = (0,external_wp_element_namespaceObject.useState)(false);
+  const {
+    text,
+    icon,
+    imageUrl
+  } = useAddedBy(item.type, item.id);
+  return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsxs)(external_wp_components_namespaceObject.__experimentalHStack, {
+    alignment: "left",
+    spacing: 0,
+    children: [imageUrl && /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)("div", {
+      className: dist_clsx('page-templates-author-field__avatar', {
+        'is-loaded': isImageLoaded
+      }),
+      children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)("img", {
+        onLoad: () => setIsImageLoaded(true),
+        alt: "",
+        src: imageUrl
+      })
+    }), !imageUrl && /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)("div", {
+      className: "page-templates-author-field__icon",
+      children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(build_module_icon, {
+        icon: icon
+      })
+    }), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)("span", {
+      className: "page-templates-author-field__name",
+      children: text
+    })]
+  });
+}
+const templatePartAuthorField = {
+  label: (0,external_wp_i18n_namespaceObject.__)('Author'),
+  id: 'author',
+  getValue: ({
+    item
+  }) => item.author_text,
+  render: AuthorField,
+  filterBy: {
+    isPrimary: true
+  }
+};
+
+;// CONCATENATED MODULE: ./packages/edit-site/build-module/components/page-patterns/index.js
+/**
+ * WordPress dependencies
+ */
 
 
 
@@ -39478,19 +40399,15 @@ function useAddedBy(postType, postId) {
 
 
 
-
-
-
 const {
-  ExperimentalBlockEditorProvider: page_patterns_ExperimentalBlockEditorProvider,
-  useGlobalStyle: page_patterns_useGlobalStyle
-} = lock_unlock_unlock(external_wp_blockEditor_namespaceObject.privateApis);
+  ExperimentalBlockEditorProvider: page_patterns_ExperimentalBlockEditorProvider
+} = unlock(external_wp_blockEditor_namespaceObject.privateApis);
 const {
   usePostActions: page_patterns_usePostActions
-} = lock_unlock_unlock(external_wp_editor_namespaceObject.privateApis);
+} = unlock(external_wp_editor_namespaceObject.privateApis);
 const {
   useLocation: page_patterns_useLocation
-} = lock_unlock_unlock(external_wp_router_namespaceObject.privateApis);
+} = unlock(external_wp_router_namespaceObject.privateApis);
 const page_patterns_EMPTY_ARRAY = [];
 const page_patterns_defaultLayouts = {
   [LAYOUT_TABLE]: {
@@ -39523,152 +40440,6 @@ const DEFAULT_VIEW = {
   fields: ['title', 'sync-status'],
   filters: []
 };
-const SYNC_FILTERS = [{
-  value: PATTERN_SYNC_TYPES.full,
-  label: (0,external_wp_i18n_namespaceObject._x)('Synced', 'pattern (singular)'),
-  description: (0,external_wp_i18n_namespaceObject.__)('Patterns that are kept in sync across the site.')
-}, {
-  value: PATTERN_SYNC_TYPES.unsynced,
-  label: (0,external_wp_i18n_namespaceObject._x)('Not synced', 'pattern (singular)'),
-  description: (0,external_wp_i18n_namespaceObject.__)('Patterns that can be changed freely without affecting the site.')
-}];
-function PreviewWrapper({
-  item,
-  onClick,
-  ariaDescribedBy,
-  children
-}) {
-  return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)("button", {
-    className: "page-patterns-preview-field__button",
-    type: "button",
-    onClick: item.type !== PATTERN_TYPES.theme ? onClick : undefined,
-    "aria-label": item.title,
-    "aria-describedby": ariaDescribedBy,
-    "aria-disabled": item.type === PATTERN_TYPES.theme,
-    children: children
-  });
-}
-function Preview({
-  item,
-  viewType
-}) {
-  const descriptionId = (0,external_wp_element_namespaceObject.useId)();
-  const description = item.description || item?.excerpt?.raw;
-  const isUserPattern = item.type === PATTERN_TYPES.user;
-  const isTemplatePart = item.type === TEMPLATE_PART_POST_TYPE;
-  const [backgroundColor] = page_patterns_useGlobalStyle('color.background');
-  const {
-    onClick
-  } = useLink({
-    postType: item.type,
-    postId: isUserPattern || isTemplatePart ? item.id : item.name,
-    canvas: 'edit'
-  });
-  const blocks = (0,external_wp_element_namespaceObject.useMemo)(() => {
-    var _item$blocks;
-    return (_item$blocks = item.blocks) !== null && _item$blocks !== void 0 ? _item$blocks : (0,external_wp_blocks_namespaceObject.parse)(item.content.raw, {
-      __unstableSkipMigrationLogs: true
-    });
-  }, [item?.content?.raw, item.blocks]);
-  const isEmpty = !blocks?.length;
-  return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsxs)("div", {
-    className: `page-patterns-preview-field is-viewtype-${viewType}`,
-    style: {
-      backgroundColor
-    },
-    children: [/*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsxs)(PreviewWrapper, {
-      item: item,
-      onClick: onClick,
-      ariaDescribedBy: !!description ? descriptionId : undefined,
-      children: [isEmpty && isTemplatePart && (0,external_wp_i18n_namespaceObject.__)('Empty template part'), isEmpty && !isTemplatePart && (0,external_wp_i18n_namespaceObject.__)('Empty pattern'), !isEmpty && /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(Async, {
-        children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_blockEditor_namespaceObject.BlockPreview, {
-          blocks: blocks,
-          viewportWidth: item.viewportWidth
-        })
-      })]
-    }), !!description && /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)("div", {
-      hidden: true,
-      id: descriptionId,
-      children: description
-    })]
-  });
-}
-function Author({
-  item,
-  viewType
-}) {
-  const [isImageLoaded, setIsImageLoaded] = (0,external_wp_element_namespaceObject.useState)(false);
-  const {
-    text,
-    icon,
-    imageUrl
-  } = useAddedBy(item.type, item.id);
-  const withIcon = viewType !== LAYOUT_LIST;
-  return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsxs)(external_wp_components_namespaceObject.__experimentalHStack, {
-    alignment: "left",
-    spacing: 0,
-    children: [withIcon && imageUrl && /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)("div", {
-      className: dist_clsx('page-templates-author-field__avatar', {
-        'is-loaded': isImageLoaded
-      }),
-      children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)("img", {
-        onLoad: () => setIsImageLoaded(true),
-        alt: "",
-        src: imageUrl
-      })
-    }), withIcon && !imageUrl && /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)("div", {
-      className: "page-templates-author-field__icon",
-      children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(build_module_icon, {
-        icon: icon
-      })
-    }), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)("span", {
-      className: "page-templates-author-field__name",
-      children: text
-    })]
-  });
-}
-function Title({
-  item
-}) {
-  const isUserPattern = item.type === PATTERN_TYPES.user;
-  const isTemplatePart = item.type === TEMPLATE_PART_POST_TYPE;
-  const {
-    onClick
-  } = useLink({
-    postType: item.type,
-    postId: isUserPattern || isTemplatePart ? item.id : item.name,
-    canvas: 'edit'
-  });
-  const title = (0,external_wp_htmlEntities_namespaceObject.decodeEntities)(defaultGetTitle(item));
-  return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsxs)(external_wp_components_namespaceObject.__experimentalHStack, {
-    alignment: "center",
-    justify: "flex-start",
-    spacing: 2,
-    children: [/*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.Flex, {
-      as: "div",
-      gap: 0,
-      justify: "left",
-      className: "edit-site-patterns__pattern-title",
-      children: item.type === PATTERN_TYPES.theme ? title : /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.Button, {
-        variant: "link",
-        onClick: onClick
-        // Required for the grid's roving tab index system.
-        // See https://github.com/WordPress/gutenberg/pull/51898#discussion_r1243399243.
-        ,
-        tabIndex: "-1",
-        children: title
-      })
-    }), item.type === PATTERN_TYPES.theme && /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.Tooltip, {
-      placement: "top",
-      text: (0,external_wp_i18n_namespaceObject.__)('This pattern cannot be edited.'),
-      children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(build_module_icon, {
-        className: "edit-site-patterns__pattern-lock-icon",
-        icon: lock_small,
-        size: 24
-      })
-    })]
-  });
-}
 function DataviewsPatterns() {
   const {
     params: {
@@ -39709,76 +40480,17 @@ function DataviewsPatterns() {
     }));
   }, [records]);
   const fields = (0,external_wp_element_namespaceObject.useMemo)(() => {
-    const _fields = [{
-      label: (0,external_wp_i18n_namespaceObject.__)('Preview'),
-      id: 'preview',
-      render: ({
-        item
-      }) => /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(Preview, {
-        item: item,
-        viewType: view.type
-      }),
-      enableSorting: false
-    }, {
-      label: (0,external_wp_i18n_namespaceObject.__)('Title'),
-      id: 'title',
-      getValue: ({
-        item
-      }) => item.title?.raw || item.title,
-      render: ({
-        item
-      }) => /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(Title, {
-        item: item
-      }),
-      enableHiding: false
-    }];
+    const _fields = [previewField, titleField];
     if (type === PATTERN_TYPES.user) {
-      _fields.push({
-        label: (0,external_wp_i18n_namespaceObject.__)('Sync status'),
-        id: 'sync-status',
-        render: ({
-          item
-        }) => {
-          const syncStatus = 'wp_pattern_sync_status' in item ? item.wp_pattern_sync_status || PATTERN_SYNC_TYPES.full : PATTERN_SYNC_TYPES.unsynced;
-          // User patterns can have their sync statuses checked directly.
-          // Non-user patterns are all unsynced for the time being.
-          return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)("span", {
-            className: `edit-site-patterns__field-sync-status-${syncStatus}`,
-            children: SYNC_FILTERS.find(({
-              value
-            }) => value === syncStatus).label
-          });
-        },
-        elements: SYNC_FILTERS,
-        filterBy: {
-          operators: [OPERATOR_IS],
-          isPrimary: true
-        },
-        enableSorting: false
-      });
+      _fields.push(patternStatusField);
     } else if (type === TEMPLATE_PART_POST_TYPE) {
       _fields.push({
-        label: (0,external_wp_i18n_namespaceObject.__)('Author'),
-        id: 'author',
-        getValue: ({
-          item
-        }) => item.author_text,
-        render: ({
-          item
-        }) => {
-          return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(Author, {
-            viewType: view.type,
-            item: item
-          });
-        },
-        elements: authors,
-        filterBy: {
-          isPrimary: true
-        }
+        ...templatePartAuthorField,
+        elements: authors
       });
     }
     return _fields;
-  }, [view.type, type, authors]);
+  }, [type, authors]);
 
   // Reset the page number when the category changes.
   (0,external_wp_element_namespaceObject.useEffect)(() => {
@@ -39804,6 +40516,7 @@ function DataviewsPatterns() {
     }
     return filterSortAndPaginate(patterns, viewWithoutFilters, fields);
   }, [patterns, view, fields, type]);
+  const dataWithPermissions = useAugmentPatternsWithPermissions(data);
   const templatePartActions = page_patterns_usePostActions({
     postType: TEMPLATE_PART_POST_TYPE,
     context: 'list'
@@ -39839,7 +40552,7 @@ function DataviewsPatterns() {
         paginationInfo: paginationInfo,
         fields: fields,
         actions: actions,
-        data: data || page_patterns_EMPTY_ARRAY,
+        data: dataWithPermissions || page_patterns_EMPTY_ARRAY,
         getItemId: item => {
           var _item$name;
           return (_item$name = item.name) !== null && _item$name !== void 0 ? _item$name : item.id;
@@ -39848,7 +40561,7 @@ function DataviewsPatterns() {
         view: view,
         onChangeView: setView,
         defaultLayouts: page_patterns_defaultLayouts
-      })]
+      }, categoryId + postType)]
     })
   });
 }
@@ -40151,7 +40864,7 @@ function usePostTypeArchiveMenuItems() {
       // `icon` is the `menu_icon` property of a post type. We
       // only handle `dashicons` for now, even if the `menu_icon`
       // also supports urls and svg as values.
-      icon: postType.icon?.startsWith('dashicons-') ? postType.icon.slice(10) : library_archive,
+      icon: typeof postType.icon === 'string' && postType.icon.startsWith('dashicons-') ? postType.icon.slice(10) : library_archive,
       templatePrefix: 'archive'
     };
   }) || [], [postTypesWithArchives, existingTemplates, needsUniqueIdentifier]);
@@ -40229,7 +40942,7 @@ const usePostTypeMenuItems = onClickMenuItem => {
       // `icon` is the `menu_icon` property of a post type. We
       // only handle `dashicons` for now, even if the `menu_icon`
       // also supports urls and svg as values.
-      icon: icon?.startsWith('dashicons-') ? icon.slice(10) : library_post,
+      icon: typeof icon === 'string' && icon.startsWith('dashicons-') ? icon.slice(10) : library_post,
       templatePrefix: templatePrefixes[slug]
     };
     const hasEntities = postTypesInfo?.[slug]?.hasEntities;
@@ -40616,12 +41329,6 @@ const useEntitiesInfo = (entityName, templatePrefixes, additionalQueryParameters
 
 
 
-
-const {
-  CompositeV2: add_custom_template_modal_content_Composite,
-  CompositeItemV2: add_custom_template_modal_content_CompositeItem,
-  useCompositeStoreV2: add_custom_template_modal_content_useCompositeStore
-} = lock_unlock_unlock(external_wp_components_namespaceObject.privateApis);
 const add_custom_template_modal_content_EMPTY_ARRAY = [];
 function SuggestionListItem({
   suggestion,
@@ -40630,8 +41337,11 @@ function SuggestionListItem({
   entityForSuggestions
 }) {
   const baseCssClass = 'edit-site-custom-template-modal__suggestions_list__list-item';
-  return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsxs)(add_custom_template_modal_content_CompositeItem, {
-    render: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.Button, {
+  return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsxs)(external_wp_components_namespaceObject.Composite.Item, {
+    render: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.Button
+    // TODO: Switch to `true` (40px size) if possible
+    , {
+      __next40pxDefaultSize: false,
       role: "option",
       className: baseCssClass,
       onClick: () => onSelect(entityForSuggestions.config.getSpecificTemplate(suggestion))
@@ -40692,9 +41402,6 @@ function SuggestionList({
   entityForSuggestions,
   onSelect
 }) {
-  const composite = add_custom_template_modal_content_useCompositeStore({
-    orientation: 'vertical'
-  });
   const [search, setSearch, debouncedSearch] = (0,external_wp_compose_namespaceObject.useDebouncedInput)();
   const suggestions = useSearchSuggestions(entityForSuggestions, debouncedSearch);
   const {
@@ -40711,8 +41418,8 @@ function SuggestionList({
       value: search,
       label: labels.search_items,
       placeholder: labels.search_items
-    }), !!suggestions?.length && /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(add_custom_template_modal_content_Composite, {
-      store: composite,
+    }), !!suggestions?.length && /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.Composite, {
+      orientation: "vertical",
       role: "listbox",
       className: "edit-site-custom-template-modal__suggestions_list",
       "aria-label": (0,external_wp_i18n_namespaceObject.__)('Suggestions list'),
@@ -41394,7 +42101,7 @@ function AddCustomGenericTemplateModalContent({
 
 const {
   useHistory: add_new_template_useHistory
-} = lock_unlock_unlock(external_wp_router_namespaceObject.privateApis);
+} = unlock(external_wp_router_namespaceObject.privateApis);
 const DEFAULT_TEMPLATE_SLUGS = ['front-page', 'home', 'single', 'page', 'index', 'archive', 'author', 'category', 'date', 'tag', 'search', '404'];
 const TEMPLATE_ICONS = {
   'front-page': library_home,
@@ -41421,7 +42128,10 @@ function TemplateListItem({
   onClick,
   children
 }) {
-  return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.Button, {
+  return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.Button
+  // TODO: Switch to `true` (40px size) if possible
+  , {
+    __next40pxDefaultSize: false,
     className: className,
     onClick: onClick,
     label: description,
@@ -41476,15 +42186,9 @@ function NewTemplateModal({
     createSuccessNotice
   } = (0,external_wp_data_namespaceObject.useDispatch)(external_wp_notices_namespaceObject.store);
   const isMobile = (0,external_wp_compose_namespaceObject.useViewportMatch)('medium', '<');
-  const {
-    homeUrl
-  } = (0,external_wp_data_namespaceObject.useSelect)(select => {
-    const {
-      getUnstableBase // Site index.
-    } = select(external_wp_coreData_namespaceObject.store);
-    return {
-      homeUrl: getUnstableBase()?.home
-    };
+  const homeUrl = (0,external_wp_data_namespaceObject.useSelect)(select => {
+    // Site index.
+    return select(external_wp_coreData_namespaceObject.store).getEntityRecord('root', '__unstableBase')?.home;
   }, []);
   const TEMPLATE_SHORT_DESCRIPTIONS = {
     'front-page': homeUrl,
@@ -41676,7 +42380,7 @@ function useMissingTemplates(setEntityForSuggestions, onClick) {
 }
 /* harmony default export */ const add_new_template = ((0,external_wp_element_namespaceObject.memo)(NewTemplate));
 
-;// CONCATENATED MODULE: ./packages/edit-site/build-module/components/page-templates/index.js
+;// CONCATENATED MODULE: ./packages/edit-site/build-module/components/page-templates/fields.js
 /**
  * External dependencies
  */
@@ -41685,9 +42389,6 @@ function useMissingTemplates(setEntityForSuggestions, onClick) {
 /**
  * WordPress dependencies
  */
-
-
-
 
 
 
@@ -41706,20 +42407,171 @@ function useMissingTemplates(setEntityForSuggestions, onClick) {
 
 
 
+const {
+  useGlobalStyle: page_templates_fields_useGlobalStyle
+} = unlock(external_wp_blockEditor_namespaceObject.privateApis);
+function fields_PreviewField({
+  item
+}) {
+  const settings = usePatternSettings();
+  const [backgroundColor = 'white'] = page_templates_fields_useGlobalStyle('color.background');
+  const blocks = (0,external_wp_element_namespaceObject.useMemo)(() => {
+    return (0,external_wp_blocks_namespaceObject.parse)(item.content.raw);
+  }, [item.content.raw]);
+  const {
+    onClick
+  } = useLink({
+    postId: item.id,
+    postType: item.type,
+    canvas: 'edit'
+  });
+  const isEmpty = !blocks?.length;
+  // Wrap everything in a block editor provider to ensure 'styles' that are needed
+  // for the previews are synced between the site editor store and the block editor store.
+  // Additionally we need to have the `__experimentalBlockPatterns` setting in order to
+  // render patterns inside the previews.
+  // TODO: Same approach is used in the patterns list and it becomes obvious that some of
+  // the block editor settings are needed in context where we don't have the block editor.
+  // Explore how we can solve this in a better way.
+  return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_editor_namespaceObject.EditorProvider, {
+    post: item,
+    settings: settings,
+    children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)("div", {
+      className: "page-templates-preview-field",
+      style: {
+        backgroundColor
+      },
+      children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsxs)("button", {
+        className: "page-templates-preview-field__button",
+        type: "button",
+        onClick: onClick,
+        "aria-label": item.title?.rendered || item.title,
+        children: [isEmpty && (0,external_wp_i18n_namespaceObject.__)('Empty template'), !isEmpty && /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(Async, {
+          children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_blockEditor_namespaceObject.BlockPreview, {
+            blocks: blocks
+          })
+        })]
+      })
+    })
+  });
+}
+const fields_previewField = {
+  label: (0,external_wp_i18n_namespaceObject.__)('Preview'),
+  id: 'preview',
+  render: fields_PreviewField,
+  enableSorting: false
+};
+function fields_TitleField({
+  item
+}) {
+  const linkProps = {
+    params: {
+      postId: item.id,
+      postType: item.type,
+      canvas: 'edit'
+    }
+  };
+  return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(Link, {
+    ...linkProps,
+    children: (0,external_wp_htmlEntities_namespaceObject.decodeEntities)(item.title?.rendered) || (0,external_wp_i18n_namespaceObject.__)('(no title)')
+  });
+}
+const fields_titleField = {
+  label: (0,external_wp_i18n_namespaceObject.__)('Template'),
+  id: 'title',
+  getValue: ({
+    item
+  }) => item.title?.rendered,
+  render: fields_TitleField,
+  enableHiding: false,
+  enableGlobalSearch: true
+};
+const descriptionField = {
+  label: (0,external_wp_i18n_namespaceObject.__)('Description'),
+  id: 'description',
+  render: ({
+    item
+  }) => {
+    return item.description && /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)("span", {
+      className: "page-templates-description",
+      children: (0,external_wp_htmlEntities_namespaceObject.decodeEntities)(item.description)
+    });
+  },
+  enableSorting: false,
+  enableGlobalSearch: true
+};
+function fields_AuthorField({
+  item
+}) {
+  const [isImageLoaded, setIsImageLoaded] = (0,external_wp_element_namespaceObject.useState)(false);
+  const {
+    text,
+    icon,
+    imageUrl
+  } = useAddedBy(item.type, item.id);
+  return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsxs)(external_wp_components_namespaceObject.__experimentalHStack, {
+    alignment: "left",
+    spacing: 0,
+    children: [imageUrl && /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)("div", {
+      className: dist_clsx('page-templates-author-field__avatar', {
+        'is-loaded': isImageLoaded
+      }),
+      children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)("img", {
+        onLoad: () => setIsImageLoaded(true),
+        alt: "",
+        src: imageUrl
+      })
+    }), !imageUrl && /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)("div", {
+      className: "page-templates-author-field__icon",
+      children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.Icon, {
+        icon: icon
+      })
+    }), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)("span", {
+      className: "page-templates-author-field__name",
+      children: text
+    })]
+  });
+}
+const authorField = {
+  label: (0,external_wp_i18n_namespaceObject.__)('Author'),
+  id: 'author',
+  getValue: ({
+    item
+  }) => item.author_text,
+  render: fields_AuthorField
+};
+
+;// CONCATENATED MODULE: ./packages/edit-site/build-module/components/page-templates/index.js
+/**
+ * WordPress dependencies
+ */
+
+
+
+
+
+
+
+/**
+ * Internal dependencies
+ */
+
+
+
 
 
 
 
 const {
   usePostActions: page_templates_usePostActions
-} = lock_unlock_unlock(external_wp_editor_namespaceObject.privateApis);
-const {
-  useGlobalStyle: page_templates_useGlobalStyle
-} = lock_unlock_unlock(external_wp_blockEditor_namespaceObject.privateApis);
+} = unlock(external_wp_editor_namespaceObject.privateApis);
 const {
   useHistory: page_templates_useHistory,
   useLocation: page_templates_useLocation
-} = lock_unlock_unlock(external_wp_router_namespaceObject.privateApis);
+} = unlock(external_wp_router_namespaceObject.privateApis);
+const {
+  useEntityRecordsWithPermissions: page_templates_useEntityRecordsWithPermissions
+} = unlock(external_wp_coreData_namespaceObject.privateApis);
 const page_templates_EMPTY_ARRAY = [];
 const page_templates_defaultLayouts = {
   [LAYOUT_TABLE]: {
@@ -41738,8 +42590,7 @@ const page_templates_defaultLayouts = {
           minWidth: 320
         },
         preview: {
-          minWidth: 120,
-          maxWidth: 120
+          width: '1%'
         },
         author: {
           width: '1%'
@@ -41776,107 +42627,6 @@ const page_templates_DEFAULT_VIEW = {
   layout: page_templates_defaultLayouts[LAYOUT_GRID].layout,
   filters: []
 };
-function page_templates_Title({
-  item,
-  viewType
-}) {
-  if (viewType === LAYOUT_LIST) {
-    return (0,external_wp_htmlEntities_namespaceObject.decodeEntities)(item.title?.rendered) || (0,external_wp_i18n_namespaceObject.__)('(no title)');
-  }
-  const linkProps = {
-    params: {
-      postId: item.id,
-      postType: item.type,
-      canvas: 'edit'
-    }
-  };
-  return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(Link, {
-    ...linkProps,
-    children: (0,external_wp_htmlEntities_namespaceObject.decodeEntities)(item.title?.rendered) || (0,external_wp_i18n_namespaceObject.__)('(no title)')
-  });
-}
-function AuthorField({
-  item
-}) {
-  const [isImageLoaded, setIsImageLoaded] = (0,external_wp_element_namespaceObject.useState)(false);
-  const {
-    text,
-    icon,
-    imageUrl
-  } = useAddedBy(item.type, item.id);
-  return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsxs)(external_wp_components_namespaceObject.__experimentalHStack, {
-    alignment: "left",
-    spacing: 0,
-    children: [imageUrl && /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)("div", {
-      className: dist_clsx('page-templates-author-field__avatar', {
-        'is-loaded': isImageLoaded
-      }),
-      children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)("img", {
-        onLoad: () => setIsImageLoaded(true),
-        alt: "",
-        src: imageUrl
-      })
-    }), !imageUrl && /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)("div", {
-      className: "page-templates-author-field__icon",
-      children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.Icon, {
-        icon: icon
-      })
-    }), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)("span", {
-      className: "page-templates-author-field__name",
-      children: text
-    })]
-  });
-}
-function page_templates_Preview({
-  item,
-  viewType
-}) {
-  const settings = usePatternSettings();
-  const [backgroundColor = 'white'] = page_templates_useGlobalStyle('color.background');
-  const blocks = (0,external_wp_element_namespaceObject.useMemo)(() => {
-    return (0,external_wp_blocks_namespaceObject.parse)(item.content.raw);
-  }, [item.content.raw]);
-  const {
-    onClick
-  } = useLink({
-    postId: item.id,
-    postType: item.type,
-    canvas: 'edit'
-  });
-  const isEmpty = !blocks?.length;
-  // Wrap everything in a block editor provider to ensure 'styles' that are needed
-  // for the previews are synced between the site editor store and the block editor store.
-  // Additionally we need to have the `__experimentalBlockPatterns` setting in order to
-  // render patterns inside the previews.
-  // TODO: Same approach is used in the patterns list and it becomes obvious that some of
-  // the block editor settings are needed in context where we don't have the block editor.
-  // Explore how we can solve this in a better way.
-  return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_editor_namespaceObject.EditorProvider, {
-    post: item,
-    settings: settings,
-    children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsxs)("div", {
-      className: `page-templates-preview-field is-viewtype-${viewType}`,
-      style: {
-        backgroundColor
-      },
-      children: [viewType === LAYOUT_LIST && !isEmpty && /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(Async, {
-        children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_blockEditor_namespaceObject.BlockPreview, {
-          blocks: blocks
-        })
-      }), viewType !== LAYOUT_LIST && /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsxs)("button", {
-        className: "page-templates-preview-field__button",
-        type: "button",
-        onClick: onClick,
-        "aria-label": item.title?.rendered || item.title,
-        children: [isEmpty && (0,external_wp_i18n_namespaceObject.__)('Empty template'), !isEmpty && /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(Async, {
-          children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_blockEditor_namespaceObject.BlockPreview, {
-            blocks: blocks
-          })
-        })]
-      })]
-    })
-  });
-}
 function PageTemplates() {
   const {
     params
@@ -41915,7 +42665,7 @@ function PageTemplates() {
   const {
     records,
     isResolving: isLoadingData
-  } = (0,external_wp_coreData_namespaceObject.useEntityRecords)('postType', TEMPLATE_POST_TYPE, {
+  } = page_templates_useEntityRecordsWithPermissions('postType', TEMPLATE_POST_TYPE, {
     per_page: -1
   });
   const history = page_templates_useHistory();
@@ -41941,61 +42691,10 @@ function PageTemplates() {
       label: author
     }));
   }, [records]);
-  const fields = (0,external_wp_element_namespaceObject.useMemo)(() => [{
-    label: (0,external_wp_i18n_namespaceObject.__)('Preview'),
-    id: 'preview',
-    render: ({
-      item
-    }) => {
-      return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(page_templates_Preview, {
-        item: item,
-        viewType: view.type
-      });
-    },
-    enableSorting: false
-  }, {
-    label: (0,external_wp_i18n_namespaceObject.__)('Template'),
-    id: 'title',
-    getValue: ({
-      item
-    }) => item.title?.rendered,
-    render: ({
-      item
-    }) => /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(page_templates_Title, {
-      item: item,
-      viewType: view.type
-    }),
-    enableHiding: false,
-    enableGlobalSearch: true
-  }, {
-    label: (0,external_wp_i18n_namespaceObject.__)('Description'),
-    id: 'description',
-    render: ({
-      item
-    }) => {
-      return item.description && /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)("span", {
-        className: "page-templates-description",
-        children: (0,external_wp_htmlEntities_namespaceObject.decodeEntities)(item.description)
-      });
-    },
-    enableSorting: false,
-    enableGlobalSearch: true
-  }, {
-    label: (0,external_wp_i18n_namespaceObject.__)('Author'),
-    id: 'author',
-    getValue: ({
-      item
-    }) => item.author_text,
-    render: ({
-      item
-    }) => {
-      return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(AuthorField, {
-        viewType: view.type,
-        item: item
-      });
-    },
+  const fields = (0,external_wp_element_namespaceObject.useMemo)(() => [fields_previewField, fields_titleField, descriptionField, {
+    ...authorField,
     elements: authors
-  }], [authors, view.type]);
+  }], [authors]);
   const {
     data,
     paginationInfo
@@ -42032,7 +42731,7 @@ function PageTemplates() {
       onChangeSelection: onChangeSelection,
       selection: selection,
       defaultLayouts: page_templates_defaultLayouts
-    })
+    }, activeView)
   });
 }
 
@@ -42048,7 +42747,10 @@ function PageTemplates() {
 
 
 function SidebarButton(props) {
-  return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.Button, {
+  return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.Button
+  // TODO: Switch to `true` (40px size) if possible
+  , {
+    __next40pxDefaultSize: false,
     ...props,
     className: dist_clsx('edit-site-sidebar-button', props.className)
   });
@@ -42085,7 +42787,7 @@ function SidebarButton(props) {
 const {
   useHistory: sidebar_navigation_screen_useHistory,
   useLocation: sidebar_navigation_screen_useLocation
-} = lock_unlock_unlock(external_wp_router_namespaceObject.privateApis);
+} = unlock(external_wp_router_namespaceObject.privateApis);
 function SidebarNavigationScreen({
   isRoot,
   title,
@@ -42103,7 +42805,7 @@ function SidebarNavigationScreen({
   } = (0,external_wp_data_namespaceObject.useSelect)(select => {
     const {
       getSettings
-    } = lock_unlock_unlock(select(store));
+    } = unlock(select(store));
     const currentlyPreviewingThemeId = currentlyPreviewingTheme();
     return {
       dashboardLink: getSettings().__experimentalDashboardLink,
@@ -42226,7 +42928,7 @@ const chevronRightSmall = /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObje
 
 const {
   useHistory: sidebar_navigation_item_useHistory
-} = lock_unlock_unlock(external_wp_router_namespaceObject.privateApis);
+} = unlock(external_wp_router_namespaceObject.privateApis);
 function SidebarNavigationItem({
   className,
   icon,
@@ -42465,7 +43167,7 @@ function SidebarNavigationItemGlobalStyles(props) {
   } = (0,external_wp_data_namespaceObject.useDispatch)(store);
   const {
     setCanvasMode
-  } = lock_unlock_unlock((0,external_wp_data_namespaceObject.useDispatch)(store));
+  } = unlock((0,external_wp_data_namespaceObject.useDispatch)(store));
   const hasGlobalStyleVariations = (0,external_wp_data_namespaceObject.useSelect)(select => !!select(external_wp_coreData_namespaceObject.store).__experimentalGetCurrentThemeGlobalStylesVariations()?.length, []);
   if (hasGlobalStyleVariations) {
     return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(SidebarNavigationItem, {
@@ -42503,7 +43205,7 @@ function SidebarNavigationScreenGlobalStyles({
   const {
     setCanvasMode,
     setEditorCanvasContainerView
-  } = lock_unlock_unlock((0,external_wp_data_namespaceObject.useDispatch)(store));
+  } = unlock((0,external_wp_data_namespaceObject.useDispatch)(store));
   const {
     isViewMode,
     isStyleBookOpened,
@@ -42513,7 +43215,7 @@ function SidebarNavigationScreenGlobalStyles({
     const {
       getCanvasMode,
       getEditorCanvasContainerView
-    } = lock_unlock_unlock(select(store));
+    } = unlock(select(store));
     const {
       getEntityRecord,
       __experimentalGetCurrentGlobalStylesId
@@ -42626,7 +43328,7 @@ const navigation = /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)
 function SidebarNavigationScreenMain() {
   const {
     setEditorCanvasContainerView
-  } = lock_unlock_unlock((0,external_wp_data_namespaceObject.useDispatch)(store));
+  } = unlock((0,external_wp_data_namespaceObject.useDispatch)(store));
 
   // Clear the editor canvas container view when accessing the main navigation screen.
   (0,external_wp_element_namespaceObject.useEffect)(() => {
@@ -42810,7 +43512,7 @@ function DeleteConfirmDialog({
 
 const {
   useHistory: more_menu_useHistory
-} = lock_unlock_unlock(external_wp_router_namespaceObject.privateApis);
+} = unlock(external_wp_router_namespaceObject.privateApis);
 const POPOVER_PROPS = {
   position: 'bottom right'
 };
@@ -42886,36 +43588,6 @@ function ScreenNavigationMoreMenu(props) {
   });
 }
 
-;// CONCATENATED MODULE: ./packages/icons/build-module/library/chevron-up.js
-/**
- * WordPress dependencies
- */
-
-
-const chevronUp = /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_primitives_namespaceObject.SVG, {
-  viewBox: "0 0 24 24",
-  xmlns: "http://www.w3.org/2000/svg",
-  children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_primitives_namespaceObject.Path, {
-    d: "M6.5 12.4L12 8l5.5 4.4-.9 1.2L12 10l-4.5 3.6-1-1.2z"
-  })
-});
-/* harmony default export */ const chevron_up = (chevronUp);
-
-;// CONCATENATED MODULE: ./packages/icons/build-module/library/chevron-down.js
-/**
- * WordPress dependencies
- */
-
-
-const chevronDown = /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_primitives_namespaceObject.SVG, {
-  viewBox: "0 0 24 24",
-  xmlns: "http://www.w3.org/2000/svg",
-  children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_primitives_namespaceObject.Path, {
-    d: "M17.5 11.6L12 16l-5.5-4.4.9-1.2L12 14l4.5-3.6 1 1.2z"
-  })
-});
-/* harmony default export */ const chevron_down = (chevronDown);
-
 ;// CONCATENATED MODULE: ./packages/edit-site/build-module/components/sidebar-navigation-screen-navigation-menus/leaf-more-menu.js
 /**
  * WordPress dependencies
@@ -42942,7 +43614,7 @@ const leaf_more_menu_POPOVER_PROPS = {
 
 const {
   useHistory: leaf_more_menu_useHistory
-} = lock_unlock_unlock(external_wp_router_namespaceObject.privateApis);
+} = unlock(external_wp_router_namespaceObject.privateApis);
 function LeafMoreMenu(props) {
   const history = leaf_more_menu_useHistory();
   const {
@@ -43067,7 +43739,7 @@ function LeafMoreMenu(props) {
 
 const {
   PrivateListView
-} = lock_unlock_unlock(external_wp_blockEditor_namespaceObject.privateApis);
+} = unlock(external_wp_blockEditor_namespaceObject.privateApis);
 
 // Needs to be kept in sync with the query used at packages/block-library/src/page-list/edit.js.
 const MAX_PAGE_COUNT = 100;
@@ -43158,7 +43830,7 @@ function NavigationMenuEditor({
   } = (0,external_wp_data_namespaceObject.useSelect)(select => {
     const {
       getSettings
-    } = lock_unlock_unlock(select(store));
+    } = unlock(select(store));
     return {
       storedSettings: getSettings()
     };
@@ -43274,7 +43946,7 @@ function SingleNavigationMenu({
 
 const {
   useLocation: sidebar_navigation_screen_navigation_menu_useLocation
-} = lock_unlock_unlock(external_wp_router_namespaceObject.privateApis);
+} = unlock(external_wp_router_namespaceObject.privateApis);
 const postType = `wp_navigation`;
 function SidebarNavigationScreenNavigationMenu({
   backPath
@@ -43367,7 +44039,7 @@ function SidebarNavigationScreenNavigationMenu({
 
 const {
   useHistory: use_navigation_menu_handlers_useHistory
-} = lock_unlock_unlock(external_wp_router_namespaceObject.privateApis);
+} = unlock(external_wp_router_namespaceObject.privateApis);
 function useDeleteNavigationMenu() {
   const {
     deleteEntityRecord
@@ -43547,7 +44219,7 @@ function SidebarNavigationScreenNavigationMenus({
   const isLoading = isResolvingNavigationMenus && !hasResolvedNavigationMenus;
   const {
     getNavigationFallbackId
-  } = lock_unlock_unlock((0,external_wp_data_namespaceObject.useSelect)(external_wp_coreData_namespaceObject.store));
+  } = unlock((0,external_wp_data_namespaceObject.useSelect)(external_wp_coreData_namespaceObject.store));
   const firstNavigationMenu = navigationMenus?.[0];
 
   // Save a boolean to prevent us creating a fallback more than once per session.
@@ -43659,7 +44331,7 @@ const NavMenuItem = ({
 
 const {
   useLocation: dataview_item_useLocation
-} = lock_unlock_unlock(external_wp_router_namespaceObject.privateApis);
+} = unlock(external_wp_router_namespaceObject.privateApis);
 function DataViewItem({
   title,
   slug,
@@ -43672,8 +44344,7 @@ function DataViewItem({
 }) {
   const {
     params: {
-      postType,
-      layout
+      postType
     }
   } = dataview_item_useLocation();
   const iconToUse = icon || VIEW_LAYOUTS.find(v => v.type === type).icon;
@@ -43683,7 +44354,7 @@ function DataViewItem({
   }
   const linkInfo = useLink({
     postType,
-    layout,
+    layout: type,
     activeView,
     isCustom: isCustom ? 'true' : undefined
   });
@@ -43787,7 +44458,7 @@ function DataviewsTemplatesSidebarContent({
 
 const {
   useLocation: sidebar_navigation_screen_templates_browse_useLocation
-} = lock_unlock_unlock(external_wp_router_namespaceObject.privateApis);
+} = unlock(external_wp_router_namespaceObject.privateApis);
 function SidebarNavigationScreenTemplatesBrowse({
   backPath
 }) {
@@ -43933,7 +44604,7 @@ function useTemplatePartAreas() {
 
 const {
   useLocation: sidebar_navigation_screen_patterns_useLocation
-} = lock_unlock_unlock(external_wp_router_namespaceObject.privateApis);
+} = unlock(external_wp_router_namespaceObject.privateApis);
 function CategoriesGroup({
   templatePartAreas,
   patternCategories,
@@ -44048,7 +44719,7 @@ function SidebarNavigationScreenPatterns({
 
 const {
   useHistory: add_new_view_useHistory
-} = lock_unlock_unlock(external_wp_router_namespaceObject.privateApis);
+} = unlock(external_wp_router_namespaceObject.privateApis);
 function AddNewItemModalContent({
   type,
   setIsAdding
@@ -44059,7 +44730,7 @@ function AddNewItemModalContent({
   } = (0,external_wp_data_namespaceObject.useDispatch)(external_wp_coreData_namespaceObject.store);
   const [title, setTitle] = (0,external_wp_element_namespaceObject.useState)('');
   const [isSaving, setIsSaving] = (0,external_wp_element_namespaceObject.useState)(false);
-  const DEFAULT_VIEWS = useDefaultViews({
+  const defaultViews = useDefaultViews({
     postType: type
   });
   return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)("form", {
@@ -44087,7 +44758,7 @@ function AddNewItemModalContent({
         title,
         status: 'publish',
         wp_dataviews_type: dataViewTaxonomyId,
-        content: JSON.stringify(DEFAULT_VIEWS[type][0].view)
+        content: JSON.stringify(defaultViews[0].view)
       });
       const {
         params: {
@@ -44105,6 +44776,7 @@ function AddNewItemModalContent({
     children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsxs)(external_wp_components_namespaceObject.__experimentalVStack, {
       spacing: "5",
       children: [/*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.TextControl, {
+        __next40pxDefaultSize: true,
         __nextHasNoMarginBottom: true,
         label: (0,external_wp_i18n_namespaceObject.__)('Name'),
         value: title,
@@ -44113,13 +44785,19 @@ function AddNewItemModalContent({
         className: "patterns-create-modal__name-input"
       }), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsxs)(external_wp_components_namespaceObject.__experimentalHStack, {
         justify: "right",
-        children: [/*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.Button, {
+        children: [/*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.Button
+        // TODO: Switch to `true` (40px size) if possible
+        , {
+          __next40pxDefaultSize: false,
           variant: "tertiary",
           onClick: () => {
             setIsAdding(false);
           },
           children: (0,external_wp_i18n_namespaceObject.__)('Cancel')
-        }), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.Button, {
+        }), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.Button
+        // TODO: Switch to `true` (40px size) if possible
+        , {
+          __next40pxDefaultSize: false,
           variant: "primary",
           type: "submit",
           "aria-disabled": !title || isSaving,
@@ -44178,7 +44856,7 @@ function AddNewItem({
 
 const {
   useHistory: custom_dataviews_list_useHistory
-} = lock_unlock_unlock(external_wp_router_namespaceObject.privateApis);
+} = unlock(external_wp_router_namespaceObject.privateApis);
 const custom_dataviews_list_EMPTY_ARRAY = [];
 function RenameItemModalContent({
   dataviewId,
@@ -44200,6 +44878,7 @@ function RenameItemModalContent({
     children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsxs)(external_wp_components_namespaceObject.__experimentalVStack, {
       spacing: "5",
       children: [/*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.TextControl, {
+        __next40pxDefaultSize: true,
         __nextHasNoMarginBottom: true,
         label: (0,external_wp_i18n_namespaceObject.__)('Name'),
         value: title,
@@ -44368,8 +45047,6 @@ function CustomDataViewsList({
 
 
 
-
-
 /**
  * Internal dependencies
  */
@@ -44381,44 +45058,8 @@ function CustomDataViewsList({
 
 
 const {
-  useLocation: sidebar_dataviews_useLocation,
-  useHistory: sidebar_dataviews_useHistory
-} = lock_unlock_unlock(external_wp_router_namespaceObject.privateApis);
-
-/**
- * Hook to switch to table layout when switching to the trash view.
- * When going out of the trash view, it switches back to the previous layout if
- * there was an automatic switch to table layout.
- */
-function useSwitchToTableOnTrash() {
-  const {
-    params: {
-      activeView,
-      layout,
-      ...restParams
-    }
-  } = sidebar_dataviews_useLocation();
-  const history = sidebar_dataviews_useHistory();
-  const viewToSwitchOutOfTrash = (0,external_wp_element_namespaceObject.useRef)(undefined);
-  const previousActiveView = (0,external_wp_compose_namespaceObject.usePrevious)(activeView);
-  (0,external_wp_element_namespaceObject.useEffect)(() => {
-    if (activeView === 'trash' && previousActiveView !== 'trash') {
-      viewToSwitchOutOfTrash.current = layout || 'list';
-      history.push({
-        ...restParams,
-        layout: 'table',
-        activeView
-      });
-    } else if (previousActiveView === 'trash' && activeView !== 'trash' && viewToSwitchOutOfTrash.current) {
-      history.push({
-        ...restParams,
-        layout: viewToSwitchOutOfTrash.current,
-        activeView
-      });
-      viewToSwitchOutOfTrash.current = undefined;
-    }
-  }, [previousActiveView, activeView, layout, history, restParams]);
-}
+  useLocation: sidebar_dataviews_useLocation
+} = unlock(external_wp_router_namespaceObject.privateApis);
 function DataViewsSidebarContent() {
   const {
     params: {
@@ -44427,8 +45068,7 @@ function DataViewsSidebarContent() {
       isCustom = 'false'
     }
   } = sidebar_dataviews_useLocation();
-  useSwitchToTableOnTrash();
-  const DEFAULT_VIEWS = useDefaultViews({
+  const defaultViews = useDefaultViews({
     postType
   });
   if (!postType) {
@@ -44437,7 +45077,7 @@ function DataViewsSidebarContent() {
   const isCustomBoolean = isCustom === 'true';
   return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsxs)(external_ReactJSXRuntime_namespaceObject.Fragment, {
     children: [/*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.__experimentalItemGroup, {
-      children: DEFAULT_VIEWS[postType].map(dataview => {
+      children: defaultViews.map(dataview => {
         return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(DataViewItem, {
           slug: dataview.slug,
           title: dataview.title,
@@ -44455,11 +45095,7 @@ function DataViewsSidebarContent() {
   });
 }
 
-;// CONCATENATED MODULE: ./packages/dataviews/build-module/components/dataform/index.js
-/**
- * External dependencies
- */
-
+;// CONCATENATED MODULE: ./packages/dataviews/build-module/dataforms-layouts/regular/index.js
 /**
  * WordPress dependencies
  */
@@ -44471,60 +45107,197 @@ function DataViewsSidebarContent() {
  */
 
 
-
-function DataFormTextControl({
-  data,
-  field,
-  onChange
-}) {
-  const {
-    id,
-    label,
-    placeholder
-  } = field;
-  const value = field.getValue({
-    item: data
-  });
-  const onChangeControl = (0,external_wp_element_namespaceObject.useCallback)(newValue => onChange(prevItem => ({
-    ...prevItem,
-    [id]: newValue
-  })), [id, onChange]);
-  return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.TextControl, {
-    label: label,
-    placeholder: placeholder,
-    value: value !== null && value !== void 0 ? value : '',
-    onChange: onChangeControl,
-    __next40pxDefaultSize: true
-  });
-}
-const controls = {
-  text: DataFormTextControl
-};
-function getControlForField(field) {
-  if (!field.type) {
-    return null;
-  }
-  if (!Object.keys(controls).includes(field.type)) {
-    return null;
-  }
-  return controls[field.type];
-}
-function DataForm({
+function FormRegular({
   data,
   fields,
   form,
   onChange
 }) {
-  const visibleFields = (0,external_wp_element_namespaceObject.useMemo)(() => normalizeFields(fields.filter(({
-    id
-  }) => !!form.visibleFields?.includes(id))), [fields, form.visibleFields]);
-  return visibleFields.map(field => {
-    const DataFormControl = getControlForField(field);
-    return DataFormControl ? /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(DataFormControl, {
-      data: data,
-      field: field,
-      onChange: onChange
-    }, field.id) : null;
+  const visibleFields = (0,external_wp_element_namespaceObject.useMemo)(() => {
+    var _form$fields;
+    return normalizeFields(((_form$fields = form.fields) !== null && _form$fields !== void 0 ? _form$fields : []).map(fieldId => fields.find(({
+      id
+    }) => id === fieldId)).filter(field => !!field));
+  }, [fields, form.fields]);
+  return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.__experimentalVStack, {
+    spacing: 4,
+    children: visibleFields.map(field => {
+      return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(field.Edit, {
+        data: data,
+        field: field,
+        onChange: onChange
+      }, field.id);
+    })
+  });
+}
+
+;// CONCATENATED MODULE: ./packages/dataviews/build-module/dataforms-layouts/panel/index.js
+/**
+ * WordPress dependencies
+ */
+
+
+
+
+
+/**
+ * Internal dependencies
+ */
+
+
+
+
+function DropdownHeader({
+  title,
+  onClose
+}) {
+  return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.__experimentalVStack, {
+    className: "dataforms-layouts-panel__dropdown-header",
+    spacing: 4,
+    children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsxs)(external_wp_components_namespaceObject.__experimentalHStack, {
+      alignment: "center",
+      children: [/*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.__experimentalHeading, {
+        level: 2,
+        size: 13,
+        children: title
+      }), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.__experimentalSpacer, {}), onClose && /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.Button
+      // TODO: Switch to `true` (40px size) if possible
+      , {
+        __next40pxDefaultSize: false,
+        className: "dataforms-layouts-panel__dropdown-header-action",
+        label: (0,external_wp_i18n_namespaceObject.__)('Close'),
+        icon: close_small,
+        onClick: onClose
+      })]
+    })
+  });
+}
+function FormField({
+  data,
+  field,
+  onChange
+}) {
+  // Use internal state instead of a ref to make sure that the component
+  // re-renders when the popover's anchor updates.
+  const [popoverAnchor, setPopoverAnchor] = (0,external_wp_element_namespaceObject.useState)(null);
+  // Memoize popoverProps to avoid returning a new object every time.
+  const popoverProps = (0,external_wp_element_namespaceObject.useMemo)(() => ({
+    // Anchor the popover to the middle of the entire row so that it doesn't
+    // move around when the label changes.
+    anchor: popoverAnchor,
+    placement: 'left-start',
+    offset: 36,
+    shift: true
+  }), [popoverAnchor]);
+  return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsxs)(external_wp_components_namespaceObject.__experimentalHStack, {
+    ref: setPopoverAnchor,
+    className: "dataforms-layouts-panel__field",
+    children: [/*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)("div", {
+      className: "dataforms-layouts-panel__field-label",
+      children: field.label
+    }), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)("div", {
+      children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.Dropdown, {
+        contentClassName: "dataforms-layouts-panel__field-dropdown",
+        popoverProps: popoverProps,
+        focusOnMount: true,
+        toggleProps: {
+          size: 'compact',
+          variant: 'tertiary',
+          tooltipPosition: 'middle left'
+        },
+        renderToggle: ({
+          isOpen,
+          onToggle
+        }) => /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.Button, {
+          className: "dataforms-layouts-panel__field-control",
+          size: "compact",
+          variant: "tertiary",
+          "aria-expanded": isOpen,
+          "aria-label": (0,external_wp_i18n_namespaceObject.sprintf)(
+          // translators: %s: Field name.
+          (0,external_wp_i18n_namespaceObject.__)('Edit %s'), field.label),
+          onClick: onToggle,
+          children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(field.render, {
+            item: data
+          })
+        }),
+        renderContent: ({
+          onClose
+        }) => /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsxs)(external_ReactJSXRuntime_namespaceObject.Fragment, {
+          children: [/*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(DropdownHeader, {
+            title: field.label,
+            onClose: onClose
+          }), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(field.Edit, {
+            data: data,
+            field: field,
+            onChange: onChange,
+            hideLabelFromVision: true
+          }, field.id)]
+        })
+      })
+    })]
+  });
+}
+function FormPanel({
+  data,
+  fields,
+  form,
+  onChange
+}) {
+  const visibleFields = (0,external_wp_element_namespaceObject.useMemo)(() => {
+    var _form$fields;
+    return normalizeFields(((_form$fields = form.fields) !== null && _form$fields !== void 0 ? _form$fields : []).map(fieldId => fields.find(({
+      id
+    }) => id === fieldId)).filter(field => !!field));
+  }, [fields, form.fields]);
+  return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.__experimentalVStack, {
+    spacing: 2,
+    children: visibleFields.map(field => {
+      return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(FormField, {
+        data: data,
+        field: field,
+        onChange: onChange
+      }, field.id);
+    })
+  });
+}
+
+;// CONCATENATED MODULE: ./packages/dataviews/build-module/dataforms-layouts/index.js
+/**
+ * Internal dependencies
+ */
+
+
+const FORM_LAYOUTS = [{
+  type: 'regular',
+  component: FormRegular
+}, {
+  type: 'panel',
+  component: FormPanel
+}];
+function getFormLayout(type) {
+  return FORM_LAYOUTS.find(layout => layout.type === type);
+}
+
+;// CONCATENATED MODULE: ./packages/dataviews/build-module/components/dataform/index.js
+/**
+ * Internal dependencies
+ */
+
+
+
+function DataForm({
+  form,
+  ...props
+}) {
+  var _form$type;
+  const layout = getFormLayout((_form$type = form.type) !== null && _form$type !== void 0 ? _form$type : 'regular');
+  if (!layout) {
+    return null;
+  }
+  return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(layout.component, {
+    form: form,
+    ...props
   });
 }
 
@@ -44544,6 +45317,7 @@ function DataForm({
 
 
 
+
 /**
  * Internal dependencies
  */
@@ -44551,61 +45325,72 @@ function DataForm({
 
 
 
+
+const {
+  PostCardPanel
+} = unlock(external_wp_editor_namespaceObject.privateApis);
 function PostEditForm({
   postType,
   postId
 }) {
   const ids = (0,external_wp_element_namespaceObject.useMemo)(() => postId.split(','), [postId]);
   const {
-    initialEdits
+    record
   } = (0,external_wp_data_namespaceObject.useSelect)(select => {
-    if (ids.length !== 1) {}
     return {
-      initialEdits: ids.length === 1 ? select(external_wp_coreData_namespaceObject.store).getEntityRecord('postType', postType, ids[0]) : null
+      record: ids.length === 1 ? select(external_wp_coreData_namespaceObject.store).getEditedEntityRecord('postType', postType, ids[0]) : null
     };
   }, [postType, ids]);
-  const registry = (0,external_wp_data_namespaceObject.useRegistry)();
+  const [multiEdits, setMultiEdits] = (0,external_wp_element_namespaceObject.useState)({});
   const {
-    saveEntityRecord
+    editEntityRecord
   } = (0,external_wp_data_namespaceObject.useDispatch)(external_wp_coreData_namespaceObject.store);
   const {
-    fields
+    fields: _fields
   } = post_fields();
-  const form = {
-    visibleFields: ['title']
-  };
-  const [edits, setEdits] = (0,external_wp_element_namespaceObject.useState)({});
-  const itemWithEdits = (0,external_wp_element_namespaceObject.useMemo)(() => {
-    return {
-      ...initialEdits,
-      ...edits
-    };
-  }, [initialEdits, edits]);
-  const onSubmit = async event => {
-    event.preventDefault();
-    const {
-      getEntityRecord
-    } = registry.resolveSelect(external_wp_coreData_namespaceObject.store);
-    for (const id of ids) {
-      const item = await getEntityRecord('postType', postType, id);
-      saveEntityRecord('postType', postType, {
-        ...item,
-        ...edits
-      });
+  const fields = (0,external_wp_element_namespaceObject.useMemo)(() => _fields?.map(field => {
+    if (field.id === 'status') {
+      return {
+        ...field,
+        elements: field.elements.filter(element => element.value !== 'trash')
+      };
     }
-    setEdits({});
+    return field;
+  }), [_fields]);
+  const form = {
+    type: 'panel',
+    fields: ['title', 'status', 'date', 'author', 'comment_status']
   };
-  return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsxs)("form", {
-    onSubmit: onSubmit,
-    children: [/*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(DataForm, {
-      data: itemWithEdits,
+  const onChange = edits => {
+    for (const id of ids) {
+      if (edits.status !== 'future' && record.status === 'future' && new Date(record.date) > new Date()) {
+        edits.date = null;
+      }
+      if (edits.status === 'private' && record.password) {
+        edits.password = '';
+      }
+      editEntityRecord('postType', postType, id, edits);
+      if (ids.length > 1) {
+        setMultiEdits(prev => ({
+          ...prev,
+          ...edits
+        }));
+      }
+    }
+  };
+  (0,external_wp_element_namespaceObject.useEffect)(() => {
+    setMultiEdits({});
+  }, [ids]);
+  return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsxs)(external_wp_components_namespaceObject.__experimentalVStack, {
+    spacing: 4,
+    children: [ids.length === 1 && /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(PostCardPanel, {
+      postType: postType,
+      postId: ids[0]
+    }), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(DataForm, {
+      data: ids.length === 1 ? record : multiEdits,
       fields: fields,
       form: form,
-      onChange: setEdits
-    }), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.Button, {
-      variant: "primary",
-      type: "submit",
-      children: (0,external_wp_i18n_namespaceObject.__)('Update')
+      onChange: onChange
     })]
   });
 }
@@ -44656,7 +45441,7 @@ function PostEdit({
 const {
   useLocation: router_useLocation,
   useHistory: router_useHistory
-} = lock_unlock_unlock(external_wp_router_namespaceObject.privateApis);
+} = unlock(external_wp_router_namespaceObject.privateApis);
 function useRedirectOldPaths() {
   const history = router_useHistory();
   const {
@@ -44850,7 +45635,7 @@ function useLayoutAreas() {
 
 const {
   useCommandContext
-} = lock_unlock_unlock(external_wp_commands_namespaceObject.privateApis);
+} = unlock(external_wp_commands_namespaceObject.privateApis);
 
 /**
  * React hook used to set the correct command context based on the current state.
@@ -44862,7 +45647,7 @@ function useSetCommandContext() {
   } = (0,external_wp_data_namespaceObject.useSelect)(select => {
     const {
       getCanvasMode
-    } = lock_unlock_unlock(select(store));
+    } = unlock(select(store));
     const {
       getBlockSelectionStart
     } = select(external_wp_blockEditor_namespaceObject.store);
@@ -44918,10 +45703,10 @@ function useSetCommandContext() {
 
 const {
   RouterProvider
-} = lock_unlock_unlock(external_wp_router_namespaceObject.privateApis);
+} = unlock(external_wp_router_namespaceObject.privateApis);
 const {
   GlobalStylesProvider
-} = lock_unlock_unlock(external_wp_editor_namespaceObject.privateApis);
+} = unlock(external_wp_editor_namespaceObject.privateApis);
 function AppLayout() {
   // This ensures the edited entity id and type are initialized properly.
   useInitEditedEntityFromURL();
@@ -45029,7 +45814,7 @@ function PluginSidebarMoreMenuItem(props) {
 
 const {
   useLocation: posts_app_router_useLocation
-} = lock_unlock_unlock(external_wp_router_namespaceObject.privateApis);
+} = unlock(external_wp_router_namespaceObject.privateApis);
 function router_useLayoutAreas() {
   const {
     params = {}
@@ -45105,10 +45890,10 @@ function router_useLayoutAreas() {
 
 const {
   RouterProvider: posts_app_RouterProvider
-} = lock_unlock_unlock(external_wp_router_namespaceObject.privateApis);
+} = unlock(external_wp_router_namespaceObject.privateApis);
 const {
   GlobalStylesProvider: posts_app_GlobalStylesProvider
-} = lock_unlock_unlock(external_wp_editor_namespaceObject.privateApis);
+} = unlock(external_wp_editor_namespaceObject.privateApis);
 function PostsLayout() {
   // This ensures the edited entity id and type are initialized properly.
   useInitEditedEntityFromURL();
@@ -45193,7 +45978,8 @@ function initializePostsDashboard(id, settings) {
     keepCaretInsideBlock: false,
     openPanels: ['post-status'],
     showBlockBreadcrumbs: true,
-    showListViewByDefault: false
+    showListViewByDefault: false,
+    enableChoosePatternModal: true
   });
   (0,external_wp_data_namespaceObject.dispatch)(store).updateSettings(settings);
 
@@ -45228,10 +46014,9 @@ function initializePostsDashboard(id, settings) {
 
 
 const {
-  registerDefaultActions,
   registerCoreBlockBindingsSources,
   bootstrapBlockBindingsSourcesFromServer
-} = lock_unlock_unlock(external_wp_editor_namespaceObject.privateApis);
+} = unlock(external_wp_editor_namespaceObject.privateApis);
 
 /**
  * Initializes the site editor screen.
@@ -45261,7 +46046,6 @@ function initializeEditor(id, settings) {
       enableFSEBlocks: true
     });
   }
-  registerDefaultActions();
 
   // We dispatch actions and update the store synchronously before rendering
   // so that we won't trigger unnecessary re-renders with useEffect.
@@ -45281,8 +46065,15 @@ function initializeEditor(id, settings) {
     keepCaretInsideBlock: false,
     openPanels: ['post-status'],
     showBlockBreadcrumbs: true,
-    showListViewByDefault: false
+    showListViewByDefault: false,
+    enableChoosePatternModal: true
   });
+  if (window.__experimentalMediaProcessing) {
+    (0,external_wp_data_namespaceObject.dispatch)(external_wp_preferences_namespaceObject.store).setDefaults('core/media', {
+      requireApproval: true,
+      optimizeOnUpload: true
+    });
+  }
   (0,external_wp_data_namespaceObject.dispatch)(store).updateSettings(settings);
 
   // Keep the defaultTemplateTypes in the core/editor settings too,

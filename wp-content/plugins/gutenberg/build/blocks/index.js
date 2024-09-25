@@ -7515,8 +7515,8 @@ const unregisterBlockVariation = (blockName, variationName) => {
  * @param {Array}    [source.usesContext]      Array of context needed by the source only in the editor.
  * @param {Function} [source.getValues]        Function to get the values from the source.
  * @param {Function} [source.setValues]        Function to update multiple values connected to the source.
- * @param {Function} [source.getPlaceholder]   Function to get the placeholder when the value is undefined.
  * @param {Function} [source.canUserEditValue] Function to determine if the user can edit the value.
+ * @param {Function} [source.getFieldsList]    Function to get the lists of fields to expose in the connections panel.
  *
  * @example
  * ```js
@@ -7528,7 +7528,6 @@ const unregisterBlockVariation = (blockName, variationName) => {
  *     label: _x( 'My Custom Source', 'block bindings source' ),
  *     getValues: () => getSourceValues(),
  *     setValues: () => updateMyCustomValuesInBatch(),
- *     getPlaceholder: () => 'Placeholder text when the value is undefined',
  *     canUserEditValue: () => true,
  * } );
  * ```
@@ -7540,8 +7539,8 @@ const registerBlockBindingsSource = source => {
     usesContext,
     getValues,
     setValues,
-    getPlaceholder,
-    canUserEditValue
+    canUserEditValue,
+    getFieldsList
   } = source;
   const existingSource = unlock((0,external_wp_data_namespaceObject.select)(store)).getBlockBindingsSource(name);
 
@@ -7608,14 +7607,15 @@ const registerBlockBindingsSource = source => {
     return;
   }
 
-  // Check the `getPlaceholder` property is correct.
-  if (getPlaceholder && typeof getPlaceholder !== 'function') {
+  // Check the `canUserEditValue` property is correct.
+  if (canUserEditValue && typeof canUserEditValue !== 'function') {
      false ? 0 : void 0;
     return;
   }
 
-  // Check the `getPlaceholder` property is correct.
-  if (canUserEditValue && typeof canUserEditValue !== 'function') {
+  // Check the `getFieldsList` property is correct.
+  if (getFieldsList && typeof getFieldsList !== 'function') {
+    // eslint-disable-next-line no-console
      false ? 0 : void 0;
     return;
   }
@@ -8239,7 +8239,12 @@ const groupingBlockName = createBlockNameSetterReducer('SET_GROUPING_BLOCK_NAME'
 function categories(state = DEFAULT_CATEGORIES, action) {
   switch (action.type) {
     case 'SET_CATEGORIES':
-      return action.categories || [];
+      // Ensure, that categories are unique by slug.
+      const uniqueCategories = new Map();
+      (action.categories || []).forEach(category => {
+        uniqueCategories.set(category.slug, category);
+      });
+      return [...uniqueCategories.values()];
     case 'UPDATE_CATEGORY':
       {
         if (!action.category || !Object.keys(action.category).length) {
@@ -8278,31 +8283,45 @@ function collections(state = {}, action) {
   }
   return state;
 }
+
+/**
+ * Merges usesContext with existing values, potentially defined in the server registration.
+ *
+ * @param {string[]} existingUsesContext Existing `usesContext`.
+ * @param {string[]} newUsesContext      Newly added `usesContext`.
+ * @return {string[]|undefined} Merged `usesContext`.
+ */
+function getMergedUsesContext(existingUsesContext = [], newUsesContext = []) {
+  const mergedArrays = Array.from(new Set(existingUsesContext.concat(newUsesContext)));
+  return mergedArrays.length > 0 ? mergedArrays : undefined;
+}
 function blockBindingsSources(state = {}, action) {
   switch (action.type) {
     case 'ADD_BLOCK_BINDINGS_SOURCE':
-      // Merge usesContext with existing values, potentially defined in the server registration.
-      let mergedUsesContext = [...(state[action.name]?.usesContext || []), ...(action.usesContext || [])];
-      // Remove duplicates.
-      mergedUsesContext = mergedUsesContext.length > 0 ? [...new Set(mergedUsesContext)] : undefined;
       return {
         ...state,
         [action.name]: {
           // Don't override the label if it's already set.
           label: state[action.name]?.label || action.label,
-          usesContext: mergedUsesContext,
+          usesContext: getMergedUsesContext(state[action.name]?.usesContext, action.usesContext),
           getValues: action.getValues,
           setValues: action.setValues,
-          getPlaceholder: action.getPlaceholder,
-          canUserEditValue: action.canUserEditValue
+          // Only set `canUserEditValue` if `setValues` is also defined.
+          canUserEditValue: action.setValues && action.canUserEditValue,
+          getFieldsList: action.getFieldsList
         }
       };
     case 'ADD_BOOTSTRAPPED_BLOCK_BINDINGS_SOURCE':
       return {
         ...state,
         [action.name]: {
+          /*
+           * Keep the exisitng properties in case the source has been registered
+           * in the client before bootstrapping.
+           */
+          ...state[action.name],
           label: action.label,
-          usesContext: action.usesContext
+          usesContext: getMergedUsesContext(state[action.name]?.usesContext, action.usesContext)
         }
       };
     case 'REMOVE_BLOCK_BINDINGS_SOURCE':
@@ -9870,8 +9889,8 @@ function addBlockBindingsSource(source) {
     usesContext: source.usesContext,
     getValues: source.getValues,
     setValues: source.setValues,
-    getPlaceholder: source.getPlaceholder,
-    canUserEditValue: source.canUserEditValue
+    canUserEditValue: source.canUserEditValue,
+    getFieldsList: source.getFieldsList
   };
 }
 
@@ -14180,7 +14199,7 @@ function figureContentReducer(node, doc, schema) {
     } else if (node.classList.contains('alignright') || node.classList.contains('alignleft') || node.classList.contains('aligncenter') || !wrapper.textContent.trim()) {
       wrapFigureContent(nodeToInsert, wrapper);
     }
-  } else if (nodeToInsert.parentNode.nodeName === 'BODY') {
+  } else {
     wrapFigureContent(nodeToInsert);
   }
 }
@@ -14762,6 +14781,7 @@ function msListConverter(node, doc) {
 ;// CONCATENATED MODULE: external ["wp","blob"]
 const external_wp_blob_namespaceObject = window["wp"]["blob"];
 ;// CONCATENATED MODULE: ./packages/blocks/build-module/api/raw-handling/image-corrector.js
+/* wp:polyfill */
 /**
  * WordPress dependencies
  */

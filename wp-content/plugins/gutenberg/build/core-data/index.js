@@ -504,6 +504,7 @@ __webpack_require__.d(__webpack_exports__, {
   __experimentalUseEntityRecords: () => (/* reexport */ __experimentalUseEntityRecords),
   __experimentalUseResourcePermissions: () => (/* reexport */ __experimentalUseResourcePermissions),
   fetchBlockPatterns: () => (/* reexport */ fetchBlockPatterns),
+  privateApis: () => (/* reexport */ privateApis),
   store: () => (/* binding */ store),
   useEntityBlockEditor: () => (/* reexport */ useEntityBlockEditor),
   useEntityId: () => (/* reexport */ useEntityId),
@@ -538,6 +539,7 @@ __webpack_require__.d(build_module_actions_namespaceObject, {
   receiveThemeSupports: () => (receiveThemeSupports),
   receiveUploadPermissions: () => (receiveUploadPermissions),
   receiveUserPermission: () => (receiveUserPermission),
+  receiveUserPermissions: () => (receiveUserPermissions),
   receiveUserQuery: () => (receiveUserQuery),
   redo: () => (redo),
   saveEditedEntityRecord: () => (saveEditedEntityRecord),
@@ -607,8 +609,18 @@ var private_selectors_namespaceObject = {};
 __webpack_require__.r(private_selectors_namespaceObject);
 __webpack_require__.d(private_selectors_namespaceObject, {
   getBlockPatternsForPostType: () => (getBlockPatternsForPostType),
+  getEntityRecordPermissions: () => (getEntityRecordPermissions),
+  getEntityRecordsPermissions: () => (getEntityRecordsPermissions),
   getNavigationFallbackId: () => (getNavigationFallbackId),
+  getRegisteredPostMeta: () => (getRegisteredPostMeta),
   getUndoManager: () => (getUndoManager)
+});
+
+// NAMESPACE OBJECT: ./packages/core-data/build-module/private-actions.js
+var private_actions_namespaceObject = {};
+__webpack_require__.r(private_actions_namespaceObject);
+__webpack_require__.d(private_actions_namespaceObject, {
+  receiveRegisteredPostMeta: () => (receiveRegisteredPostMeta)
 });
 
 // NAMESPACE OBJECT: ./packages/core-data/build-module/resolvers.js
@@ -636,6 +648,7 @@ __webpack_require__.d(resolvers_namespaceObject, {
   getEntityRecords: () => (resolvers_getEntityRecords),
   getNavigationFallbackId: () => (resolvers_getNavigationFallbackId),
   getRawEntityRecord: () => (resolvers_getRawEntityRecord),
+  getRegisteredPostMeta: () => (resolvers_getRegisteredPostMeta),
   getRevision: () => (resolvers_getRevision),
   getRevisions: () => (resolvers_getRevisions),
   getThemeSupports: () => (resolvers_getThemeSupports),
@@ -17528,6 +17541,7 @@ const applyAwarenessUpdate = (awareness, update, origin) => {
 }
 
 ;// CONCATENATED MODULE: ./packages/sync/build-module/y-webrtc/crypto.js
+/* wp:polyfill */
 // File copied as is from the y-webrtc package.
 /* eslint-disable eslint-comments/disable-enable-pair */
 /* eslint-disable eslint-comments/no-unlimited-disable */
@@ -17627,6 +17641,7 @@ const decrypt = (data, key) => {
 const decryptJson = (data, key) => decrypt(data, key).then(decryptedValue => readAny(createDecoder(new Uint8Array(decryptedValue))));
 
 ;// CONCATENATED MODULE: ./packages/sync/build-module/y-webrtc/y-webrtc.js
+/* wp:polyfill */
 // File copied as is from the y-webrtc package with only exports
 // added to the following vars/functions: signalingConns,rooms, publishSignalingMessage, log.
 /* eslint-disable eslint-comments/disable-enable-pair */
@@ -18313,6 +18328,7 @@ class WebrtcProvider extends observable_Observable {
 }
 
 ;// CONCATENATED MODULE: ./packages/sync/build-module/webrtc-http-stream-signaling.js
+/* wp:polyfill */
 /**
  * External dependencies
  */
@@ -18860,7 +18876,7 @@ function __experimentalReceiveThemeGlobalStyleVariations(stylesheet, variations)
 /**
  * Returns an action object used in signalling that the index has been received.
  *
- * @deprecated since WP 5.9, this is not useful anymore, use the selector direclty.
+ * @deprecated since WP 5.9, this is not useful anymore, use the selector directly.
  *
  * @return {Object} Action object.
  */
@@ -18921,17 +18937,17 @@ function receiveEmbedPreview(url, preview) {
 /**
  * Action triggered to delete an entity record.
  *
- * @param {string}   kind                         Kind of the deleted entity.
- * @param {string}   name                         Name of the deleted entity.
- * @param {string}   recordId                     Record ID of the deleted entity.
- * @param {?Object}  query                        Special query parameters for the
- *                                                DELETE API call.
- * @param {Object}   [options]                    Delete options.
- * @param {Function} [options.__unstableFetch]    Internal use only. Function to
- *                                                call instead of `apiFetch()`.
- *                                                Must return a promise.
- * @param {boolean}  [options.throwOnError=false] If false, this action suppresses all
- *                                                the exceptions. Defaults to false.
+ * @param {string}        kind                         Kind of the deleted entity.
+ * @param {string}        name                         Name of the deleted entity.
+ * @param {number|string} recordId                     Record ID of the deleted entity.
+ * @param {?Object}       query                        Special query parameters for the
+ *                                                     DELETE API call.
+ * @param {Object}        [options]                    Delete options.
+ * @param {Function}      [options.__unstableFetch]    Internal use only. Function to
+ *                                                     call instead of `apiFetch()`.
+ *                                                     Must return a promise.
+ * @param {boolean}       [options.throwOnError=false] If false, this action suppresses all
+ *                                                     the exceptions. Defaults to false.
  */
 const deleteEntityRecord = (kind, name, recordId, query, {
   __unstableFetch = (external_wp_apiFetch_default()),
@@ -19347,11 +19363,11 @@ const saveEditedEntityRecord = (kind, name, recordId, options) => async ({
 /**
  * Action triggered to save only specified properties for the entity.
  *
- * @param {string} kind        Kind of the entity.
- * @param {string} name        Name of the entity.
- * @param {Object} recordId    ID of the record.
- * @param {Array}  itemsToSave List of entity properties or property paths to save.
- * @param {Object} options     Saving options.
+ * @param {string}        kind        Kind of the entity.
+ * @param {string}        name        Name of the entity.
+ * @param {number|string} recordId    ID of the record.
+ * @param {Array}         itemsToSave List of entity properties or property paths to save.
+ * @param {Object}        options     Saving options.
  */
 const __experimentalSaveSpecifiedEntityEdits = (kind, name, recordId, itemsToSave, options) => async ({
   select,
@@ -19413,6 +19429,28 @@ function receiveUserPermission(key, isAllowed) {
     type: 'RECEIVE_USER_PERMISSION',
     key,
     isAllowed
+  };
+}
+
+/**
+ * Returns an action object used in signalling that the current user has
+ * permission to perform an action on a REST resource. Ignored from
+ * documentation as it's internal to the data store.
+ *
+ * @ignore
+ *
+ * @param {Object<string, boolean>} permissions An object where keys represent
+ *                                              actions and REST resources, and
+ *                                              values indicate whether the user
+ *                                              is allowed to perform the
+ *                                              action.
+ *
+ * @return {Object} Action object.
+ */
+function receiveUserPermissions(permissions) {
+  return {
+    type: 'RECEIVE_USER_PERMISSIONS',
+    permissions
   };
 }
 
@@ -20862,6 +20900,11 @@ function userPermissions(state = {}, action) {
         ...state,
         [action.key]: action.isAllowed
       };
+    case 'RECEIVE_USER_PERMISSIONS':
+      return {
+        ...state,
+        ...action.permissions
+      };
   }
   return state;
 }
@@ -20954,6 +20997,25 @@ function defaultTemplates(state = {}, action) {
   }
   return state;
 }
+
+/**
+ * Reducer returning an object of registered post meta.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {Object} Updated state.
+ */
+function registeredPostMeta(state = {}, action) {
+  switch (action.type) {
+    case 'RECEIVE_REGISTERED_POST_META':
+      return {
+        ...state,
+        [action.postType]: action.registeredPostMeta
+      };
+  }
+  return state;
+}
 /* harmony default export */ const build_module_reducer = ((0,external_wp_data_namespaceObject.combineReducers)({
   terms,
   users,
@@ -20974,7 +21036,8 @@ function defaultTemplates(state = {}, action) {
   blockPatternCategories,
   userPatternCategories,
   navigationFallbackId,
-  defaultTemplates
+  defaultTemplates,
+  registeredPostMeta
 }));
 
 // EXTERNAL MODULE: ./node_modules/equivalent-key-map/equivalent-key-map.js
@@ -21142,13 +21205,11 @@ function isRawAttribute(entity, attribute) {
 
 ;// CONCATENATED MODULE: ./packages/core-data/build-module/utils/user-permissions.js
 const ALLOWED_RESOURCE_ACTIONS = ['create', 'read', 'update', 'delete'];
-function getUserPermissionsFromResponse(response) {
+function getUserPermissionsFromAllowHeader(allowedMethods) {
   const permissions = {};
-
-  // Optional chaining operator is used here because the API requests don't
-  // return the expected result in the React native version. Instead, API requests
-  // only return the result, without including response properties like the headers.
-  const allowedMethods = response.headers?.get('allow') || '';
+  if (!allowedMethods) {
+    return permissions;
+  }
   const methods = {
     create: 'POST',
     read: 'GET',
@@ -22268,6 +22329,70 @@ const getBlockPatternsForPostType = (0,external_wp_data_namespaceObject.createRe
   postTypes
 }) => !postTypes || Array.isArray(postTypes) && postTypes.includes(postType)), () => [select(STORE_NAME).getBlockPatterns()]));
 
+/**
+ * Returns the entity records permissions for the given entity record ids.
+ */
+const getEntityRecordsPermissions = (0,external_wp_data_namespaceObject.createRegistrySelector)(select => (0,external_wp_data_namespaceObject.createSelector)((state, kind, name, ids) => {
+  const normalizedIds = Array.isArray(ids) ? ids : [ids];
+  return normalizedIds.map(id => ({
+    delete: select(STORE_NAME).canUser('delete', {
+      kind,
+      name,
+      id
+    }),
+    update: select(STORE_NAME).canUser('update', {
+      kind,
+      name,
+      id
+    })
+  }));
+}, state => [state.userPermissions]));
+
+/**
+ * Returns the entity record permissions for the given entity record id.
+ *
+ * @param state Data state.
+ * @param kind  Entity kind.
+ * @param name  Entity name.
+ * @param id    Entity record id.
+ *
+ * @return The entity record permissions.
+ */
+function getEntityRecordPermissions(state, kind, name, id) {
+  return getEntityRecordsPermissions(state, kind, name, id)[0];
+}
+
+/**
+ * Returns the registered post meta fields for a given post type.
+ *
+ * @param state    Data state.
+ * @param postType Post type.
+ *
+ * @return Registered post meta fields.
+ */
+function getRegisteredPostMeta(state, postType) {
+  var _state$registeredPost;
+  return (_state$registeredPost = state.registeredPostMeta?.[postType]) !== null && _state$registeredPost !== void 0 ? _state$registeredPost : {};
+}
+
+;// CONCATENATED MODULE: ./packages/core-data/build-module/private-actions.js
+/**
+ * Returns an action object used in signalling that the registered post meta
+ * fields for a post type have been received.
+ *
+ * @param {string} postType           Post type slug.
+ * @param {Object} registeredPostMeta Registered post meta.
+ *
+ * @return {Object} Action object.
+ */
+function receiveRegisteredPostMeta(postType, registeredPostMeta) {
+  return {
+    type: 'RECEIVE_REGISTERED_POST_META',
+    postType,
+    registeredPostMeta
+  };
+}
+
 ;// CONCATENATED MODULE: ./node_modules/camel-case/dist.es2015/index.js
 
 
@@ -22698,7 +22823,7 @@ const resolvers_getEntityRecord = (kind, name, key = '', query) => async ({
         ...entityConfig.baseURLParams,
         ...query
       });
-      if (query !== undefined) {
+      if (query !== undefined && query._fields) {
         query = {
           ...query,
           include: [key]
@@ -22717,22 +22842,25 @@ const resolvers_getEntityRecord = (kind, name, key = '', query) => async ({
         parse: false
       });
       const record = await response.json();
-      const permissions = getUserPermissionsFromResponse(response);
+      const permissions = getUserPermissionsFromAllowHeader(response.headers?.get('allow'));
+      const canUserResolutionsArgs = [];
+      const receiveUserPermissionArgs = {};
+      for (const action of ALLOWED_RESOURCE_ACTIONS) {
+        receiveUserPermissionArgs[getUserPermissionCacheKey(action, {
+          kind,
+          name,
+          id: key
+        })] = permissions[action];
+        canUserResolutionsArgs.push([action, {
+          kind,
+          name,
+          id: key
+        }]);
+      }
       registry.batch(() => {
         dispatch.receiveEntityRecords(kind, name, record, query);
-        for (const action of ALLOWED_RESOURCE_ACTIONS) {
-          const permissionKey = getUserPermissionCacheKey(action, {
-            kind,
-            name,
-            id: key
-          });
-          dispatch.receiveUserPermission(permissionKey, permissions[action]);
-          dispatch.finishResolution('canUser', [action, {
-            kind,
-            name,
-            id: key
-          }]);
-        }
+        dispatch.receiveUserPermissions(receiveUserPermissionArgs);
+        dispatch.finishResolutions('canUser', canUserResolutionsArgs);
       });
     }
   } finally {
@@ -22799,6 +22927,10 @@ const resolvers_getEntityRecords = (kind, name, query = {}) => async ({
       records = Object.values(await external_wp_apiFetch_default()({
         path
       }));
+      meta = {
+        totalItems: records.length,
+        totalPages: 1
+      };
     }
 
     // If we request fields but the result doesn't contain the fields,
@@ -22817,13 +22949,36 @@ const resolvers_getEntityRecords = (kind, name, query = {}) => async ({
     registry.batch(() => {
       dispatch.receiveEntityRecords(kind, name, records, query, false, undefined, meta);
 
-      // When requesting all fields, the list of results can be used to
-      // resolve the `getEntityRecord` selector in addition to `getEntityRecords`.
+      // When requesting all fields, the list of results can be used to resolve
+      // the `getEntityRecord` and `canUser` selectors in addition to `getEntityRecords`.
       // See https://github.com/WordPress/gutenberg/pull/26575
+      // See https://github.com/WordPress/gutenberg/pull/64504
       if (!query?._fields && !query.context) {
         const key = entityConfig.key || DEFAULT_ENTITY_KEY;
         const resolutionsArgs = records.filter(record => record?.[key]).map(record => [kind, name, record[key]]);
+        const targetHints = records.filter(record => record?.[key]).map(record => ({
+          id: record[key],
+          permissions: getUserPermissionsFromAllowHeader(record?._links?.self?.[0].targetHints.allow)
+        }));
+        const canUserResolutionsArgs = [];
+        const receiveUserPermissionArgs = {};
+        for (const targetHint of targetHints) {
+          for (const action of ALLOWED_RESOURCE_ACTIONS) {
+            canUserResolutionsArgs.push([action, {
+              kind,
+              name,
+              id: targetHint.id
+            }]);
+            receiveUserPermissionArgs[getUserPermissionCacheKey(action, {
+              kind,
+              name,
+              id: targetHint.id
+            })] = targetHint.permissions[action];
+          }
+        }
+        dispatch.receiveUserPermissions(receiveUserPermissionArgs);
         dispatch.finishResolutions('getEntityRecord', resolutionsArgs);
+        dispatch.finishResolutions('canUser', canUserResolutionsArgs);
       }
       dispatch.__unstableReleaseStoreLock(lock);
     });
@@ -22931,7 +23086,11 @@ const resolvers_canUser = (requestedAction, resource, id) => async ({
     // 5xx). The previously determined isAllowed value will remain in the store.
     return;
   }
-  const permissions = getUserPermissionsFromResponse(response);
+
+  // Optional chaining operator is used here because the API requests don't
+  // return the expected result in the React native version. Instead, API requests
+  // only return the result, without including response properties like the headers.
+  const permissions = getUserPermissionsFromAllowHeader(response.headers?.get('allow'));
   registry.batch(() => {
     for (const action of ALLOWED_RESOURCE_ACTIONS) {
       const key = getUserPermissionCacheKey(action, resource, id);
@@ -22949,9 +23108,9 @@ const resolvers_canUser = (requestedAction, resource, id) => async ({
  * Checks whether the current user can perform the given action on the given
  * REST resource.
  *
- * @param {string} kind     Entity kind.
- * @param {string} name     Entity name.
- * @param {string} recordId Record's id.
+ * @param {string}        kind     Entity kind.
+ * @param {string}        name     Entity name.
+ * @param {number|string} recordId Record's id.
  */
 const resolvers_canUserEditEntityRecord = (kind, name, recordId) => async ({
   dispatch
@@ -23062,7 +23221,7 @@ const resolvers_experimentalGetCurrentThemeBaseGlobalStyles = () => async ({
 }) => {
   const currentTheme = await resolveSelect.getCurrentTheme();
   const themeGlobalStyles = await external_wp_apiFetch_default()({
-    path: `/wp/v2/global-styles/themes/${currentTheme.stylesheet}`
+    path: `/wp/v2/global-styles/themes/${currentTheme.stylesheet}?context=view`
   });
   dispatch.__experimentalReceiveThemeBaseGlobalStyles(currentTheme.stylesheet, themeGlobalStyles);
 };
@@ -23072,7 +23231,7 @@ const resolvers_experimentalGetCurrentThemeGlobalStylesVariations = () => async 
 }) => {
   const currentTheme = await resolveSelect.getCurrentTheme();
   const variations = await external_wp_apiFetch_default()({
-    path: `/wp/v2/global-styles/themes/${currentTheme.stylesheet}/variations`
+    path: `/wp/v2/global-styles/themes/${currentTheme.stylesheet}/variations?context=view`
   });
   dispatch.__experimentalReceiveThemeGlobalStyleVariations(currentTheme.stylesheet, variations);
 };
@@ -23139,7 +23298,8 @@ const resolvers_getUserPatternCategories = () => async ({
 };
 const resolvers_getNavigationFallbackId = () => async ({
   dispatch,
-  select
+  select,
+  registry
 }) => {
   const fallback = await external_wp_apiFetch_default()({
     path: (0,external_wp_url_namespaceObject.addQueryArgs)('/wp-block-editor/v1/navigation-fallback', {
@@ -23147,8 +23307,12 @@ const resolvers_getNavigationFallbackId = () => async ({
     })
   });
   const record = fallback?._embedded?.self;
-  dispatch.receiveNavigationFallbackId(fallback?.id);
-  if (record) {
+  registry.batch(() => {
+    dispatch.receiveNavigationFallbackId(fallback?.id);
+    if (!record) {
+      return;
+    }
+
     // If the fallback is already in the store, don't invalidate navigation queries.
     // Otherwise, invalidate the cache for the scenario where there were no Navigation
     // posts in the state and the fallback created one.
@@ -23158,7 +23322,7 @@ const resolvers_getNavigationFallbackId = () => async ({
 
     // Resolve to avoid further network requests.
     dispatch.finishResolution('getEntityRecord', ['postType', 'wp_navigation', fallback.id]);
-  }
+  });
 };
 const resolvers_getDefaultTemplateId = query => async ({
   dispatch
@@ -23183,7 +23347,8 @@ const resolvers_getDefaultTemplateId = query => async ({
  *                                     fields, fields must always include the ID.
  */
 const resolvers_getRevisions = (kind, name, recordKey, query = {}) => async ({
-  dispatch
+  dispatch,
+  registry
 }) => {
   const configs = await dispatch(getOrLoadEntitiesConfig(kind, name));
   const entityConfig = configs.find(config => config.name === name && config.kind === kind);
@@ -23233,16 +23398,17 @@ const resolvers_getRevisions = (kind, name, recordKey, query = {}) => async ({
         return record;
       });
     }
-    dispatch.receiveRevisions(kind, name, recordKey, records, query, false, meta);
+    registry.batch(() => {
+      dispatch.receiveRevisions(kind, name, recordKey, records, query, false, meta);
 
-    // When requesting all fields, the list of results can be used to
-    // resolve the `getRevision` selector in addition to `getRevisions`.
-    if (!query?._fields && !query.context) {
-      const key = entityConfig.key || DEFAULT_ENTITY_KEY;
-      const resolutionsArgs = records.filter(record => record[key]).map(record => [kind, name, recordKey, record[key]]);
-      dispatch.startResolutions('getRevision', resolutionsArgs);
-      dispatch.finishResolutions('getRevision', resolutionsArgs);
-    }
+      // When requesting all fields, the list of results can be used to
+      // resolve the `getRevision` selector in addition to `getRevisions`.
+      if (!query?._fields && !query.context) {
+        const key = entityConfig.key || DEFAULT_ENTITY_KEY;
+        const resolutionsArgs = records.filter(record => record[key]).map(record => [kind, name, recordKey, record[key]]);
+        dispatch.finishResolutions('getRevision', resolutionsArgs);
+      }
+    });
   }
 };
 
@@ -23289,6 +23455,34 @@ const resolvers_getRevision = (kind, name, recordKey, revisionKey, query) => asy
   }
   if (record) {
     dispatch.receiveRevisions(kind, name, recordKey, record, query);
+  }
+};
+
+/**
+ * Requests a specific post type options from the REST API.
+ *
+ * @param {string} postType Post type slug.
+ */
+const resolvers_getRegisteredPostMeta = postType => async ({
+  dispatch,
+  resolveSelect
+}) => {
+  let options;
+  try {
+    const {
+      rest_namespace: restNamespace = 'wp/v2',
+      rest_base: restBase
+    } = (await resolveSelect.getPostType(postType)) || {};
+    options = await external_wp_apiFetch_default()({
+      path: `${restNamespace}/${restBase}/?context=edit`,
+      method: 'OPTIONS'
+    });
+  } catch (error) {
+    // Do nothing if the request comes back with an API error.
+    return;
+  }
+  if (options) {
+    dispatch.receiveRegisteredPostMeta(postType, options?.schema?.properties?.meta?.properties);
   }
 };
 
@@ -23551,7 +23745,7 @@ function createLocksActions() {
 
 ;// CONCATENATED MODULE: external ["wp","privateApis"]
 const external_wp_privateApis_namespaceObject = window["wp"]["privateApis"];
-;// CONCATENATED MODULE: ./packages/core-data/build-module/private-apis.js
+;// CONCATENATED MODULE: ./packages/core-data/build-module/lock-unlock.js
 /**
  * WordPress dependencies
  */
@@ -24074,9 +24268,11 @@ function __experimentalUseEntityRecord(kind, name, recordId, options) {
 
 
 
+
 /**
  * Internal dependencies
  */
+
 
 
 const EMPTY_ARRAY = [];
@@ -24169,6 +24365,42 @@ function __experimentalUseEntityRecords(kind, name, queryArgs, options) {
     since: '6.1'
   });
   return useEntityRecords(kind, name, queryArgs, options);
+}
+function useEntityRecordsWithPermissions(kind, name, queryArgs = {}, options = {
+  enabled: true
+}) {
+  const entityConfig = (0,external_wp_data_namespaceObject.useSelect)(select => select(store).getEntityConfig(kind, name), [kind, name]);
+  const {
+    records: data,
+    ...ret
+  } = useEntityRecords(kind, name, queryArgs, options);
+  const ids = (0,external_wp_element_namespaceObject.useMemo)(() => {
+    var _data$map;
+    return (_data$map = data?.map(
+    // @ts-ignore
+    record => {
+      var _entityConfig$key;
+      return record[(_entityConfig$key = entityConfig?.key) !== null && _entityConfig$key !== void 0 ? _entityConfig$key : 'id'];
+    })) !== null && _data$map !== void 0 ? _data$map : [];
+  }, [data, entityConfig?.key]);
+  const permissions = (0,external_wp_data_namespaceObject.useSelect)(select => {
+    const {
+      getEntityRecordsPermissions
+    } = unlock(select(store));
+    return getEntityRecordsPermissions(kind, name, ids);
+  }, [ids, kind, name]);
+  const dataWithPermissions = (0,external_wp_element_namespaceObject.useMemo)(() => {
+    var _data$map2;
+    return (_data$map2 = data?.map((record, index) => ({
+      // @ts-ignore
+      ...record,
+      permissions: permissions[index]
+    }))) !== null && _data$map2 !== void 0 ? _data$map2 : [];
+  }, [data, permissions]);
+  return {
+    records: dataWithPermissions,
+    ...ret
+  };
 }
 
 ;// CONCATENATED MODULE: external ["wp","warning"]
@@ -24479,6 +24711,7 @@ function updateFootnotesFromMeta(blocks, meta) {
         continue;
       }
       const richTextValue = typeof value === 'string' ? external_wp_richText_namespaceObject.RichTextData.fromHTMLString(value) : new external_wp_richText_namespaceObject.RichTextData(value);
+      let hasFootnotes = false;
       richTextValue.replacements.forEach(replacement => {
         if (replacement.type === 'core/footnote') {
           const id = replacement.attributes['data-fn'];
@@ -24497,9 +24730,12 @@ function updateFootnotesFromMeta(blocks, meta) {
           replacement.innerHTML = (0,external_wp_richText_namespaceObject.toHTMLString)({
             value: countValue
           });
+          hasFootnotes = true;
         }
       });
-      attributes[key] = typeof value === 'string' ? richTextValue.toHTMLString() : richTextValue;
+      if (hasFootnotes) {
+        attributes[key] = typeof value === 'string' ? richTextValue.toHTMLString() : richTextValue;
+      }
     }
     return attributes;
   }
@@ -24685,10 +24921,10 @@ function useEntityBlockEditor(kind, name, {
  * specified property of the nearest provided
  * entity of the specified type.
  *
- * @param {string} kind  The entity kind.
- * @param {string} name  The entity name.
- * @param {string} prop  The property name.
- * @param {string} [_id] An entity ID to use instead of the context-provided one.
+ * @param {string}        kind  The entity kind.
+ * @param {string}        name  The entity name.
+ * @param {string}        prop  The property name.
+ * @param {number|string} [_id] An entity ID to use instead of the context-provided one.
  *
  * @return {[*, Function, *]} An array where the first item is the
  *                            property value, the second is the
@@ -24734,6 +24970,17 @@ function useEntityProp(kind, name, prop, _id) {
 
 
 
+;// CONCATENATED MODULE: ./packages/core-data/build-module/private-apis.js
+/**
+ * Internal dependencies
+ */
+
+
+const privateApis = {};
+lock(privateApis, {
+  useEntityRecordsWithPermissions: useEntityRecordsWithPermissions
+});
+
 ;// CONCATENATED MODULE: ./packages/core-data/build-module/index.js
 /**
  * WordPress dependencies
@@ -24743,6 +24990,7 @@ function useEntityProp(kind, name, prop, _id) {
 /**
  * Internal dependencies
  */
+
 
 
 
@@ -24817,7 +25065,9 @@ const storeConfig = () => ({
  */
 const store = (0,external_wp_data_namespaceObject.createReduxStore)(STORE_NAME, storeConfig());
 unlock(store).registerPrivateSelectors(private_selectors_namespaceObject);
+unlock(store).registerPrivateActions(private_actions_namespaceObject);
 (0,external_wp_data_namespaceObject.register)(store); // Register store after unlocking private selectors to allow resolvers to use them.
+
 
 
 
