@@ -23,7 +23,7 @@
 );var f=d.getElementsByTagName(s)[0],
 j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-})(window,document,'script','dataLayer','GTM-PS9M4PL');</script>
+})(window,document,'script','dataLayer','G-XQ8J45JE0W');</script>
 <!-- End Google Tag Manager -->
 
 <link rel="profile" href="http://gmpg.org/xfn/11">
@@ -31,13 +31,22 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 
 <!-- GCF code -->
 <!-- Global site tag (gtag.js) - Google Analytics -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=UA-51483554-1"></script>
+<!-- <script async src="https://www.googletagmanager.com/gtag/js?id=UA-51483554-1"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
 
   gtag('config', 'UA-51483554-1');
+</script> -->
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-XQ8J45JE0W"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-XQ8J45JE0W');
 </script>
 <!-- GCF code END-->
 
@@ -49,9 +58,9 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 		<script type="application/json">
 		{
 			"vars" : {
-				"gtag_id": "UA-51483554-1",
+				"gtag_id": "G-XQ8J45JE0W",
 				"config" : {
-					"UA-51483554-1": { "groups": "default" }
+					"G-XQ8J45JE0W": { "groups": "default" }
 				}
 			}
 		}

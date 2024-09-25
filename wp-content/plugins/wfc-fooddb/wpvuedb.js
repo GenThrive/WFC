@@ -79,7 +79,7 @@ new Vue({
         }
       },
       fetchjson() {
-        var url = 'https://www.watercalculator.org/wp-content/plugins/wfc-fooddb/fooddb3.json'
+        var url = 'https://watercalculator.org/wp-content/plugins/wfc-fooddb/fooddb3.json'
         fetch(url).then((response) => {return response.json()}).then((data) => {this.recipes = data })
       }
     },

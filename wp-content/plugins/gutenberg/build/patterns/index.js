@@ -86,13 +86,7 @@ const external_wp_blocks_namespaceObject = window["wp"]["blocks"];
 const external_wp_coreData_namespaceObject = window["wp"]["coreData"];
 ;// CONCATENATED MODULE: external ["wp","blockEditor"]
 const external_wp_blockEditor_namespaceObject = window["wp"]["blockEditor"];
-;// CONCATENATED MODULE: external ["wp","i18n"]
-const external_wp_i18n_namespaceObject = window["wp"]["i18n"];
 ;// CONCATENATED MODULE: ./packages/patterns/build-module/constants.js
-/**
- * WordPress dependencies
- */
-
 const PATTERN_TYPES = {
   theme: 'pattern',
   user: 'wp_block'
@@ -107,25 +101,12 @@ const PATTERN_SYNC_TYPES = {
 
 // TODO: This should not be hardcoded. Maybe there should be a config and/or an UI.
 const PARTIAL_SYNCING_SUPPORTED_BLOCKS = {
-  'core/paragraph': {
-    content: (0,external_wp_i18n_namespaceObject.__)('Content')
-  },
-  'core/heading': {
-    content: (0,external_wp_i18n_namespaceObject.__)('Content')
-  },
-  'core/button': {
-    text: (0,external_wp_i18n_namespaceObject.__)('Text'),
-    url: (0,external_wp_i18n_namespaceObject.__)('URL'),
-    linkTarget: (0,external_wp_i18n_namespaceObject.__)('Link Target'),
-    rel: (0,external_wp_i18n_namespaceObject.__)('Link Relationship')
-  },
-  'core/image': {
-    id: (0,external_wp_i18n_namespaceObject.__)('Image ID'),
-    url: (0,external_wp_i18n_namespaceObject.__)('URL'),
-    title: (0,external_wp_i18n_namespaceObject.__)('Title'),
-    alt: (0,external_wp_i18n_namespaceObject.__)('Alt Text')
-  }
+  'core/paragraph': ['content'],
+  'core/heading': ['content'],
+  'core/button': ['text', 'url', 'linkTarget', 'rel'],
+  'core/image': ['id', 'url', 'title', 'alt']
 };
+const PATTERN_OVERRIDES_BINDING_SOURCE = 'core/pattern-overrides';
 
 ;// CONCATENATED MODULE: ./packages/patterns/build-module/store/actions.js
 /**
@@ -198,6 +179,7 @@ const convertSyncedPatternToStatic = clientId => ({
   registry
 }) => {
   const patternBlock = registry.select(external_wp_blockEditor_namespaceObject.store).getBlock(clientId);
+  const existingOverrides = patternBlock.attributes?.content;
   function cloneBlocksAndRemoveBindings(blocks) {
     return blocks.map(block => {
       let metadata = block.attributes.metadata;
@@ -207,13 +189,26 @@ const convertSyncedPatternToStatic = clientId => ({
         };
         delete metadata.id;
         delete metadata.bindings;
+        // Use overridden values of the pattern block if they exist.
+        if (existingOverrides?.[metadata.name]) {
+          // Iterate over each overriden attribute.
+          for (const [attributeName, value] of Object.entries(existingOverrides[metadata.name])) {
+            // Skip if the attribute does not exist in the block type.
+            if (!(0,external_wp_blocks_namespaceObject.getBlockType)(block.name)?.attributes[attributeName]) {
+              continue;
+            }
+            // Update the block attribute with the override value.
+            block.attributes[attributeName] = value;
+          }
+        }
       }
       return (0,external_wp_blocks_namespaceObject.cloneBlock)(block, {
         metadata: metadata && Object.keys(metadata).length > 0 ? metadata : undefined
       }, cloneBlocksAndRemoveBindings(block.innerBlocks));
     });
   }
-  registry.dispatch(external_wp_blockEditor_namespaceObject.store).replaceBlocks(patternBlock.clientId, cloneBlocksAndRemoveBindings(patternBlock.innerBlocks));
+  const patternInnerBlocks = registry.select(external_wp_blockEditor_namespaceObject.store).getBlocks(patternBlock.clientId);
+  registry.dispatch(external_wp_blockEditor_namespaceObject.store).replaceBlocks(patternBlock.clientId, cloneBlocksAndRemoveBindings(patternInnerBlocks));
 };
 
 /**
@@ -259,7 +254,7 @@ const external_wp_privateApis_namespaceObject = window["wp"]["privateApis"];
 const {
   lock,
   unlock
-} = (0,external_wp_privateApis_namespaceObject.__dangerousOptInToUnstableAPIsOnlyForCoreModules)('I know using unstable features means my theme or plugin will inevitably break in the next version of WordPress.', '@wordpress/patterns');
+} = (0,external_wp_privateApis_namespaceObject.__dangerousOptInToUnstableAPIsOnlyForCoreModules)('I acknowledge private features are not for use in themes or plugins and doing so will break in the next version of WordPress.', '@wordpress/patterns');
 
 ;// CONCATENATED MODULE: ./packages/patterns/build-module/store/index.js
 /**
@@ -301,12 +296,86 @@ const store = (0,external_wp_data_namespaceObject.createReduxStore)(STORE_NAME, 
 unlock(store).registerPrivateActions(actions_namespaceObject);
 unlock(store).registerPrivateSelectors(selectors_namespaceObject);
 
-;// CONCATENATED MODULE: external "React"
-const external_React_namespaceObject = window["React"];
 ;// CONCATENATED MODULE: external ["wp","components"]
 const external_wp_components_namespaceObject = window["wp"]["components"];
 ;// CONCATENATED MODULE: external ["wp","element"]
 const external_wp_element_namespaceObject = window["wp"]["element"];
+;// CONCATENATED MODULE: external ["wp","i18n"]
+const external_wp_i18n_namespaceObject = window["wp"]["i18n"];
+;// CONCATENATED MODULE: ./packages/patterns/build-module/api/index.js
+/**
+ * Internal dependencies
+ */
+
+
+/**
+ * Determines whether a block is overridable.
+ *
+ * @param {WPBlock} block The block to test.
+ *
+ * @return {boolean} `true` if a block is overridable, `false` otherwise.
+ */
+function isOverridableBlock(block) {
+  return Object.keys(PARTIAL_SYNCING_SUPPORTED_BLOCKS).includes(block.name) && !!block.attributes.metadata?.name && !!block.attributes.metadata?.bindings && Object.values(block.attributes.metadata.bindings).some(binding => binding.source === 'core/pattern-overrides');
+}
+
+/**
+ * Determines whether the blocks list has overridable blocks.
+ *
+ * @param {WPBlock[]} blocks The blocks list.
+ *
+ * @return {boolean} `true` if the list has overridable blocks, `false` otherwise.
+ */
+function hasOverridableBlocks(blocks) {
+  return blocks.some(block => {
+    if (isOverridableBlock(block)) {
+      return true;
+    }
+    return hasOverridableBlocks(block.innerBlocks);
+  });
+}
+
+;// CONCATENATED MODULE: external "ReactJSXRuntime"
+const external_ReactJSXRuntime_namespaceObject = window["ReactJSXRuntime"];
+;// CONCATENATED MODULE: ./packages/patterns/build-module/components/overrides-panel.js
+/**
+ * WordPress dependencies
+ */
+
+
+
+
+
+
+/**
+ * Internal dependencies
+ */
+
+
+
+const {
+  BlockQuickNavigation
+} = unlock(external_wp_blockEditor_namespaceObject.privateApis);
+function OverridesPanel() {
+  const allClientIds = (0,external_wp_data_namespaceObject.useSelect)(select => select(external_wp_blockEditor_namespaceObject.store).getClientIdsWithDescendants(), []);
+  const {
+    getBlock
+  } = (0,external_wp_data_namespaceObject.useSelect)(external_wp_blockEditor_namespaceObject.store);
+  const clientIdsWithOverrides = (0,external_wp_element_namespaceObject.useMemo)(() => allClientIds.filter(clientId => {
+    const block = getBlock(clientId);
+    return isOverridableBlock(block);
+  }), [allClientIds, getBlock]);
+  if (!clientIdsWithOverrides?.length) {
+    return null;
+  }
+  return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.PanelBody, {
+    title: (0,external_wp_i18n_namespaceObject.__)('Overrides'),
+    children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(BlockQuickNavigation, {
+      clientIds: clientIdsWithOverrides
+    })
+  });
+}
+
 ;// CONCATENATED MODULE: external ["wp","notices"]
 const external_wp_notices_namespaceObject = window["wp"]["notices"];
 ;// CONCATENATED MODULE: external ["wp","compose"]
@@ -314,10 +383,10 @@ const external_wp_compose_namespaceObject = window["wp"]["compose"];
 ;// CONCATENATED MODULE: external ["wp","htmlEntities"]
 const external_wp_htmlEntities_namespaceObject = window["wp"]["htmlEntities"];
 ;// CONCATENATED MODULE: ./packages/patterns/build-module/components/category-selector.js
-
 /**
  * WordPress dependencies
  */
+
 
 
 
@@ -351,7 +420,7 @@ function CategorySelector({
     }, []);
     onChange(uniqueTerms);
   }
-  return (0,external_React_namespaceObject.createElement)(external_wp_components_namespaceObject.FormTokenField, {
+  return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.FormTokenField, {
     className: "patterns-menu-items__convert-modal-categories",
     value: categoryTerms,
     suggestions: suggestions,
@@ -461,10 +530,10 @@ function useAddPatternCategory() {
 }
 
 ;// CONCATENATED MODULE: ./packages/patterns/build-module/components/create-pattern-modal.js
-
 /**
  * WordPress dependencies
  */
+
 
 
 
@@ -479,21 +548,27 @@ function useAddPatternCategory() {
 
 
 
+
+
 function CreatePatternModal({
   className = 'patterns-menu-items__convert-modal',
-  modalTitle = (0,external_wp_i18n_namespaceObject.__)('Create pattern'),
+  modalTitle,
   ...restProps
 }) {
-  return (0,external_React_namespaceObject.createElement)(external_wp_components_namespaceObject.Modal, {
-    title: modalTitle,
+  const defaultModalTitle = (0,external_wp_data_namespaceObject.useSelect)(select => select(external_wp_coreData_namespaceObject.store).getPostType(PATTERN_TYPES.user)?.labels?.add_new_item, []);
+  return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.Modal, {
+    title: modalTitle || defaultModalTitle,
     onRequestClose: restProps.onClose,
-    overlayClassName: className
-  }, (0,external_React_namespaceObject.createElement)(CreatePatternModalContents, {
-    ...restProps
-  }));
+    overlayClassName: className,
+    focusOnMount: "firstContentElement",
+    size: "small",
+    children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(CreatePatternModalContents, {
+      ...restProps
+    })
+  });
 }
 function CreatePatternModalContents({
-  confirmLabel = (0,external_wp_i18n_namespaceObject.__)('Create'),
+  confirmLabel = (0,external_wp_i18n_namespaceObject.__)('Add'),
   defaultCategories = [],
   content,
   onClose,
@@ -540,52 +615,56 @@ function CreatePatternModalContents({
       setTitle('');
     }
   }
-  return (0,external_React_namespaceObject.createElement)("form", {
+  return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)("form", {
     onSubmit: event => {
       event.preventDefault();
       onCreate(title, syncType);
-    }
-  }, (0,external_React_namespaceObject.createElement)(external_wp_components_namespaceObject.__experimentalVStack, {
-    spacing: "5"
-  }, (0,external_React_namespaceObject.createElement)(external_wp_components_namespaceObject.TextControl, {
-    label: (0,external_wp_i18n_namespaceObject.__)('Name'),
-    value: title,
-    onChange: setTitle,
-    placeholder: (0,external_wp_i18n_namespaceObject.__)('My pattern'),
-    className: "patterns-create-modal__name-input",
-    __nextHasNoMarginBottom: true,
-    __next40pxDefaultSize: true
-  }), (0,external_React_namespaceObject.createElement)(CategorySelector, {
-    categoryTerms: categoryTerms,
-    onChange: setCategoryTerms,
-    categoryMap: categoryMap
-  }), (0,external_React_namespaceObject.createElement)(external_wp_components_namespaceObject.ToggleControl, {
-    label: (0,external_wp_i18n_namespaceObject._x)('Synced', 'Option that makes an individual pattern synchronized'),
-    help: (0,external_wp_i18n_namespaceObject.__)('Sync this pattern across multiple locations.'),
-    checked: syncType === PATTERN_SYNC_TYPES.full,
-    onChange: () => {
-      setSyncType(syncType === PATTERN_SYNC_TYPES.full ? PATTERN_SYNC_TYPES.unsynced : PATTERN_SYNC_TYPES.full);
-    }
-  }), (0,external_React_namespaceObject.createElement)(external_wp_components_namespaceObject.__experimentalHStack, {
-    justify: "right"
-  }, (0,external_React_namespaceObject.createElement)(external_wp_components_namespaceObject.Button, {
-    __next40pxDefaultSize: true,
-    variant: "tertiary",
-    onClick: () => {
-      onClose();
-      setTitle('');
-    }
-  }, (0,external_wp_i18n_namespaceObject.__)('Cancel')), (0,external_React_namespaceObject.createElement)(external_wp_components_namespaceObject.Button, {
-    __next40pxDefaultSize: true,
-    variant: "primary",
-    type: "submit",
-    "aria-disabled": !title || isSaving,
-    isBusy: isSaving
-  }, confirmLabel))));
+    },
+    children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsxs)(external_wp_components_namespaceObject.__experimentalVStack, {
+      spacing: "5",
+      children: [/*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.TextControl, {
+        label: (0,external_wp_i18n_namespaceObject.__)('Name'),
+        value: title,
+        onChange: setTitle,
+        placeholder: (0,external_wp_i18n_namespaceObject.__)('My pattern'),
+        className: "patterns-create-modal__name-input",
+        __nextHasNoMarginBottom: true,
+        __next40pxDefaultSize: true
+      }), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(CategorySelector, {
+        categoryTerms: categoryTerms,
+        onChange: setCategoryTerms,
+        categoryMap: categoryMap
+      }), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.ToggleControl, {
+        label: (0,external_wp_i18n_namespaceObject._x)('Synced', 'pattern (singular)'),
+        help: (0,external_wp_i18n_namespaceObject.__)('Sync this pattern across multiple locations.'),
+        checked: syncType === PATTERN_SYNC_TYPES.full,
+        onChange: () => {
+          setSyncType(syncType === PATTERN_SYNC_TYPES.full ? PATTERN_SYNC_TYPES.unsynced : PATTERN_SYNC_TYPES.full);
+        }
+      }), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsxs)(external_wp_components_namespaceObject.__experimentalHStack, {
+        justify: "right",
+        children: [/*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.Button, {
+          __next40pxDefaultSize: true,
+          variant: "tertiary",
+          onClick: () => {
+            onClose();
+            setTitle('');
+          },
+          children: (0,external_wp_i18n_namespaceObject.__)('Cancel')
+        }), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.Button, {
+          __next40pxDefaultSize: true,
+          variant: "primary",
+          type: "submit",
+          "aria-disabled": !title || isSaving,
+          isBusy: isSaving,
+          children: confirmLabel
+        })]
+      })]
+    })
+  });
 }
 
 ;// CONCATENATED MODULE: ./packages/patterns/build-module/components/duplicate-pattern-modal.js
-
 /**
  * WordPress dependencies
  */
@@ -597,6 +676,7 @@ function CreatePatternModalContents({
 /**
  * Internal dependencies
  */
+
 
 
 function getTermLabels(pattern, categories) {
@@ -660,7 +740,7 @@ function DuplicatePatternModal({
   if (!pattern) {
     return null;
   }
-  return (0,external_React_namespaceObject.createElement)(CreatePatternModal, {
+  return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(CreatePatternModal, {
     modalTitle: (0,external_wp_i18n_namespaceObject.__)('Duplicate pattern'),
     confirmLabel: (0,external_wp_i18n_namespaceObject.__)('Duplicate'),
     onClose: onClose,
@@ -670,10 +750,11 @@ function DuplicatePatternModal({
 }
 
 ;// CONCATENATED MODULE: ./packages/patterns/build-module/components/rename-pattern-modal.js
-
 /**
  * WordPress dependencies
  */
+
+
 
 
 
@@ -735,52 +816,60 @@ function RenamePatternModal({
     onClose?.();
     setName('');
   };
-  return (0,external_React_namespaceObject.createElement)(external_wp_components_namespaceObject.Modal, {
+  return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.Modal, {
     title: (0,external_wp_i18n_namespaceObject.__)('Rename'),
     ...props,
-    onRequestClose: onClose
-  }, (0,external_React_namespaceObject.createElement)("form", {
-    onSubmit: onRename
-  }, (0,external_React_namespaceObject.createElement)(external_wp_components_namespaceObject.__experimentalVStack, {
-    spacing: "5"
-  }, (0,external_React_namespaceObject.createElement)(external_wp_components_namespaceObject.TextControl, {
-    __nextHasNoMarginBottom: true,
-    __next40pxDefaultSize: true,
-    label: (0,external_wp_i18n_namespaceObject.__)('Name'),
-    value: name,
-    onChange: setName,
-    required: true
-  }), (0,external_React_namespaceObject.createElement)(external_wp_components_namespaceObject.__experimentalHStack, {
-    justify: "right"
-  }, (0,external_React_namespaceObject.createElement)(external_wp_components_namespaceObject.Button, {
-    __next40pxDefaultSize: true,
-    variant: "tertiary",
-    onClick: onRequestClose
-  }, (0,external_wp_i18n_namespaceObject.__)('Cancel')), (0,external_React_namespaceObject.createElement)(external_wp_components_namespaceObject.Button, {
-    __next40pxDefaultSize: true,
-    variant: "primary",
-    type: "submit"
-  }, (0,external_wp_i18n_namespaceObject.__)('Save'))))));
+    onRequestClose: onClose,
+    focusOnMount: "firstContentElement",
+    size: "small",
+    children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)("form", {
+      onSubmit: onRename,
+      children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsxs)(external_wp_components_namespaceObject.__experimentalVStack, {
+        spacing: "5",
+        children: [/*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.TextControl, {
+          __nextHasNoMarginBottom: true,
+          __next40pxDefaultSize: true,
+          label: (0,external_wp_i18n_namespaceObject.__)('Name'),
+          value: name,
+          onChange: setName,
+          required: true
+        }), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsxs)(external_wp_components_namespaceObject.__experimentalHStack, {
+          justify: "right",
+          children: [/*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.Button, {
+            __next40pxDefaultSize: true,
+            variant: "tertiary",
+            onClick: onRequestClose,
+            children: (0,external_wp_i18n_namespaceObject.__)('Cancel')
+          }), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.Button, {
+            __next40pxDefaultSize: true,
+            variant: "primary",
+            type: "submit",
+            children: (0,external_wp_i18n_namespaceObject.__)('Save')
+          })]
+        })]
+      })
+    })
+  });
 }
 
 ;// CONCATENATED MODULE: external ["wp","primitives"]
 const external_wp_primitives_namespaceObject = window["wp"]["primitives"];
 ;// CONCATENATED MODULE: ./packages/icons/build-module/library/symbol.js
-
 /**
  * WordPress dependencies
  */
 
-const symbol = (0,external_React_namespaceObject.createElement)(external_wp_primitives_namespaceObject.SVG, {
+
+const symbol = /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_primitives_namespaceObject.SVG, {
   xmlns: "http://www.w3.org/2000/svg",
-  viewBox: "0 0 24 24"
-}, (0,external_React_namespaceObject.createElement)(external_wp_primitives_namespaceObject.Path, {
-  d: "M21.3 10.8l-5.6-5.6c-.7-.7-1.8-.7-2.5 0l-5.6 5.6c-.7.7-.7 1.8 0 2.5l5.6 5.6c.3.3.8.5 1.2.5s.9-.2 1.2-.5l5.6-5.6c.8-.7.8-1.9.1-2.5zm-1 1.4l-5.6 5.6c-.1.1-.3.1-.4 0l-5.6-5.6c-.1-.1-.1-.3 0-.4l5.6-5.6s.1-.1.2-.1.1 0 .2.1l5.6 5.6c.1.1.1.3 0 .4zm-16.6-.4L10 5.5l-1-1-6.3 6.3c-.7.7-.7 1.8 0 2.5L9 19.5l1.1-1.1-6.3-6.3c-.2 0-.2-.2-.1-.3z"
-}));
+  viewBox: "0 0 24 24",
+  children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_primitives_namespaceObject.Path, {
+    d: "M21.3 10.8l-5.6-5.6c-.7-.7-1.8-.7-2.5 0l-5.6 5.6c-.7.7-.7 1.8 0 2.5l5.6 5.6c.3.3.8.5 1.2.5s.9-.2 1.2-.5l5.6-5.6c.8-.7.8-1.9.1-2.5zm-1 1.4l-5.6 5.6c-.1.1-.3.1-.4 0l-5.6-5.6c-.1-.1-.1-.3 0-.4l5.6-5.6s.1-.1.2-.1.1 0 .2.1l5.6 5.6c.1.1.1.3 0 .4zm-16.6-.4L10 5.5l-1-1-6.3 6.3c-.7.7-.7 1.8 0 2.5L9 19.5l1.1-1.1-6.3-6.3c-.2 0-.2-.2-.1-.3z"
+  })
+});
 /* harmony default export */ const library_symbol = (symbol);
 
 ;// CONCATENATED MODULE: ./packages/patterns/build-module/components/pattern-convert-button.js
-
 /**
  * WordPress dependencies
  */
@@ -810,6 +899,9 @@ const symbol = (0,external_React_namespaceObject.createElement)(external_wp_prim
  * @param {()=>void} props.closeBlockSettingsMenu Callback to close the block settings menu dropdown.
  * @return {import('react').ComponentType} The menu control or null.
  */
+
+
+
 function PatternConvertButton({
   clientIds,
   rootClientId,
@@ -852,7 +944,11 @@ function PatternConvertButton({
     // Hide when block doesn't support being made into a pattern.
     (0,external_wp_blocks_namespaceObject.hasBlockSupport)(block.name, 'reusable', true)) &&
     // Hide when current doesn't have permission to do that.
-    !!canUser('create', 'blocks');
+    // Blocks refers to the wp_block post type, this checks the ability to create a post of that type.
+    !!canUser('create', {
+      kind: 'postType',
+      name: 'wp_block'
+    });
     return _canConvert;
   }, [clientIds, rootClientId]);
   const {
@@ -883,29 +979,31 @@ function PatternConvertButton({
     });
     setIsModalOpen(false);
   };
-  return (0,external_React_namespaceObject.createElement)(external_React_namespaceObject.Fragment, null, (0,external_React_namespaceObject.createElement)(external_wp_components_namespaceObject.MenuItem, {
-    icon: library_symbol,
-    onClick: () => setIsModalOpen(true),
-    "aria-expanded": isModalOpen,
-    "aria-haspopup": "dialog"
-  }, (0,external_wp_i18n_namespaceObject.__)('Create pattern')), isModalOpen && (0,external_React_namespaceObject.createElement)(CreatePatternModal, {
-    content: getContent,
-    onSuccess: pattern => {
-      handleSuccess(pattern);
-    },
-    onError: () => {
-      setIsModalOpen(false);
-    },
-    onClose: () => {
-      setIsModalOpen(false);
-    }
-  }));
+  return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsxs)(external_ReactJSXRuntime_namespaceObject.Fragment, {
+    children: [/*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.MenuItem, {
+      icon: library_symbol,
+      onClick: () => setIsModalOpen(true),
+      "aria-expanded": isModalOpen,
+      "aria-haspopup": "dialog",
+      children: (0,external_wp_i18n_namespaceObject.__)('Create pattern')
+    }), isModalOpen && /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(CreatePatternModal, {
+      content: getContent,
+      onSuccess: pattern => {
+        handleSuccess(pattern);
+      },
+      onError: () => {
+        setIsModalOpen(false);
+      },
+      onClose: () => {
+        setIsModalOpen(false);
+      }
+    })]
+  });
 }
 
 ;// CONCATENATED MODULE: external ["wp","url"]
 const external_wp_url_namespaceObject = window["wp"]["url"];
 ;// CONCATENATED MODULE: ./packages/patterns/build-module/components/patterns-manage-button.js
-
 /**
  * WordPress dependencies
  */
@@ -922,6 +1020,9 @@ const external_wp_url_namespaceObject = window["wp"]["url"];
  */
 
 
+
+
+
 function PatternsManageButton({
   clientId
 }) {
@@ -933,22 +1034,27 @@ function PatternsManageButton({
     const {
       getBlock,
       canRemoveBlock,
-      getBlockCount,
-      getSettings
+      getBlockCount
     } = select(external_wp_blockEditor_namespaceObject.store);
     const {
       canUser
     } = select(external_wp_coreData_namespaceObject.store);
     const reusableBlock = getBlock(clientId);
-    const isBlockTheme = getSettings().__unstableIsBlockBasedTheme;
     return {
       canRemove: canRemoveBlock(clientId),
-      isVisible: !!reusableBlock && (0,external_wp_blocks_namespaceObject.isReusableBlock)(reusableBlock) && !!canUser('update', 'blocks', reusableBlock.attributes.ref),
+      isVisible: !!reusableBlock && (0,external_wp_blocks_namespaceObject.isReusableBlock)(reusableBlock) && !!canUser('update', {
+        kind: 'postType',
+        name: 'wp_block',
+        id: reusableBlock.attributes.ref
+      }),
       innerBlockCount: getBlockCount(clientId),
       // The site editor and templates both check whether the user
       // has edit_theme_options capabilities. We can leverage that here
       // and omit the manage patterns link if the user can't access it.
-      managePatternsUrl: isBlockTheme && canUser('read', 'templates') ? (0,external_wp_url_namespaceObject.addQueryArgs)('site-editor.php', {
+      managePatternsUrl: canUser('create', {
+        kind: 'postType',
+        name: 'wp_template'
+      }) ? (0,external_wp_url_namespaceObject.addQueryArgs)('site-editor.php', {
         path: '/patterns'
       }) : (0,external_wp_url_namespaceObject.addQueryArgs)('edit.php', {
         post_type: 'wp_block'
@@ -964,16 +1070,19 @@ function PatternsManageButton({
   if (!isVisible) {
     return null;
   }
-  return (0,external_React_namespaceObject.createElement)(external_React_namespaceObject.Fragment, null, canRemove && (0,external_React_namespaceObject.createElement)(external_wp_components_namespaceObject.MenuItem, {
-    onClick: () => convertSyncedPatternToStatic(clientId)
-  }, (0,external_wp_i18n_namespaceObject.__)('Detach')), (0,external_React_namespaceObject.createElement)(external_wp_components_namespaceObject.MenuItem, {
-    href: managePatternsUrl
-  }, (0,external_wp_i18n_namespaceObject.__)('Manage patterns')));
+  return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsxs)(external_ReactJSXRuntime_namespaceObject.Fragment, {
+    children: [canRemove && /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.MenuItem, {
+      onClick: () => convertSyncedPatternToStatic(clientId),
+      children: (0,external_wp_i18n_namespaceObject.__)('Detach')
+    }), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.MenuItem, {
+      href: managePatternsUrl,
+      children: (0,external_wp_i18n_namespaceObject.__)('Manage patterns')
+    })]
+  });
 }
 /* harmony default export */ const patterns_manage_button = (PatternsManageButton);
 
 ;// CONCATENATED MODULE: ./packages/patterns/build-module/components/index.js
-
 /**
  * WordPress dependencies
  */
@@ -982,27 +1091,33 @@ function PatternsManageButton({
 /**
  * Internal dependencies
  */
+
+
+
 
 
 function PatternsMenuItems({
   rootClientId
 }) {
-  return (0,external_React_namespaceObject.createElement)(external_wp_blockEditor_namespaceObject.BlockSettingsMenuControls, null, ({
-    selectedClientIds,
-    onClose
-  }) => (0,external_React_namespaceObject.createElement)(external_React_namespaceObject.Fragment, null, (0,external_React_namespaceObject.createElement)(PatternConvertButton, {
-    clientIds: selectedClientIds,
-    rootClientId: rootClientId,
-    closeBlockSettingsMenu: onClose
-  }), selectedClientIds.length === 1 && (0,external_React_namespaceObject.createElement)(patterns_manage_button, {
-    clientId: selectedClientIds[0]
-  })));
+  return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_blockEditor_namespaceObject.BlockSettingsMenuControls, {
+    children: ({
+      selectedClientIds,
+      onClose
+    }) => /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsxs)(external_ReactJSXRuntime_namespaceObject.Fragment, {
+      children: [/*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(PatternConvertButton, {
+        clientIds: selectedClientIds,
+        rootClientId: rootClientId,
+        closeBlockSettingsMenu: onClose
+      }), selectedClientIds.length === 1 && /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(patterns_manage_button, {
+        clientId: selectedClientIds[0]
+      })]
+    })
+  });
 }
 
 ;// CONCATENATED MODULE: external ["wp","a11y"]
 const external_wp_a11y_namespaceObject = window["wp"]["a11y"];
 ;// CONCATENATED MODULE: ./packages/patterns/build-module/components/rename-pattern-category-modal.js
-
 /**
  * WordPress dependencies
  */
@@ -1018,6 +1133,8 @@ const external_wp_a11y_namespaceObject = window["wp"]["a11y"];
 /**
  * Internal dependencies
  */
+
+
 
 function RenamePatternCategoryModal({
   category,
@@ -1106,89 +1223,178 @@ function RenamePatternCategoryModal({
     onClose();
     setName('');
   };
-  return (0,external_React_namespaceObject.createElement)(external_wp_components_namespaceObject.Modal, {
+  return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.Modal, {
     title: (0,external_wp_i18n_namespaceObject.__)('Rename'),
     onRequestClose: onRequestClose,
-    ...props
-  }, (0,external_React_namespaceObject.createElement)("form", {
-    onSubmit: onSave
-  }, (0,external_React_namespaceObject.createElement)(external_wp_components_namespaceObject.__experimentalVStack, {
-    spacing: "5"
-  }, (0,external_React_namespaceObject.createElement)(external_wp_components_namespaceObject.__experimentalVStack, {
-    spacing: "2"
-  }, (0,external_React_namespaceObject.createElement)(external_wp_components_namespaceObject.TextControl, {
-    ref: textControlRef,
-    __nextHasNoMarginBottom: true,
-    __next40pxDefaultSize: true,
-    label: (0,external_wp_i18n_namespaceObject.__)('Name'),
-    value: name,
-    onChange: onChange,
-    "aria-describedby": validationMessageId,
-    required: true
-  }), validationMessage && (0,external_React_namespaceObject.createElement)("span", {
-    className: "patterns-rename-pattern-category-modal__validation-message",
-    id: validationMessageId
-  }, validationMessage)), (0,external_React_namespaceObject.createElement)(external_wp_components_namespaceObject.__experimentalHStack, {
-    justify: "right"
-  }, (0,external_React_namespaceObject.createElement)(external_wp_components_namespaceObject.Button, {
-    __next40pxDefaultSize: true,
-    variant: "tertiary",
-    onClick: onRequestClose
-  }, (0,external_wp_i18n_namespaceObject.__)('Cancel')), (0,external_React_namespaceObject.createElement)(external_wp_components_namespaceObject.Button, {
-    __next40pxDefaultSize: true,
-    variant: "primary",
-    type: "submit",
-    "aria-disabled": !name || name === category.name || isSaving,
-    isBusy: isSaving
-  }, (0,external_wp_i18n_namespaceObject.__)('Save'))))));
+    ...props,
+    children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)("form", {
+      onSubmit: onSave,
+      children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsxs)(external_wp_components_namespaceObject.__experimentalVStack, {
+        spacing: "5",
+        children: [/*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsxs)(external_wp_components_namespaceObject.__experimentalVStack, {
+          spacing: "2",
+          children: [/*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.TextControl, {
+            ref: textControlRef,
+            __nextHasNoMarginBottom: true,
+            __next40pxDefaultSize: true,
+            label: (0,external_wp_i18n_namespaceObject.__)('Name'),
+            value: name,
+            onChange: onChange,
+            "aria-describedby": validationMessageId,
+            required: true
+          }), validationMessage && /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)("span", {
+            className: "patterns-rename-pattern-category-modal__validation-message",
+            id: validationMessageId,
+            children: validationMessage
+          })]
+        }), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsxs)(external_wp_components_namespaceObject.__experimentalHStack, {
+          justify: "right",
+          children: [/*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.Button, {
+            __next40pxDefaultSize: true,
+            variant: "tertiary",
+            onClick: onRequestClose,
+            children: (0,external_wp_i18n_namespaceObject.__)('Cancel')
+          }), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.Button, {
+            __next40pxDefaultSize: true,
+            variant: "primary",
+            type: "submit",
+            "aria-disabled": !name || name === category.name || isSaving,
+            isBusy: isSaving,
+            children: (0,external_wp_i18n_namespaceObject.__)('Save')
+          })]
+        })]
+      })
+    })
+  });
 }
 
-;// CONCATENATED MODULE: ./node_modules/nanoid/index.browser.js
-
-let random = bytes => crypto.getRandomValues(new Uint8Array(bytes))
-let customRandom = (alphabet, defaultSize, getRandom) => {
-  let mask = (2 << (Math.log(alphabet.length - 1) / Math.LN2)) - 1
-  let step = -~((1.6 * mask * defaultSize) / alphabet.length)
-  return (size = defaultSize) => {
-    let id = ''
-    while (true) {
-      let bytes = getRandom(step)
-      let j = step
-      while (j--) {
-        id += alphabet[bytes[j] & mask] || ''
-        if (id.length === size) return id
-      }
-    }
-  }
-}
-let customAlphabet = (alphabet, size = 21) =>
-  customRandom(alphabet, size, random)
-let nanoid = (size = 21) =>
-  crypto.getRandomValues(new Uint8Array(size)).reduce((id, byte) => {
-    byte &= 63
-    if (byte < 36) {
-      id += byte.toString(36)
-    } else if (byte < 62) {
-      id += (byte - 26).toString(36).toUpperCase()
-    } else if (byte > 62) {
-      id += '-'
-    } else {
-      id += '_'
-    }
-    return id
-  }, '')
-
-
-;// CONCATENATED MODULE: ./packages/patterns/build-module/components/partial-syncing-controls.js
-
-/**
- * External dependencies
- */
-
-
+;// CONCATENATED MODULE: ./packages/patterns/build-module/components/allow-overrides-modal.js
 /**
  * WordPress dependencies
  */
+
+
+
+
+
+
+function AllowOverridesModal({
+  placeholder,
+  initialName = '',
+  onClose,
+  onSave
+}) {
+  const [editedBlockName, setEditedBlockName] = (0,external_wp_element_namespaceObject.useState)(initialName);
+  const descriptionId = (0,external_wp_element_namespaceObject.useId)();
+  const isNameValid = !!editedBlockName.trim();
+  const handleSubmit = () => {
+    if (editedBlockName !== initialName) {
+      const message = (0,external_wp_i18n_namespaceObject.sprintf)( /* translators: %s: new name/label for the block */
+      (0,external_wp_i18n_namespaceObject.__)('Block name changed to: "%s".'), editedBlockName);
+
+      // Must be assertive to immediately announce change.
+      (0,external_wp_a11y_namespaceObject.speak)(message, 'assertive');
+    }
+    onSave(editedBlockName);
+
+    // Immediate close avoids ability to hit save multiple times.
+    onClose();
+  };
+  return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.Modal, {
+    title: (0,external_wp_i18n_namespaceObject.__)('Enable overrides'),
+    onRequestClose: onClose,
+    focusOnMount: "firstContentElement",
+    aria: {
+      describedby: descriptionId
+    },
+    size: "small",
+    children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)("form", {
+      onSubmit: event => {
+        event.preventDefault();
+        if (!isNameValid) {
+          return;
+        }
+        handleSubmit();
+      },
+      children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsxs)(external_wp_components_namespaceObject.__experimentalVStack, {
+        spacing: "6",
+        children: [/*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.__experimentalText, {
+          id: descriptionId,
+          children: (0,external_wp_i18n_namespaceObject.__)('Overrides are changes you make to a block within a synced pattern instance. Use overrides to customize a synced pattern instance to suit its new context. Name this block to specify an override.')
+        }), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.TextControl, {
+          __nextHasNoMarginBottom: true,
+          __next40pxDefaultSize: true,
+          value: editedBlockName,
+          label: (0,external_wp_i18n_namespaceObject.__)('Name'),
+          help: (0,external_wp_i18n_namespaceObject.__)('For example, if you are creating a recipe pattern, you use "Recipe Title", "Recipe Description", etc.'),
+          placeholder: placeholder,
+          onChange: setEditedBlockName
+        }), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsxs)(external_wp_components_namespaceObject.__experimentalHStack, {
+          justify: "right",
+          children: [/*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.Button, {
+            __next40pxDefaultSize: true,
+            variant: "tertiary",
+            onClick: onClose,
+            children: (0,external_wp_i18n_namespaceObject.__)('Cancel')
+          }), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.Button, {
+            __next40pxDefaultSize: true,
+            "aria-disabled": !isNameValid,
+            variant: "primary",
+            type: "submit",
+            children: (0,external_wp_i18n_namespaceObject.__)('Enable')
+          })]
+        })]
+      })
+    })
+  });
+}
+function DisallowOverridesModal({
+  onClose,
+  onSave
+}) {
+  const descriptionId = (0,external_wp_element_namespaceObject.useId)();
+  return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.Modal, {
+    title: (0,external_wp_i18n_namespaceObject.__)('Disable overrides'),
+    onRequestClose: onClose,
+    aria: {
+      describedby: descriptionId
+    },
+    size: "small",
+    children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)("form", {
+      onSubmit: event => {
+        event.preventDefault();
+        onSave();
+        onClose();
+      },
+      children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsxs)(external_wp_components_namespaceObject.__experimentalVStack, {
+        spacing: "6",
+        children: [/*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.__experimentalText, {
+          id: descriptionId,
+          children: (0,external_wp_i18n_namespaceObject.__)('Are you sure you want to disable overrides? Disabling overrides will revert all applied overrides for this block throughout instances of this pattern.')
+        }), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsxs)(external_wp_components_namespaceObject.__experimentalHStack, {
+          justify: "right",
+          children: [/*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.Button, {
+            __next40pxDefaultSize: true,
+            variant: "tertiary",
+            onClick: onClose,
+            children: (0,external_wp_i18n_namespaceObject.__)('Cancel')
+          }), /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.Button, {
+            __next40pxDefaultSize: true,
+            variant: "primary",
+            type: "submit",
+            children: (0,external_wp_i18n_namespaceObject.__)('Disable')
+          })]
+        })]
+      })
+    })
+  });
+}
+
+;// CONCATENATED MODULE: ./packages/patterns/build-module/components/pattern-overrides-controls.js
+/**
+ * WordPress dependencies
+ */
+
 
 
 
@@ -1197,82 +1403,188 @@ let nanoid = (size = 21) =>
  * Internal dependencies
  */
 
-function PartialSyncingControls({
-  name,
-  attributes,
-  setAttributes
-}) {
-  const syncedAttributes = PARTIAL_SYNCING_SUPPORTED_BLOCKS[name];
-  const attributeSources = Object.keys(syncedAttributes).map(attributeName => attributes.metadata?.bindings?.[attributeName]?.source);
-  const isConnectedToOtherSources = attributeSources.every(source => source && source !== 'core/pattern-overrides');
 
-  // Render nothing if all supported attributes are connected to other sources.
+
+
+
+function removeBindings(bindings) {
+  let updatedBindings = {
+    ...bindings
+  };
+  delete updatedBindings.__default;
+  if (!Object.keys(updatedBindings).length) {
+    updatedBindings = undefined;
+  }
+  return updatedBindings;
+}
+function addBindings(bindings) {
+  return {
+    ...bindings,
+    __default: {
+      source: PATTERN_OVERRIDES_BINDING_SOURCE
+    }
+  };
+}
+function PatternOverridesControls({
+  attributes,
+  setAttributes,
+  name: blockName
+}) {
+  const controlId = (0,external_wp_element_namespaceObject.useId)();
+  const [showAllowOverridesModal, setShowAllowOverridesModal] = (0,external_wp_element_namespaceObject.useState)(false);
+  const [showDisallowOverridesModal, setShowDisallowOverridesModal] = (0,external_wp_element_namespaceObject.useState)(false);
+  const hasName = !!attributes.metadata?.name;
+  const defaultBindings = attributes.metadata?.bindings?.__default;
+  const hasOverrides = hasName && defaultBindings?.source === PATTERN_OVERRIDES_BINDING_SOURCE;
+  const isConnectedToOtherSources = defaultBindings?.source && defaultBindings.source !== PATTERN_OVERRIDES_BINDING_SOURCE;
+  function updateBindings(isChecked, customName) {
+    const prevBindings = attributes?.metadata?.bindings;
+    const updatedBindings = isChecked ? addBindings(prevBindings) : removeBindings(prevBindings);
+    const updatedMetadata = {
+      ...attributes.metadata,
+      bindings: updatedBindings
+    };
+    if (customName) {
+      updatedMetadata.name = customName;
+    }
+    setAttributes({
+      metadata: updatedMetadata
+    });
+  }
+
+  // Avoid overwriting other (e.g. meta) bindings.
   if (isConnectedToOtherSources) {
     return null;
   }
-  function updateBindings(isChecked) {
-    let updatedBindings = {
-      ...attributes?.metadata?.bindings
-    };
-    if (!isChecked) {
-      for (const attributeName of Object.keys(syncedAttributes)) {
-        if (updatedBindings[attributeName]?.source === 'core/pattern-overrides') {
-          delete updatedBindings[attributeName];
-        }
+  const hasUnsupportedImageAttributes = blockName === 'core/image' && (!!attributes.caption?.length || !!attributes.href?.length);
+  const helpText = !hasOverrides && hasUnsupportedImageAttributes ? (0,external_wp_i18n_namespaceObject.__)(`Overrides currently don't support image captions or links. Remove the caption or link first before enabling overrides.`) : (0,external_wp_i18n_namespaceObject.__)('Allow changes to this block throughout instances of this pattern.');
+  return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsxs)(external_ReactJSXRuntime_namespaceObject.Fragment, {
+    children: [/*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_blockEditor_namespaceObject.InspectorControls, {
+      group: "advanced",
+      children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.BaseControl, {
+        id: controlId,
+        label: (0,external_wp_i18n_namespaceObject.__)('Overrides'),
+        help: helpText,
+        children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.Button, {
+          __next40pxDefaultSize: true,
+          className: "pattern-overrides-control__allow-overrides-button",
+          variant: "secondary",
+          "aria-haspopup": "dialog",
+          onClick: () => {
+            if (hasOverrides) {
+              setShowDisallowOverridesModal(true);
+            } else {
+              setShowAllowOverridesModal(true);
+            }
+          },
+          disabled: !hasOverrides && hasUnsupportedImageAttributes,
+          accessibleWhenDisabled: true,
+          children: hasOverrides ? (0,external_wp_i18n_namespaceObject.__)('Disable overrides') : (0,external_wp_i18n_namespaceObject.__)('Enable overrides')
+        })
+      })
+    }), showAllowOverridesModal && /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(AllowOverridesModal, {
+      initialName: attributes.metadata?.name,
+      onClose: () => setShowAllowOverridesModal(false),
+      onSave: newName => {
+        updateBindings(true, newName);
       }
-      if (!Object.keys(updatedBindings).length) {
-        updatedBindings = undefined;
-      }
-      setAttributes({
-        metadata: {
-          ...attributes.metadata,
-          bindings: updatedBindings
-        }
-      });
-      return;
-    }
-    for (const attributeName of Object.keys(syncedAttributes)) {
-      if (!updatedBindings[attributeName]) {
-        updatedBindings[attributeName] = {
-          source: 'core/pattern-overrides'
-        };
-      }
-    }
-    if (typeof attributes.metadata?.id === 'string') {
-      setAttributes({
-        metadata: {
-          ...attributes.metadata,
-          bindings: updatedBindings
-        }
-      });
-      return;
-    }
-    const id = nanoid(6);
-    setAttributes({
-      metadata: {
-        ...attributes.metadata,
-        id,
-        bindings: updatedBindings
-      }
-    });
-  }
-  return (0,external_React_namespaceObject.createElement)(external_wp_blockEditor_namespaceObject.InspectorControls, {
-    group: "advanced"
-  }, (0,external_React_namespaceObject.createElement)(external_wp_components_namespaceObject.BaseControl, {
-    __nextHasNoMarginBottom: true
-  }, (0,external_React_namespaceObject.createElement)(external_wp_components_namespaceObject.BaseControl.VisualLabel, null, (0,external_wp_i18n_namespaceObject.__)('Pattern overrides')), (0,external_React_namespaceObject.createElement)(external_wp_components_namespaceObject.CheckboxControl, {
-    __nextHasNoMarginBottom: true,
-    label: (0,external_wp_i18n_namespaceObject.__)('Allow instance overrides'),
-    checked: attributeSources.some(source => source === 'core/pattern-overrides'),
-    onChange: isChecked => {
-      updateBindings(isChecked);
-    }
-  })));
+    }), showDisallowOverridesModal && /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(DisallowOverridesModal, {
+      onClose: () => setShowDisallowOverridesModal(false),
+      onSave: () => updateBindings(false)
+    })]
+  });
 }
-/* harmony default export */ const partial_syncing_controls = (PartialSyncingControls);
+/* harmony default export */ const pattern_overrides_controls = (PatternOverridesControls);
 
 ;// CONCATENATED MODULE: ./packages/patterns/build-module/components/reset-overrides-control.js
+/**
+ * WordPress dependencies
+ */
 
+
+
+
+
+const CONTENT = 'content';
+function ResetOverridesControl(props) {
+  const name = props.attributes.metadata?.name;
+  const registry = (0,external_wp_data_namespaceObject.useRegistry)();
+  const isOverriden = (0,external_wp_data_namespaceObject.useSelect)(select => {
+    if (!name) {
+      return;
+    }
+    const {
+      getBlockAttributes,
+      getBlockParentsByBlockName
+    } = select(external_wp_blockEditor_namespaceObject.store);
+    const [patternClientId] = getBlockParentsByBlockName(props.clientId, 'core/block', true);
+    if (!patternClientId) {
+      return;
+    }
+    const overrides = getBlockAttributes(patternClientId)[CONTENT];
+    if (!overrides) {
+      return;
+    }
+    return overrides.hasOwnProperty(name);
+  }, [props.clientId, name]);
+  function onClick() {
+    const {
+      getBlockAttributes,
+      getBlockParentsByBlockName
+    } = registry.select(external_wp_blockEditor_namespaceObject.store);
+    const [patternClientId] = getBlockParentsByBlockName(props.clientId, 'core/block', true);
+    if (!patternClientId) {
+      return;
+    }
+    const overrides = getBlockAttributes(patternClientId)[CONTENT];
+    if (!overrides.hasOwnProperty(name)) {
+      return;
+    }
+    const {
+      updateBlockAttributes,
+      __unstableMarkLastChangeAsPersistent
+    } = registry.dispatch(external_wp_blockEditor_namespaceObject.store);
+    __unstableMarkLastChangeAsPersistent();
+    let newOverrides = {
+      ...overrides
+    };
+    delete newOverrides[name];
+    if (!Object.keys(newOverrides).length) {
+      newOverrides = undefined;
+    }
+    updateBlockAttributes(patternClientId, {
+      [CONTENT]: newOverrides
+    });
+  }
+  return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_blockEditor_namespaceObject.__unstableBlockToolbarLastItem, {
+    children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.ToolbarGroup, {
+      children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.ToolbarButton, {
+        onClick: onClick,
+        disabled: !isOverriden,
+        children: (0,external_wp_i18n_namespaceObject.__)('Reset')
+      })
+    })
+  });
+}
+
+;// CONCATENATED MODULE: ./packages/icons/build-module/library/copy.js
+/**
+ * WordPress dependencies
+ */
+
+
+const copy = /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_primitives_namespaceObject.SVG, {
+  xmlns: "http://www.w3.org/2000/svg",
+  viewBox: "0 0 24 24",
+  children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_primitives_namespaceObject.Path, {
+    fillRule: "evenodd",
+    clipRule: "evenodd",
+    d: "M5 4.5h11a.5.5 0 0 1 .5.5v11a.5.5 0 0 1-.5.5H5a.5.5 0 0 1-.5-.5V5a.5.5 0 0 1 .5-.5ZM3 5a2 2 0 0 1 2-2h11a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5Zm17 3v10.75c0 .69-.56 1.25-1.25 1.25H6v1.5h12.75a2.75 2.75 0 0 0 2.75-2.75V8H20Z"
+  })
+});
+/* harmony default export */ const library_copy = (copy);
+
+;// CONCATENATED MODULE: ./packages/patterns/build-module/components/pattern-overrides-block-controls.js
 /**
  * WordPress dependencies
  */
@@ -1282,53 +1594,119 @@ function PartialSyncingControls({
 
 
 
-function recursivelyFindBlockWithId(blocks, id) {
-  for (const block of blocks) {
-    if (block.attributes.metadata?.id === id) {
-      return block;
-    }
-    const found = recursivelyFindBlockWithId(block.innerBlocks, id);
-    if (found) {
-      return found;
-    }
-  }
-}
-function ResetOverridesControl(props) {
-  const registry = (0,external_wp_data_namespaceObject.useRegistry)();
-  const id = props.attributes.metadata?.id;
-  const patternWithOverrides = (0,external_wp_data_namespaceObject.useSelect)(select => {
-    if (!id) {
-      return undefined;
-    }
+
+
+/**
+ * Internal dependencies
+ */
+
+
+
+
+const {
+  useBlockDisplayTitle
+} = unlock(external_wp_blockEditor_namespaceObject.privateApis);
+function PatternOverridesToolbarIndicator({
+  clientIds
+}) {
+  const isSingleBlockSelected = clientIds.length === 1;
+  const {
+    icon,
+    firstBlockName
+  } = (0,external_wp_data_namespaceObject.useSelect)(select => {
     const {
-      getBlockParentsByBlockName,
-      getBlocksByClientId
+      getBlockAttributes,
+      getBlockNamesByClientId
     } = select(external_wp_blockEditor_namespaceObject.store);
-    const patternBlock = getBlocksByClientId(getBlockParentsByBlockName(props.clientId, 'core/block'))[0];
-    if (!patternBlock?.attributes.content?.[id]) {
-      return undefined;
+    const {
+      getBlockType,
+      getActiveBlockVariation
+    } = select(external_wp_blocks_namespaceObject.store);
+    const blockTypeNames = getBlockNamesByClientId(clientIds);
+    const _firstBlockTypeName = blockTypeNames[0];
+    const firstBlockType = getBlockType(_firstBlockTypeName);
+    let _icon;
+    if (isSingleBlockSelected) {
+      const match = getActiveBlockVariation(_firstBlockTypeName, getBlockAttributes(clientIds[0]));
+      // Take into account active block variations.
+      _icon = match?.icon || firstBlockType.icon;
+    } else {
+      const isSelectionOfSameType = new Set(blockTypeNames).size === 1;
+      // When selection consists of blocks of multiple types, display an
+      // appropriate icon to communicate the non-uniformity.
+      _icon = isSelectionOfSameType ? firstBlockType.icon : library_copy;
     }
-    return patternBlock;
-  }, [props.clientId, id]);
-  const resetOverrides = async () => {
-    var _editedRecord$blocks;
-    const editedRecord = await registry.resolveSelect(external_wp_coreData_namespaceObject.store).getEditedEntityRecord('postType', 'wp_block', patternWithOverrides.attributes.ref);
-    const blocks = (_editedRecord$blocks = editedRecord.blocks) !== null && _editedRecord$blocks !== void 0 ? _editedRecord$blocks : (0,external_wp_blocks_namespaceObject.parse)(editedRecord.content);
-    const block = recursivelyFindBlockWithId(blocks, id);
-    const newAttributes = Object.assign(
-    // Reset every existing attribute to undefined.
-    Object.fromEntries(Object.keys(props.attributes).map(key => [key, undefined])),
-    // Then assign the original attributes.
-    block.attributes);
-    props.setAttributes(newAttributes);
-  };
-  return (0,external_React_namespaceObject.createElement)(external_wp_blockEditor_namespaceObject.BlockControls, {
-    group: "other"
-  }, (0,external_React_namespaceObject.createElement)(external_wp_components_namespaceObject.ToolbarGroup, null, (0,external_React_namespaceObject.createElement)(external_wp_components_namespaceObject.ToolbarButton, {
-    onClick: resetOverrides,
-    disabled: !patternWithOverrides,
-    __experimentalIsFocusable: true
-  }, (0,external_wp_i18n_namespaceObject.__)('Reset'))));
+    return {
+      icon: _icon,
+      firstBlockName: getBlockAttributes(clientIds[0]).metadata.name
+    };
+  }, [clientIds, isSingleBlockSelected]);
+  const firstBlockTitle = useBlockDisplayTitle({
+    clientId: clientIds[0],
+    maximumLength: 35
+  });
+  const blockDescription = isSingleBlockSelected ? (0,external_wp_i18n_namespaceObject.sprintf)( /* translators: %1s: The block type's name; %2s: The block's user-provided name (the same as the override name). */
+  (0,external_wp_i18n_namespaceObject.__)('This %1$s is editable using the "%2$s" override.'), firstBlockTitle.toLowerCase(), firstBlockName) : (0,external_wp_i18n_namespaceObject.__)('These blocks are editable using overrides.');
+  const descriptionId = (0,external_wp_element_namespaceObject.useId)();
+  return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.ToolbarItem, {
+    children: toggleProps => /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.DropdownMenu, {
+      className: "patterns-pattern-overrides-toolbar-indicator",
+      label: firstBlockTitle,
+      popoverProps: {
+        placement: 'bottom-start',
+        className: 'patterns-pattern-overrides-toolbar-indicator__popover'
+      },
+      icon: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_ReactJSXRuntime_namespaceObject.Fragment, {
+        children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_blockEditor_namespaceObject.BlockIcon, {
+          icon: icon,
+          className: "patterns-pattern-overrides-toolbar-indicator-icon",
+          showColors: true
+        })
+      }),
+      toggleProps: {
+        description: blockDescription,
+        ...toggleProps
+      },
+      menuProps: {
+        orientation: 'both',
+        'aria-describedby': descriptionId
+      },
+      children: () => /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_components_namespaceObject.__experimentalText, {
+        id: descriptionId,
+        children: blockDescription
+      })
+    })
+  });
+}
+function PatternOverridesBlockControls() {
+  const {
+    clientIds,
+    hasPatternOverrides,
+    hasParentPattern
+  } = (0,external_wp_data_namespaceObject.useSelect)(select => {
+    const {
+      getBlockAttributes,
+      getSelectedBlockClientIds,
+      getBlockParentsByBlockName
+    } = select(external_wp_blockEditor_namespaceObject.store);
+    const selectedClientIds = getSelectedBlockClientIds();
+    const _hasPatternOverrides = selectedClientIds.every(clientId => {
+      var _getBlockAttributes$m;
+      return Object.values((_getBlockAttributes$m = getBlockAttributes(clientId)?.metadata?.bindings) !== null && _getBlockAttributes$m !== void 0 ? _getBlockAttributes$m : {}).some(binding => binding?.source === PATTERN_OVERRIDES_BINDING_SOURCE);
+    });
+    const _hasParentPattern = selectedClientIds.every(clientId => getBlockParentsByBlockName(clientId, 'core/block', true).length > 0);
+    return {
+      clientIds: selectedClientIds,
+      hasPatternOverrides: _hasPatternOverrides,
+      hasParentPattern: _hasParentPattern
+    };
+  }, []);
+  return hasPatternOverrides && hasParentPattern ? /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(external_wp_blockEditor_namespaceObject.BlockControls, {
+    group: "parent",
+    children: /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(PatternOverridesToolbarIndicator, {
+      clientIds: clientIds
+    })
+  }) : null;
 }
 
 ;// CONCATENATED MODULE: ./packages/patterns/build-module/private-apis.js
@@ -1345,17 +1723,24 @@ function ResetOverridesControl(props) {
 
 
 
+
+
+
 const privateApis = {};
 lock(privateApis, {
+  OverridesPanel: OverridesPanel,
   CreatePatternModal: CreatePatternModal,
   CreatePatternModalContents: CreatePatternModalContents,
   DuplicatePatternModal: DuplicatePatternModal,
+  isOverridableBlock: isOverridableBlock,
+  hasOverridableBlocks: hasOverridableBlocks,
   useDuplicatePatternProps: useDuplicatePatternProps,
   RenamePatternModal: RenamePatternModal,
   PatternsMenuItems: PatternsMenuItems,
   RenamePatternCategoryModal: RenamePatternCategoryModal,
-  PartialSyncingControls: partial_syncing_controls,
+  PatternOverridesControls: pattern_overrides_controls,
   ResetOverridesControl: ResetOverridesControl,
+  PatternOverridesBlockControls: PatternOverridesBlockControls,
   useAddPatternCategory: useAddPatternCategory,
   PATTERN_TYPES: PATTERN_TYPES,
   PATTERN_DEFAULT_CATEGORY: PATTERN_DEFAULT_CATEGORY,

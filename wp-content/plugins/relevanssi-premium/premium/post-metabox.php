@@ -17,10 +17,23 @@
  * types that are indexed by Relevanssi.
  */
 function relevanssi_add_metaboxes() {
-	global $post;
+	global $post, $relevanssi_variables;
 	if ( null === $post ) {
 		return;
 	}
+
+	if ( ! current_user_can(
+		/**
+		 * Filters the capability required to access the Relevanssi sidebar.
+		 *
+		 * @param string The capability required, default 'edit_others_posts'.
+		 */
+		apply_filters( 'relevanssi_sidebar_capability', $relevanssi_variables['sidebar_capability'] )
+	)
+	) {
+		return;
+	}
+
 	$indexed_post_types = get_option( 'relevanssi_index_post_types', array() );
 	if ( ! in_array( $post->post_type, $indexed_post_types, true ) ) {
 		return;
@@ -43,89 +56,29 @@ function relevanssi_add_metaboxes() {
  * Prints out the Relevanssi Post Controls meta box that is displayed on the post edit pages.
  *
  * @global array  $relevanssi_variables The Relevanssi global variables array, used to get the file name for nonce.
- * @global object $wpdb                 The WordPress database interface.
  * @global object $post                 The global post object.
  */
 function relevanssi_post_metabox() {
-	global $relevanssi_variables, $wpdb, $post;
+	global $relevanssi_variables, $post;
 	wp_nonce_field( plugin_basename( $relevanssi_variables['file'] ), 'relevanssi_hidepost' );
 
-	$hide_post   = checked( 'on', get_post_meta( $post->ID, '_relevanssi_hide_post', true ), false );
-	$pin_for_all = checked( 'on', get_post_meta( $post->ID, '_relevanssi_pin_for_all', true ), false );
+	$hide_post    = checked( 'on', get_post_meta( $post->ID, '_relevanssi_hide_post', true ), false );
+	$hide_content = checked( 'on', get_post_meta( $post->ID, '_relevanssi_hide_content', true ), false );
+	$pin_for_all  = checked( 'on', get_post_meta( $post->ID, '_relevanssi_pin_for_all', true ), false );
 
-	$pins = get_post_meta( $post->ID, '_relevanssi_pin', false );
-	$pin  = implode( ', ', $pins );
+	$pins          = get_post_meta( $post->ID, '_relevanssi_pin', false );
+	$pin_weights   = get_post_meta( $post->ID, '_relevanssi_pin_weights', true );
+	$weighted_pins = array();
+	foreach ( $pins as $pin ) {
+		if ( isset( $pin_weights[ $pin ] ) ) {
+			$pin .= ' (' . $pin_weights[ $pin ] . ')';
+		}
+		$weighted_pins[] = $pin;
+	}
+	$pin = implode( ', ', $weighted_pins );
 
 	$unpins = get_post_meta( $post->ID, '_relevanssi_unpin', false );
 	$unpin  = implode( ', ', $unpins );
-
-	$terms_list = $wpdb->get_results(
-		$wpdb->prepare(
-			'SELECT * FROM ' . $relevanssi_variables['relevanssi_table'] . ' WHERE doc = %d', // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.PreparedSQL.NotPrepared
-			$post->ID
-		),
-		OBJECT
-	);
-
-	$terms['content']     = array();
-	$terms['title']       = array();
-	$terms['comment']     = array();
-	$terms['tag']         = array();
-	$terms['link']        = array();
-	$terms['author']      = array();
-	$terms['category']    = array();
-	$terms['excerpt']     = array();
-	$terms['taxonomy']    = array();
-	$terms['customfield'] = array();
-	$terms['mysql']       = array();
-
-	foreach ( $terms_list as $row ) {
-		if ( $row->content > 0 ) {
-			$terms['content'][] = $row->term;
-		}
-		if ( $row->title > 0 ) {
-			$terms['title'][] = $row->term;
-		}
-		if ( $row->comment > 0 ) {
-			$terms['comment'][] = $row->term;
-		}
-		if ( $row->tag > 0 ) {
-			$terms['tag'][] = $row->term;
-		}
-		if ( $row->link > 0 ) {
-			$terms['link'][] = $row->term;
-		}
-		if ( $row->author > 0 ) {
-			$terms['author'][] = $row->term;
-		}
-		if ( $row->category > 0 ) {
-			$terms['category'][] = $row->term;
-		}
-		if ( $row->excerpt > 0 ) {
-			$terms['excerpt'][] = $row->term;
-		}
-		if ( $row->taxonomy > 0 ) {
-			$terms['taxonomy'][] = $row->term;
-		}
-		if ( $row->customfield > 0 ) {
-			$terms['customfield'][] = $row->term;
-		}
-		if ( $row->mysqlcolumn > 0 ) {
-			$terms['mysql'][] = $row->term;
-		}
-	}
-
-	$content_terms     = implode( ' ', $terms['content'] );
-	$title_terms       = implode( ' ', $terms['title'] );
-	$comment_terms     = implode( ' ', $terms['comment'] );
-	$tag_terms         = implode( ' ', $terms['tag'] );
-	$link_terms        = implode( ' ', $terms['link'] );
-	$author_terms      = implode( ' ', $terms['author'] );
-	$category_terms    = implode( ' ', $terms['category'] );
-	$excerpt_terms     = implode( ' ', $terms['excerpt'] );
-	$taxonomy_terms    = implode( ' ', $terms['taxonomy'] );
-	$customfield_terms = implode( ' ', $terms['customfield'] );
-	$mysql_terms       = implode( ' ', $terms['mysql'] );
 
 	// The actual fields for data entry.
 	?>
@@ -136,7 +89,9 @@ function relevanssi_post_metabox() {
 	<p><strong><?php esc_html_e( 'Pin this post', 'relevanssi' ); ?></strong></p>
 	<p><?php esc_html_e( 'A comma-separated list of single word keywords or multi-word phrases. If any of these keywords are present in the search query, this post will be moved on top of the search results.', 'relevanssi' ); ?></p>
 	<label for="relevanssi_pin" class="screen-reader-text"><?php esc_html_e( 'Pinned keywords for this post', 'relevanssi' ); ?></label>
-	<textarea id="relevanssi_pin" name="relevanssi_pin" cols="30" rows="2"><?php echo esc_html( $pin ); ?></textarea/>
+	<textarea id="relevanssi_pin" name="relevanssi_pin" cols="30" rows="2" style="max-width: 100%"><?php echo esc_html( $pin ); ?></textarea/>
+
+	<p><?php esc_html_e( "You can add weights to pinned keywords like this: 'keyword (100)'. The post with the highest weight will be sorted first if there are multiple posts pinned to the same keyword.", 'relevanssi' ); ?></p>
 
 	<?php
 	if ( 0 === intval( get_option( 'relevanssi_content_boost' ) ) ) {
@@ -154,11 +109,16 @@ function relevanssi_post_metabox() {
 	<p><strong><?php esc_html_e( 'Exclude this post', 'relevanssi' ); ?></strong></p>
 	<p><?php esc_html_e( 'A comma-separated list of single word keywords or multi-word phrases. If any of these keywords are present in the search query, this post will be removed from the search results.', 'relevanssi' ); ?></p>
 	<label for="relevanssi_unpin" class="screen-reader-text"><?php esc_html_e( 'Excluded keywords for this post', 'relevanssi' ); ?></label>
-	<textarea id="relevanssi_unpin" name="relevanssi_unpin" cols="30" rows="2"><?php echo esc_html( $unpin ); ?></textarea>
+	<textarea id="relevanssi_unpin" name="relevanssi_unpin" cols="30" rows="2" style="max-width: 100%"><?php echo esc_html( $unpin ); ?></textarea>
 
 	<p><input type="checkbox" id="relevanssi_hide_post" name="relevanssi_hide_post" <?php echo esc_attr( $hide_post ); ?> />
 	<label for="relevanssi_hide_post">
 		<?php esc_html_e( 'Exclude this post or page from the index.', 'relevanssi' ); ?>
+	</label></p>
+
+	<p><input type="checkbox" id="relevanssi_hide_content" name="relevanssi_hide_content" <?php echo esc_attr( $hide_content ); ?> />
+	<label for="relevanssi_hide_content">
+		<?php esc_html_e( 'Ignore post content in the indexing.', 'relevanssi' ); ?>
 	</label></p>
 
 	<?php
@@ -166,79 +126,10 @@ function relevanssi_post_metabox() {
 	if ( isset( $related_posts_settings['enabled'] ) && 'on' === $related_posts_settings['enabled'] ) {
 		relevanssi_related_posts_metabox( $post->ID );
 	}
-	?>
 
-	<div id="relevanssi_sees_container" style="display: none">
-	<?php
-	if ( ! empty( $title_terms ) ) {
-		?>
-		<h3><?php esc_html_e( 'Post title', 'relevanssi' ); ?>:</h3>
-		<p><?php echo esc_html( $title_terms ); ?></p>
-		<?php
-	}
-	if ( ! empty( $content_terms ) ) {
-		?>
-		<h3><?php esc_html_e( 'Post content', 'relevanssi' ); ?>:</h3>
-		<p><?php echo esc_html( $content_terms ); ?></p>
-		<?php
-	}
-	if ( ! empty( $comment_terms ) ) {
-		?>
-	<h3><?php esc_html_e( 'Comments', 'relevanssi' ); ?>:</h3>
-	<p><?php echo esc_html( $comment_terms ); ?></p>
-		<?php
-	}
-	if ( ! empty( $tag_terms ) ) {
-		?>
-	<h3><?php esc_html_e( 'Tags', 'relevanssi' ); ?>:</h3>
-	<p><?php echo esc_html( $tag_terms ); ?></p>
-		<?php
-	}
-	if ( ! empty( $category_terms ) ) {
-		?>
-	<h3><?php esc_html_e( 'Categories', 'relevanssi' ); ?>:</h3>
-	<p><?php echo esc_html( $category_terms ); ?></p>
-		<?php
-	}
-	if ( ! empty( $taxonomy_terms ) ) {
-		?>
-	<h3><?php esc_html_e( 'Other taxonomies', 'relevanssi' ); ?>:</h3>
-	<p><?php echo esc_html( $taxonomy_terms ); ?></p>
-		<?php
-	}
-	if ( ! empty( $link_terms ) ) {
-		?>
-	<h3><?php esc_html_e( 'Links', 'relevanssi' ); ?>:</h3>
-	<p><?php echo esc_html( $link_terms ); ?></p>
-		<?php
-	}
-	if ( ! empty( $author_terms ) ) {
-		?>
-	<h3><?php esc_html_e( 'Authors', 'relevanssi' ); ?>:</h3>
-	<p><?php echo esc_html( $author_terms ); ?></p>
-		<?php
-	}
-	if ( ! empty( $excerpt_terms ) ) {
-		?>
-	<h3><?php esc_html_e( 'Excerpt', 'relevanssi' ); ?>:</h3>
-	<p><?php echo esc_html( $excerpt_terms ); ?></p>
-		<?php
-	}
-	if ( ! empty( $customfield_terms ) ) {
-		?>
-	<h3><?php esc_html_e( 'Custom fields', 'relevanssi' ); ?>:</h3>
-	<p><?php echo esc_html( $customfield_terms ); ?></p>
-		<?php
-	}
-	if ( ! empty( $mysql_terms ) ) {
-		?>
-	<h3><?php esc_html_e( 'MySQL content', 'relevanssi' ); ?>:</h3>
-	<p><?php echo esc_html( $mysql_terms ); ?></p>
-		<?php
-	}
-	?>
-	</div>
-	<?php
+	$display = false;
+	$element = relevanssi_generate_how_relevanssi_sees( $post->ID, $display );
+	echo $element;  // phpcs:ignore WordPress.Security.EscapeOutput
 }
 
 /**
@@ -258,32 +149,70 @@ function relevanssi_save_gutenberg_postdata( $post ) {
 
 	// Check nonce here?
 
-	$pin = get_post_meta( $post->ID, '_relevanssi_pin_keywords', true );
-	if ( $pin ) {
-		delete_post_meta( $post->ID, '_relevanssi_pin' );
-		$pins = explode( ',', sanitize_text_field( wp_unslash( $pin ) ) );
-		foreach ( $pins as $pin ) {
-			$pin = trim( $pin );
-			if ( ! empty( $pin ) ) {
-				add_post_meta( $post->ID, '_relevanssi_pin', $pin );
-			}
-		}
-	} else {
-		delete_post_meta( $post->ID, '_relevanssi_pin' );
-	}
+	$keywords = get_post_meta( $post->ID, '_relevanssi_pin_keywords', true );
+	relevanssi_update_pin_fields( $post->ID, $keywords );
 
-	$pin = get_post_meta( $post->ID, '_relevanssi_unpin_keywords', false );
-	if ( $pin ) {
-		delete_post_meta( $post->ID, '_relevanssi_unpin' );
-		$pins = explode( ',', sanitize_text_field( wp_unslash( $pin ) ) );
+	$keywords = get_post_meta( $post->ID, '_relevanssi_unpin_keywords', true );
+	relevanssi_update_unpin_fields( $post->ID, $keywords );
+}
+
+/**
+ * Updates the _relevanssi_pin custom fields based on a list of keywords.
+ *
+ * @param int    $post_id  The post ID.
+ * @param string $keywords The keywords.
+ */
+function relevanssi_update_pin_fields( $post_id, $keywords ) {
+	$pin_weights = array();
+	if ( $keywords ) {
+		delete_post_meta( $post_id, '_relevanssi_pin' );
+		$pins = explode( ',', sanitize_text_field( wp_unslash( $keywords ) ) );
 		foreach ( $pins as $pin ) {
+			list( $pin, $weight ) = array_pad( explode( '(', $pin, 2 ), 2, '1' );
+
+			$weight = str_replace( ')', '', $weight );
+			$weight = intval( $weight );
+			if ( $weight < 1 ) {
+				$weight = 1;
+			}
 			$pin = trim( $pin );
+
+			if ( $weight > 1 ) {
+				$pin_weights[ $pin ] = $weight;
+			}
+
 			if ( ! empty( $pin ) ) {
-				add_post_meta( $post->ID, '_relevanssi_unpin', $pin );
+				add_post_meta( $post_id, '_relevanssi_pin', $pin );
 			}
 		}
 	} else {
-		delete_post_meta( $post->ID, '_relevanssi_unpin' );
+		delete_post_meta( $post_id, '_relevanssi_pin' );
+	}
+	if ( ! empty( $pin_weights ) ) {
+		update_post_meta( $post_id, '_relevanssi_pin_weights', $pin_weights );
+	} else {
+		delete_post_meta( $post_id, '_relevanssi_pin_weights' );
+	}
+}
+
+/**
+ * Updates the _relevanssi_unpin custom fields based on a list of keywords.
+ *
+ * @param int    $post_id  The post ID.
+ * @param string $keywords The keywords.
+ */
+function relevanssi_update_unpin_fields( $post_id, $keywords ) {
+	if ( $keywords ) {
+		delete_post_meta( $post_id, '_relevanssi_unpin' );
+		$pins = explode( ',', sanitize_text_field( wp_unslash( $keywords ) ) );
+		foreach ( $pins as $pin ) {
+			$pin = trim( $pin );
+			if ( ! empty( $pin ) ) {
+				add_post_meta( $post_id, '_relevanssi_unpin', $pin );
+			}
+		}
+	} else {
+		delete_post_meta( $post_id, '_relevanssi_unpin' );
 	}
 }
 
@@ -327,10 +256,8 @@ function relevanssi_save_postdata( $post_id ) {
 			if ( ! current_user_can( 'edit_page', $post_id ) ) {
 				return;
 			}
-		} else {
-			if ( ! current_user_can( 'edit_post', $post_id ) ) {
-				return;
-			}
+		} elseif ( ! current_user_can( 'edit_post', $post_id ) ) {
+			return;
 		}
 	}
 
@@ -350,6 +277,17 @@ function relevanssi_save_postdata( $post_id ) {
 		delete_post_meta( $post_id, '_relevanssi_hide_post' );
 	}
 
+	$hide_content = '';
+	if ( isset( $post['relevanssi_hide_content'] ) && 'on' === $post['relevanssi_hide_content'] ) {
+		$hide_content = 'on';
+	}
+
+	if ( 'on' === $hide_content ) {
+		update_post_meta( $post_id, '_relevanssi_hide_content', $hide_content );
+	} else {
+		delete_post_meta( $post_id, '_relevanssi_hide_content' );
+	}
+
 	$pin_for_all = '';
 	if ( isset( $post['relevanssi_pin_for_all'] ) && 'on' === $post['relevanssi_pin_for_all'] ) {
 		$pin_for_all = 'on';
@@ -362,14 +300,7 @@ function relevanssi_save_postdata( $post_id ) {
 	}
 
 	if ( isset( $post['relevanssi_pin'] ) ) {
-		delete_post_meta( $post_id, '_relevanssi_pin' );
-		$pins = explode( ',', sanitize_text_field( wp_unslash( $post['relevanssi_pin'] ) ) );
-		foreach ( $pins as $pin ) {
-			$pin = trim( $pin );
-			if ( ! empty( $pin ) ) {
-				add_post_meta( $post_id, '_relevanssi_pin', $pin );
-			}
-		}
+		relevanssi_update_pin_fields( $post_id, $post['relevanssi_pin'] );
 	} else {
 		delete_post_meta( $post_id, '_relevanssi_pin' );
 	}
@@ -467,9 +398,9 @@ function relevanssi_related_posts_metabox( $post_id ) {
 	<?php esc_html_e( "Don't show this as a related post for any post.", 'relevanssi' ); ?></label></p>
 
 	<p><strong><?php esc_html_e( 'Related Posts keywords', 'relevanssi' ); ?></strong></p>
-	<p><?php esc_html_e( 'A comma-separated list of keywords to use for the Related Posts feature. Anything entered here will used when searching for related posts. Using phrases with quotes is allowed, but will restrict the related posts to posts including that phrase.', 'relevanssi' ); ?></p>
+	<p><?php esc_html_e( 'A comma-separated list of keywords to use for the Related Posts feature. Anything entered here will be used when searching for related posts. Using phrases with quotes is allowed, but will restrict the related posts to posts including that phrase.', 'relevanssi' ); ?></p>
 	<label for="relevanssi_related_keywords" class="screen-reader-text"><?php esc_html_e( 'Related posts keywords for this post', 'relevanssi' ); ?></label>
-	<p><textarea id="relevanssi_related_keywords" name="relevanssi_related_keywords" cols="30" rows="2"><?php echo esc_html( $related ); ?></textarea></p>
+	<p><textarea id="relevanssi_related_keywords" name="relevanssi_related_keywords" cols="30" rows="2" style="max-width: 100%"><?php echo esc_html( $related ); ?></textarea></p>
 
 	<p><label for="relevanssi_related_include_ids"><?php esc_html_e( 'A comma-separated list of post IDs to use as related posts for this post', 'relevanssi' ); ?></label>:</p>
 	<p><input type="text" id="relevanssi_related_include_ids" name="relevanssi_related_include_ids" value="<?php echo esc_html( $include_ids ); ?>"/></p>
@@ -489,7 +420,118 @@ function relevanssi_related_posts_metabox( $post_id ) {
 	echo relevanssi_generate_excluded_list( $post_id ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 	?>
 	</ul>
+
+	<p><strong><?php esc_html_e( 'Insights', 'relevanssi' ); ?></strong></p>
+	<p>The most common search terms for this post:</p>
+	<ol id='most_common_terms'>
 	<?php
+	echo relevanssi_generate_tracking_insights_most_common( $post_id ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+	?>
+	</ol>
+
+	<p>Low-ranking search terms for this post:</p>
+	<ol id='low_ranking_terms'>
+	<?php
+	echo relevanssi_generate_tracking_insights_low_ranking( $post_id ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+	?>
+	</ol>
+	<?php
+}
+
+/**
+ * Generates tracking insights.
+ *
+ * @param int    $post_id The post ID.
+ * @param string $output  If 'HTML', output HTML code. If 'ARRAY', output an
+ * array. Default value is 'HTML'.
+ */
+function relevanssi_generate_tracking_insights_most_common( int $post_id, string $output = 'HTML' ) {
+	global $wpdb, $relevanssi_variables;
+	$table = $relevanssi_variables['tracking_table'];
+
+	$output_html = 'ARRAY' !== $output ? true : false;
+	if ( $output_html ) {
+		$list = '';
+	} else {
+		$list = array();
+	}
+
+	$common_terms = $wpdb->get_results(
+		$wpdb->prepare(
+			"SELECT DISTINCT(query), COUNT(*) AS `count` FROM $table" . // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.PreparedSQL.NotPrepared
+			' WHERE post_id = %d
+			 GROUP BY query
+			 ORDER BY count DESC
+			 LIMIT 5',
+			$post_id
+		)
+	);
+
+	if ( $common_terms ) {
+		if ( $output_html ) {
+			$list = '<li>' . implode(
+				'</li><li>',
+				array_map(
+					function ( $v ) {
+						return "$v->query ($v->count)";
+					},
+					$common_terms
+				)
+			) . '</li></ol>';
+		} else {
+			$list = $common_terms;
+		}
+	}
+
+	return $list;
+}
+
+/**
+ * Generates tracking insights.
+ *
+ * @param int    $post_id The post ID.
+ * @param string $output  If 'HTML', output HTML code. If 'ARRAY', output an
+ * array. Default value is 'HTML'.
+ */
+function relevanssi_generate_tracking_insights_low_ranking( int $post_id, string $output = 'HTML' ) {
+	global $wpdb, $relevanssi_variables;
+	$table = $relevanssi_variables['tracking_table'];
+
+	$output_html = 'ARRAY' !== $output ? true : false;
+	if ( $output_html ) {
+		$list = '';
+	} else {
+		$list = array();
+	}
+
+	$low_ranking_terms = $wpdb->get_results(
+		$wpdb->prepare(
+			"SELECT `query`, `rank` FROM $table" . // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.PreparedSQL.NotPrepared
+			' WHERE post_id = %d
+			 AND `rank` > 1
+			 ORDER BY `rank` DESC
+			 LIMIT 5',
+			$post_id
+		)
+	);
+
+	if ( $low_ranking_terms ) {
+		if ( $output_html ) {
+			$list = '<li>' . implode(
+				'</li><li>',
+				array_map(
+					function ( $v ) {
+						return "$v->query ($v->rank)";
+					},
+					$low_ranking_terms
+				)
+			) . '</li></ol>';
+		} else {
+			$list = $low_ranking_terms;
+		}
+	}
+
+	return $list;
 }
 
 /**
@@ -506,27 +548,17 @@ function relevanssi_generate_related_list( $post_id, $output = 'HTML' ) {
 	} else {
 		$list = array();
 	}
-	$related_posts = get_post_meta( $post_id, '_relevanssi_related_posts', true );
-	if ( empty( $related_posts ) ) {
-		/**
-		 * Makes it possible to set $just_objects to true.
-		 *
-		 * Return true here if you wish to use just objects in the related posts.
-		 * If the filter returns false (default), full HTML will be stoerd in the
-		 * transient.
-		 *
-		 * @param boolean Return true, if you want to get post objects in the
-		 * transient.
-		 */
-		relevanssi_related_posts( $post_id, apply_filters( 'relevanssi_related_just_objects', false ), true );
-		$related_posts = get_post_meta( $post_id, '_relevanssi_related_posts', true );
-	}
-	$related_array = explode( ',', $related_posts );
-	foreach ( $related_array as $related_post_id ) {
+	$related_posts = relevanssi_get_related_post_ids( $post_id );
+	foreach ( $related_posts as $related_post_id ) {
 		$title = get_the_title( $related_post_id );
 		$link  = get_permalink( $related_post_id );
 		if ( $output_html ) {
-			$list .= '<li><a href="' . esc_attr( $link ) . '">' . esc_html( $title ) . '</a> (<button type="button" class="removepost" data-removepost="' . esc_attr( $related_post_id ) . '">' . esc_html__( 'not this', 'relevanssi' ) . '</button>)</li>';
+			$list .= '<li><a href="' . esc_attr( $link ) . '">'
+				. esc_html( $title ) . '</a> '
+				. '(<button type="button" class="removepost" data-removepost="'
+				. esc_attr( $related_post_id ) . '">'
+				. esc_html__( 'not this', 'relevanssi' ) .
+				'</button>)</li>';
 		} else {
 			$list[] = array(
 				'id'    => $related_post_id,
@@ -568,10 +600,8 @@ function relevanssi_generate_excluded_list( $post_id, $output = 'HTML' ) {
 				);
 			}
 		}
-	} else {
-		if ( $output_html ) {
-			$list .= '<li>' . esc_html__( 'Nothing excluded.', 'relevanssi' ) . '</li>';
-		}
+	} elseif ( $output_html ) {
+		$list .= '<li>' . esc_html__( 'Nothing excluded.', 'relevanssi' ) . '</li>';
 	}
 	return $list;
 }

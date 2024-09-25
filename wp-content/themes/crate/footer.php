@@ -91,6 +91,11 @@
 				'container'      => false,
 			) ); ?>
 		</nav>
+		<div>
+			<p>
+				<span><?php esc_html_e('Questions? Email: info@ecorise.org', 'crate' ); ?></span>
+			</p>
+		</div>
 
 		<div>
 			<a href="https://twitter.com/WaterCalcOrg">
@@ -104,7 +109,7 @@
 		<div class="copyright">
 			<p>
 				<span><?php crate_copyright_text(); ?></span>
-				<a href="<?php echo esc_url( 'https://ecorise.org/' ); ?>" title="<?php esc_attr_e( 'EcoRise', 'crate' ); ?>" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'EcoRise', 'crate' ); ?></a><span>. <?php esc_html_e( 'All Rights Reserved', 'crate' ); ?>.</span>
+				<a href="<?php echo esc_url( 'https://www.ecorise.org/' ); ?>" title="<?php esc_attr_e( 'EcoRise', 'crate' ); ?>" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'EcoRise', 'crate' ); ?></a><span>. <?php esc_html_e( 'All Rights Reserved', 'crate' ); ?>.</span>
 			</p>
 		</div>
 

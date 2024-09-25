@@ -8,6 +8,25 @@
  * @see     https://www.relevanssi.com/
  */
 
+add_action( 'relevanssi_indexing_tab_shortcodes', 'relevanssi_form_disable_shortcodes' );
+add_action( 'relevanssi_indexing_tab', 'relevanssi_form_index_users', 10 );
+add_action( 'relevanssi_indexing_tab', 'relevanssi_form_index_synonyms', 11 );
+add_action( 'relevanssi_indexing_tab', 'relevanssi_form_index_taxonomies', 12 );
+add_action( 'relevanssi_indexing_tab', 'relevanssi_form_index_pdf_parent', 14 );
+add_action( 'relevanssi_indexing_tab_advanced', 'relevanssi_form_thousands_separator', 10 );
+add_action( 'relevanssi_indexing_tab_advanced', 'relevanssi_form_mysql_columns', 11 );
+add_action( 'relevanssi_indexing_tab_advanced', 'relevanssi_form_internal_links', 12 );
+add_action( 'relevanssi_indexing_tab_advanced', 'relevanssi_form_index_post_type_archives', 13 );
+add_action( 'relevanssi_debugging_tab', 'relevanssi_form_reset_words', 10 );
+add_filter( 'manage_posts_columns', 'relevanssi_manage_columns', 10, 2 );
+add_filter( 'manage_pages_columns', 'relevanssi_manage_columns', 10, 2 );
+add_action( 'admin_print_footer_scripts-edit.php', 'relevanssi_quick_edit_js' );
+add_filter( 'default_hidden_columns', 'relevanssi_hide_columns' );
+add_action( 'save_post', 'relevanssi_quick_edit_save' );
+add_filter( 'quick_edit_custom_box', 'relevanssi_quick_edit_custom_box', 10 );
+add_filter( 'manage_posts_custom_column', 'relevanssi_manage_custom_column', 10, 2 );
+add_filter( 'manage_pages_custom_column', 'relevanssi_manage_custom_column', 10, 2 );
+
 /**
  * Adds the Premium page actions.
  *
@@ -26,13 +45,17 @@ function relevanssi_premium_plugin_page_actions( $plugin_page ) {
  * Prints out the form fields for entering the API key.
  *
  * Prints out table rows and form fields for entering the API key, or if API key
- * is set, controls to remove it.
+ * is set, controls to remove it. If the API key is defined in the
+ * RELEVANSSI_API_KEY constant, nothing is printed out.
  *
  * @param string $context The context for the form. Default null.
  *
  * @since 2.0.0
  */
 function relevanssi_form_api_key( $context = null ) {
+	if ( defined( 'RELEVANSSI_API_KEY' ) ) {
+		return;
+	}
 	$api_key = get_option( 'relevanssi_api_key' );
 	if ( 'network' === $context ) {
 		$api_key = get_network_option( null, 'relevanssi_api_key' );
@@ -84,7 +107,31 @@ function relevanssi_form_do_not_call_home() {
 				<input type='checkbox' name='relevanssi_do_not_call_home' id='relevanssi_do_not_call_home' <?php echo esc_attr( $can_i_call_home ); ?> />
 				<?php esc_html_e( 'Disable update version checking and attachment indexing', 'relevanssi' ); ?>
 			</label>
-		<p class="description"><?php esc_html_e( "If you check this box, Relevanssi will stop all outside connections. This means the plugin won't check for updates from Relevanssi.com and won't read attachment contents using Relevanssiservices.com attachment reader (using custom attachment reader is still allowed). Do not check this box unless you know what you're doing, because this will disable Relevanssi updates.", 'relevanssi' ); ?></p>
+		<p class="description"><?php esc_html_e( "If you check this box, Relevanssi will stop all outside connections. This means the plugin won't check for updates from Relevanssi.com, won't read attachment contents using Relevanssiservices.com attachment reader (using custom attachment reader is still allowed), or update plugin translations. Do not check this box unless you know what you're doing, because this will disable Relevanssi updates.", 'relevanssi' ); ?></p>
+		</td>
+		</td>
+	</tr>
+	<?php
+}
+
+/**
+ * Prints out the form fields for updating translations.
+ */
+function relevanssi_form_update_translations() {
+	$option              = get_option( 'relevanssi_update_translations' );
+	$update_translations = relevanssi_check( $option );
+	?>
+	<tr>
+		<th scope="row">
+			<?php esc_html_e( 'Update translations', 'relevanssi' ); ?>
+		</th>
+		<td>
+			<label for='relevanssi_update_translations'>
+				<input type='checkbox' name='relevanssi_update_translations' id='relevanssi_update_translations' <?php echo esc_attr( $update_translations ); ?> />
+				<?php esc_html_e( 'Check for plugin translation updates', 'relevanssi' ); ?>
+			</label>
+		<p class="description"><?php esc_html_e( 'If you check this box, Relevanssi will check for updates to the plugin translations. At the moment, translations are available for:', 'relevanssi' ); ?>
+		Deutsch (de_DE), español (es_ES), français (fr_FR), suomi (fi)</p>
 		</td>
 		</td>
 	</tr>
@@ -582,14 +629,13 @@ function relevanssi_form_index_synonyms() {
 		</fieldset>
 		<p class="description">
 		<?php
-			_e( 'If checked, Relevanssi will use the synonyms in indexing. If you add <code>dog = hound</code> to the synonym list and enable this feature, every time the indexer sees <code>hound</code> in post content or post title, it will index it as <code>hound dog</code>. Thus, the post will be found when searching with either word. This makes it possible to use synonyms with AND searches, but will slow down indexing, especially with large databases and large lists of synonyms. This only works for post titles and post content. You can use multi-word keys and values, but phrases do not work.', 'relevanssi' ); // phpcs:ignore WordPress.Security.EscapeOutput.UnsafePrintingFunction
+			_e( 'If checked, Relevanssi will use the synonyms in indexing. If you add <code>dog = hound</code> to the synonym list and enable this feature, every time the indexer sees <code>hound</code> in post content or post title, it will index it as <code>hound dog</code>. Thus, the post will be found when searching with either word. This makes it possible to use synonyms with AND searches, but will slow down indexing, especially with large databases and large lists of synonyms. You can use multi-word values, but phrases do not work.', 'relevanssi' ); // phpcs:ignore WordPress.Security.EscapeOutput.UnsafePrintingFunction
 		?>
 		</p>
 		</td>
 	</tr>
 	</table>
 
-	<br /><br />
 	<?php
 }
 
@@ -744,9 +790,6 @@ function relevanssi_form_index_post_type_archives() {
 	}
 
 	?>
-	<h2><?php esc_html_e( 'Indexing post type archives', 'relevanssi' ); ?></h2>
-
-	<table class="form-table">
 	<tr>
 		<th scope="row">
 			<?php esc_html_e( 'Index post type archives', 'relevanssi' ); ?>
@@ -776,7 +819,35 @@ function relevanssi_form_index_post_type_archives() {
 			<p class="description"><?php printf( esc_html__( 'This list includes all post types that are not built in and have %1$s set to true. If you want to adjust the list, you can use the %2$s filter hook.', 'relevanssi' ), '<code>has_archive</code>', '<code>relevanssi_indexed_post_type_archives</code>' ); ?></p>
 		</td>
 	</tr>
-	</table>
+	<?php
+}
+
+/**
+ * Prints out the form fields for choosing the number of excerpt parts.
+ *
+ * @param string $enabled If this is empty, make the field disabled.
+ */
+function relevanssi_form_max_excerpts( $enabled ) {
+	$max_excerpts = get_option( 'relevanssi_max_excerpts', 1 );
+
+	?>
+	<tr id="tr_max_excerpts">
+		<th scope="row">
+			<label for="relevanssi_max_excerpts"><?php esc_html_e( 'Number of excerpt snippets', 'relevanssi' ); ?></label>
+		</th>
+		<td>
+			<input type='text' name='relevanssi_max_excerpts'
+				id='relevanssi_max_excerpts' size='4'
+				value='<?php echo esc_attr( $max_excerpts ); ?>'
+				<?php
+				if ( empty( $enabled ) ) {
+					echo "disabled='disabled'";
+				}
+				?>
+				/>
+			<p class="description"><?php esc_html_e( 'The maximum number of excerpt snippets Relevanssi will create for each post.', 'relevanssi' ); ?></p>
+		</td>
+	</tr>
 	<?php
 }
 
@@ -799,8 +870,17 @@ function relevanssi_premium_add_admin_scripts( $hook ) {
 	$post_hooks = array( 'post.php', 'post-new.php' );
 	if ( in_array( $hook, $post_hooks, true ) ) {
 		global $post;
-		// Only add the scripts for attachment posts.
-		if ( 'attachment' === $post->post_type ) {
+		/**
+		 * Filters whether to add the attachment scripts.
+		 *
+		 * By default, Relevanssi only adds the attachment scripts to the post
+		 * type "attachment". With this filter hook, you can add these scripts
+		 * to other post types as well.
+		 *
+		 * @param boolean $add_scripts Whether to add the scripts.
+		 * @param string  $post_type   The post type.
+		 */
+		if ( apply_filters( 'relevanssi_add_attachment_scripts', 'attachment' === $post->post_type, $post->post_type ) ) {
 			$api_key = get_network_option( null, 'relevanssi_api_key' );
 			if ( ! $api_key ) {
 				$api_key = get_option( 'relevanssi_api_key' );
@@ -860,7 +940,8 @@ function relevanssi_premium_add_admin_scripts( $hook ) {
  * Takes the options array and does the actual updating of options using
  * update_options().
  *
- * @param array $options Key has the option name, value the option value.
+ * @param string $options JSON-formatted array. Key has the option name, value
+ * the option value.
  */
 function relevanssi_import_options( $options ) {
 	$unserialized = json_decode( stripslashes( $options ) );
@@ -873,10 +954,15 @@ function relevanssi_import_options( $options ) {
 				'relevanssi_punctuation',
 				'relevanssi_related_style',
 				'relevanssi_related_settings',
+				'relevanssi_synonyms',
+				'relevanssi_body_stopwords',
+				'relevanssi_stopwords',
+				'relevanssi_spamblock',
 			),
 			true
 		) ) {
-			// The options are associative arrays that are translated to objects in JSON and need to be changed back to arrays.
+			// The options are associative arrays that are translated to
+			// objects in JSON and need to be changed back to arrays.
 			$value = (array) $value;
 		}
 		if ( 'relevanssi_redirects' === $key ) {
@@ -906,65 +992,47 @@ function relevanssi_update_premium_options() {
 		$request['tab'] = '';
 	}
 
-	if ( isset( $request['relevanssi_link_boost'] ) ) {
-		$boost = floatval( $request['relevanssi_link_boost'] );
-		update_option( 'relevanssi_link_boost', $boost );
-	}
+	relevanssi_update_floatval( $request, 'relevanssi_link_boost', true, '0.75' );
 
 	if ( empty( $request['relevanssi_api_key'] ) ) {
 		unset( $request['relevanssi_api_key'] );
 	}
 
 	if ( 'overview' === $request['tab'] ) {
-		if ( ! isset( $request['relevanssi_hide_post_controls'] ) ) {
-			$request['relevanssi_hide_post_controls'] = 'off';
-		}
-		if ( ! isset( $request['relevanssi_show_post_controls'] ) ) {
-			$request['relevanssi_show_post_controls'] = 'off';
-		}
-		if ( ! isset( $request['relevanssi_do_not_call_home'] ) ) {
-			$request['relevanssi_do_not_call_home'] = 'off';
-		}
+		relevanssi_turn_off_options(
+			$request,
+			array(
+				'relevanssi_do_not_call_home',
+				'relevanssi_update_translations',
+				'relevanssi_hide_post_controls',
+				'relevanssi_show_post_controls',
+			)
+		);
 	}
 
 	if ( 'indexing' === $request['tab'] ) {
-		if ( ! isset( $request['relevanssi_index_users'] ) ) {
-			$request['relevanssi_index_users'] = 'off';
-		}
-
-		if ( ! isset( $request['relevanssi_index_synonyms'] ) ) {
-			$request['relevanssi_index_synonyms'] = 'off';
-		}
-
-		if ( ! isset( $request['relevanssi_index_taxonomies'] ) ) {
-			$request['relevanssi_index_taxonomies'] = 'off';
-		}
-
-		if ( ! isset( $request['relevanssi_index_subscribers'] ) ) {
-			$request['relevanssi_index_subscribers'] = 'off';
-		}
-
-		if ( ! isset( $request['relevanssi_index_post_type_archives'] ) ) {
-			$request['relevanssi_index_post_type_archives'] = 'off';
-		}
-
-		if ( ! isset( $request['relevanssi_index_pdf_parent'] ) ) {
-			$request['relevanssi_index_pdf_parent'] = 'off';
-		}
+		relevanssi_turn_off_options(
+			$request,
+			array(
+				'relevanssi_index_pdf_parent',
+				'relevanssi_index_post_type_archives',
+				'relevanssi_index_subscribers',
+				'relevanssi_index_synonyms',
+				'relevanssi_index_taxonomies',
+				'relevanssi_index_users',
+			)
+		);
 	}
 
 	if ( 'attachments' === $request['tab'] ) {
-		if ( ! isset( $request['relevanssi_read_new_files'] ) ) {
-			$request['relevanssi_read_new_files'] = 'off';
-		}
-
-		if ( ! isset( $request['relevanssi_send_pdf_files'] ) ) {
-			$request['relevanssi_send_pdf_files'] = 'off';
-		}
-
-		if ( ! isset( $request['relevanssi_link_pdf_files'] ) ) {
-			$request['relevanssi_link_pdf_files'] = 'off';
-		}
+		relevanssi_turn_off_options(
+			$request,
+			array(
+				'relevanssi_link_pdf_files',
+				'relevanssi_read_new_files',
+				'relevanssi_send_pdf_files',
+			)
+		);
 	}
 
 	if ( 'searching' === $request['tab'] ) {
@@ -981,40 +1049,40 @@ function relevanssi_update_premium_options() {
 	}
 
 	if ( 'logging' === $request['tab'] ) {
-		if ( ! isset( $request['relevanssi_hide_branding'] ) ) {
-			$request['relevanssi_hide_branding'] = 'off';
-		}
+		relevanssi_turn_off_options(
+			$request,
+			array(
+				'relevanssi_click_tracking',
+				'relevanssi_hide_branding',
+			)
+		);
+		relevanssi_update_intval( $request, 'relevanssi_trim_click_logs', true, 180 );
+	}
+
+	if ( 'excerpts' === $request['tab'] ) {
+		relevanssi_update_intval( $request, 'relevanssi_max_excerpts', true, 1 );
+		relevanssi_update_intval( $request, 'relevanssi_trim_click_logs', true, 180 );
 	}
 
 	if ( 'related' === $request['tab'] ) {
 		$settings = get_option( 'relevanssi_related_settings', relevanssi_related_default_settings() );
 
-		$settings['enabled'] = 'off';
-		if ( isset( $request['relevanssi_related_enabled'] ) && 'off' !== $request['relevanssi_related_enabled'] ) {
-			$settings['enabled'] = 'on';
-		}
-		if ( isset( $request['relevanssi_related_number'] ) ) {
-			$settings['number'] = intval( $request['relevanssi_related_number'] );
-		}
-		if ( isset( $request['relevanssi_related_months'] ) ) {
-			$settings['months'] = intval( $request['relevanssi_related_months'] );
-		}
-		if ( isset( $request['relevanssi_related_nothing'] ) ) {
-			$settings['nothing'] = 'nothing';
-			if ( in_array( $request['relevanssi_related_nothing'], array( 'random', 'random_cat' ), true ) ) {
-				$settings['nothing'] = $request['relevanssi_related_nothing'];
-			}
-		}
-		if ( isset( $request['relevanssi_related_notenough'] ) ) {
-			$settings['notenough'] = 'nothing';
-			if ( in_array( $request['relevanssi_related_notenough'], array( 'random', 'random_cat' ), true ) ) {
-				$settings['notenough'] = $request['relevanssi_related_notenough'];
-			}
-		}
-		$settings['append'] = '';
-		if ( isset( $request['relevanssi_related_append'] ) && is_array( $request['relevanssi_related_append'] ) ) {
-			$settings['append'] = implode( ',', $request['relevanssi_related_append'] );
-		}
+		$settings['enabled']    = relevanssi_off_or_on( $request, 'relevanssi_related_enabled' );
+		$settings['number']     = relevanssi_intval( $request, 'relevanssi_related_number' );
+		$settings['months']     = relevanssi_intval( $request, 'relevanssi_related_months' );
+		$settings['nothing']    = relevanssi_legal_value(
+			$request,
+			'relevanssi_related_nothing',
+			array( 'random', 'random_cat' ),
+			'nothing'
+		);
+		$settings['notenough']  = relevanssi_legal_value(
+			$request,
+			'relevanssi_related_notenough',
+			array( 'random', 'random_cat' ),
+			'nothing'
+		);
+		$settings['append']     = relevanssi_implode( $request, 'relevanssi_related_append' );
 		$settings['post_types'] = '';
 		if ( isset( $request['relevanssi_related_post_types'] ) && is_array( $request['relevanssi_related_post_types'] ) ) {
 			$settings['post_types'] = implode( ',', $request['relevanssi_related_post_types'] );
@@ -1022,190 +1090,523 @@ function relevanssi_update_premium_options() {
 				$settings['post_types'] = 'matching_post_type';
 			}
 		}
-		$settings['keyword'] = '';
-		if ( isset( $request['relevanssi_related_keyword'] ) && is_array( $request['relevanssi_related_keyword'] ) ) {
-			$settings['keyword'] = implode( ',', $request['relevanssi_related_keyword'] );
-		}
-		$settings['restrict'] = '';
-		if ( isset( $request['relevanssi_related_restrict'] ) && is_array( $request['relevanssi_related_restrict'] ) ) {
-			$settings['restrict'] = implode( ',', $request['relevanssi_related_restrict'] );
-		}
-		$settings['cache_for_admins'] = 'off';
-		if ( isset( $request['relevanssi_related_cache_for_admins'] ) && 'off' !== $request['relevanssi_related_cache_for_admins'] ) {
-			$settings['cache_for_admins'] = 'on';
-		}
+		$settings['keyword']          = relevanssi_implode( $request, 'relevanssi_related_keyword' );
+		$settings['restrict']         = relevanssi_implode( $request, 'relevanssi_related_restrict' );
+		$settings['cache_for_admins'] = relevanssi_off_or_on( $request, 'relevanssi_related_cache_for_admins' );
 
 		update_option( 'relevanssi_related_settings', $settings );
 
+		if ( 'off' === $settings['enabled'] ) {
+			relevanssi_flush_related_cache();
+		}
 		if ( isset( $request['relevanssi_flush_related_cache'] ) && 'off' !== $request['relevanssi_flush_related_cache'] ) {
 			relevanssi_flush_related_cache();
 		}
 
 		$style = get_option( 'relevanssi_related_style', relevanssi_related_default_styles() );
 
-		if ( isset( $request['relevanssi_related_width'] ) ) {
-			$style['width'] = intval( $request['relevanssi_related_width'] );
-		}
-		$style['excerpts'] = 'off';
-		if ( isset( $request['relevanssi_related_excerpts'] ) && 'off' !== $request['relevanssi_related_excerpts'] ) {
-			$style['excerpts'] = 'on';
-		}
-		$style['titles'] = 'off';
-		if ( isset( $request['relevanssi_related_titles'] ) && 'off' !== $request['relevanssi_related_titles'] ) {
-			$style['titles'] = 'on';
-		}
-		$style['thumbnails'] = 'off';
-		if ( isset( $request['relevanssi_related_thumbnails'] ) && 'off' !== $request['relevanssi_related_thumbnails'] ) {
-			$style['thumbnails'] = 'on';
-		}
-		if ( isset( $request['relevanssi_default_thumbnail'] ) ) {
-			$style['default_thumbnail'] = intval( $request['relevanssi_default_thumbnail'] );
-		}
+		$style['width']             = relevanssi_intval( $request, 'relevanssi_related_width' );
+		$style['excerpts']          = relevanssi_off_or_on( $request, 'relevanssi_related_excerpts' );
+		$style['titles']            = relevanssi_off_or_on( $request, 'relevanssi_related_titles' );
+		$style['thumbnails']        = relevanssi_off_or_on( $request, 'relevanssi_related_thumbnails' );
+		$style['default_thumbnail'] = relevanssi_intval( $request, 'relevanssi_default_thumbnail' );
+
 		if ( isset( $request['relevanssi_remove_default_thumbnail'] ) && 'off' !== $request['relevanssi_remove_default_thumbnail'] ) {
 			$style['default_thumbnail'] = 0;
 		}
 		update_option( 'relevanssi_related_style', $style );
 	}
 
+	if ( 'spamblock' === $request['tab'] ) {
+		$settings['keywords'] = stripslashes( $request['relevanssi_spamblock_keywords'] );
+		$settings['regex']    = stripslashes( $request['relevanssi_spamblock_regex'] );
+
+		$settings['chinese']  = relevanssi_off_or_on( $request, 'relevanssi_spamblock_chinese' );
+		$settings['cyrillic'] = relevanssi_off_or_on( $request, 'relevanssi_spamblock_cyrillic' );
+		$settings['emoji']    = relevanssi_off_or_on( $request, 'relevanssi_spamblock_emoji' );
+		$settings['bots']     = relevanssi_off_or_on( $request, 'relevanssi_spamblock_bots' );
+
+		update_option( 'relevanssi_spamblock', $settings );
+	}
+
 	if ( isset( $request['relevanssi_remove_api_key'] ) ) {
-		update_option( 'relevanssi_api_key', '' );
+		update_option( 'relevanssi_api_key', '', false );
 	}
-	if ( isset( $request['relevanssi_api_key'] ) ) {
-		$value = sanitize_text_field( wp_unslash( $request['relevanssi_api_key'] ) );
-		update_option( 'relevanssi_api_key', $value );
-	}
-	if ( isset( $request['relevanssi_index_synonyms'] ) ) {
-		$value = 'off';
-		if ( 'off' !== $request['relevanssi_index_synonyms'] ) {
-			$value = 'on';
-		}
-		update_option( 'relevanssi_index_synonyms', $value );
-	}
-	if ( isset( $request['relevanssi_index_post_type_archives'] ) ) {
-		$value = 'off';
-		if ( 'off' !== $request['relevanssi_index_post_type_archives'] ) {
-			$value = 'on';
-		}
-		update_option( 'relevanssi_index_post_type_archives', $value );
-	}
-	if ( isset( $request['relevanssi_index_users'] ) ) {
-		$value = 'off';
-		if ( 'off' !== $request['relevanssi_index_users'] ) {
-			$value = 'on';
-		}
-		update_option( 'relevanssi_index_users', $value );
-	}
-	if ( isset( $request['relevanssi_index_subscribers'] ) ) {
-		$value = 'off';
-		if ( 'off' !== $request['relevanssi_index_subscribers'] ) {
-			$value = 'on';
-		}
-		update_option( 'relevanssi_index_subscribers', $value );
-	}
-	if ( isset( $request['relevanssi_index_user_fields'] ) ) {
-		$value = sanitize_text_field( wp_unslash( $request['relevanssi_index_user_fields'] ) );
-		update_option( 'relevanssi_index_user_fields', $value );
-	}
-	if ( isset( $request['relevanssi_internal_links'] ) ) {
-		$value = sanitize_text_field( wp_unslash( $request['relevanssi_internal_links'] ) );
-		update_option( 'relevanssi_internal_links', $value );
-	}
-	if ( isset( $request['relevanssi_hide_branding'] ) ) {
-		$value = 'off';
-		if ( 'off' !== $request['relevanssi_hide_branding'] ) {
-			$value = 'on';
-		}
-		update_option( 'relevanssi_hide_branding', $value );
-	}
-	if ( isset( $request['relevanssi_hide_post_controls'] ) ) {
-		$value = 'off';
-		if ( 'off' !== $request['relevanssi_hide_post_controls'] ) {
-			$value = 'on';
-		}
-		update_option( 'relevanssi_hide_post_controls', $value );
-	}
-	if ( isset( $request['relevanssi_show_post_controls'] ) ) {
-		$value = 'off';
-		if ( 'off' !== $request['relevanssi_show_post_controls'] ) {
-			$value = 'on';
-		}
-		update_option( 'relevanssi_show_post_controls', $value );
-	}
-	if ( isset( $request['relevanssi_do_not_call_home'] ) ) {
-		$value = 'off';
-		if ( 'off' !== $request['relevanssi_do_not_call_home'] ) {
-			$value = 'on';
-		}
-		update_option( 'relevanssi_do_not_call_home', $value );
-	}
-	if ( isset( $request['relevanssi_index_taxonomies'] ) ) {
-		$value = 'off';
-		if ( 'off' !== $request['relevanssi_index_taxonomies'] ) {
-			$value = 'on';
-		}
-		update_option( 'relevanssi_index_taxonomies', $value );
-	}
-	if ( isset( $request['relevanssi_thousand_separator'] ) ) {
-		$value = sanitize_text_field( wp_unslash( $request['relevanssi_thousand_separator'] ) );
-		update_option( 'relevanssi_thousand_separator', $value );
-	}
-	if ( isset( $request['relevanssi_disable_shortcodes'] ) ) {
-		$value = sanitize_text_field( wp_unslash( $request['relevanssi_disable_shortcodes'] ) );
-		update_option( 'relevanssi_disable_shortcodes', $value );
-	}
-	if ( isset( $request['relevanssi_mysql_columns'] ) ) {
-		$value = sanitize_text_field( wp_unslash( $request['relevanssi_mysql_columns'] ) );
-		update_option( 'relevanssi_mysql_columns', $value );
-	}
-	if ( isset( $request['relevanssi_searchblogs'] ) ) {
-		$value = sanitize_text_field( wp_unslash( $request['relevanssi_searchblogs'] ) );
-		update_option( 'relevanssi_searchblogs', $value );
-	}
-	if ( isset( $request['relevanssi_searchblogs_all'] ) ) {
-		$value = 'off';
-		if ( 'off' !== $request['relevanssi_searchblogs_all'] ) {
-			$value = 'on';
-		}
-		update_option( 'relevanssi_searchblogs_all', $value );
-	}
-	if ( isset( $request['relevanssi_read_new_files'] ) ) {
-		$value = 'off';
-		if ( 'off' !== $request['relevanssi_read_new_files'] ) {
-			$value = 'on';
-		}
-		update_option( 'relevanssi_read_new_files', $value );
-	}
-	if ( isset( $request['relevanssi_send_pdf_files'] ) ) {
-		$value = 'off';
-		if ( 'off' !== $request['relevanssi_send_pdf_files'] ) {
-			$value = 'on';
-		}
-		update_option( 'relevanssi_send_pdf_files', $value );
-	}
-	if ( isset( $request['relevanssi_index_pdf_parent'] ) ) {
-		$value = 'off';
-		if ( 'off' !== $request['relevanssi_index_pdf_parent'] ) {
-			$value = 'on';
-		}
-		update_option( 'relevanssi_index_pdf_parent', $value );
-	}
-	if ( isset( $request['relevanssi_link_pdf_files'] ) ) {
-		$value = 'off';
-		if ( 'off' !== $request['relevanssi_link_pdf_files'] ) {
-			$value = 'on';
-		}
-		update_option( 'relevanssi_link_pdf_files', $value );
-	}
-	if ( isset( $request['relevanssi_server_location'] ) ) {
-		$value = 'us';
-		if ( 'eu' === $request['relevanssi_server_location'] ) {
-			$value = 'eu';
-		}
-		update_option( 'relevanssi_server_location', $value );
-	}
+	relevanssi_update_off_or_on( $request, 'relevanssi_click_tracking', false );
+	relevanssi_update_off_or_on( $request, 'relevanssi_do_not_call_home', false );
+	relevanssi_update_off_or_on( $request, 'relevanssi_hide_branding', false );
+	relevanssi_update_off_or_on( $request, 'relevanssi_hide_post_controls', false );
+	relevanssi_update_off_or_on( $request, 'relevanssi_index_pdf_parent', false );
+	relevanssi_update_off_or_on( $request, 'relevanssi_index_post_type_archives', true );
+	relevanssi_update_off_or_on( $request, 'relevanssi_index_subscribers', false );
+	relevanssi_update_off_or_on( $request, 'relevanssi_index_synonyms', true );
+	relevanssi_update_off_or_on( $request, 'relevanssi_index_taxonomies', true );
+	relevanssi_update_off_or_on( $request, 'relevanssi_index_users', true );
+	relevanssi_update_off_or_on( $request, 'relevanssi_link_pdf_files', false );
+	relevanssi_update_off_or_on( $request, 'relevanssi_read_new_files', false );
+	relevanssi_update_off_or_on( $request, 'relevanssi_searchblogs_all', false );
+	relevanssi_update_off_or_on( $request, 'relevanssi_send_pdf_files', false );
+	relevanssi_update_off_or_on( $request, 'relevanssi_show_post_controls', false );
+	relevanssi_update_off_or_on( $request, 'relevanssi_update_translations', false );
+	relevanssi_update_sanitized( $request, 'relevanssi_api_key', true );
+	relevanssi_update_sanitized( $request, 'relevanssi_disable_shortcodes', false );
+	relevanssi_update_sanitized( $request, 'relevanssi_index_user_fields', false );
+	relevanssi_update_sanitized( $request, 'relevanssi_internal_links', false );
+	relevanssi_update_sanitized( $request, 'relevanssi_mysql_columns', false );
+	relevanssi_update_sanitized( $request, 'relevanssi_searchblogs', false );
+	relevanssi_update_sanitized( $request, 'relevanssi_thousand_separator', false );
+
+	relevanssi_update_legal_value(
+		$request,
+		'relevanssi_server_location',
+		array( 'us', 'eu' ),
+		'us',
+		false
+	);
 
 	if ( 'redirects' === $request['tab'] ) {
 		$value = relevanssi_process_redirects( $request );
 		update_option( 'relevanssi_redirects', $value );
 	}
+}
+
+/**
+ * Adds Relevanssi Premium tabs to Relevanssi settings page.
+ *
+ * @global array $relevanssi_variables Used for the plugin path.
+ *
+ * @param array $tabs The array of tab items.
+ *
+ * @return array The tab array with Premium tabs added.
+ */
+function relevanssi_premium_add_tabs( $tabs ) {
+	global $relevanssi_variables;
+
+	$slugs          = wp_list_pluck( $tabs, 'slug' );
+	$redirects_id   = array_search( 'redirects', $slugs, true );
+	$attachments_id = array_search( 'attachments', $slugs, true );
+
+	$tabs[ $redirects_id ]   = array(
+		'slug'     => 'redirects',
+		'name'     => __( 'Redirects', 'relevanssi' ),
+		'require'  => dirname( $relevanssi_variables['file'] )
+					. '/premium/tabs/redirects-tab.php',
+		'callback' => 'relevanssi_redirects_tab',
+		'save'     => true,
+	);
+	$tabs[ $attachments_id ] = array(
+		'slug'     => 'attachments',
+		'name'     => __( 'Attachments', 'relevanssi' ),
+		'require'  => dirname( $relevanssi_variables['file'] )
+					. '/premium/tabs/attachments-tab.php',
+		'callback' => 'relevanssi_attachments_tab',
+		'save'     => true,
+	);
+
+	$tabs[] = array(
+		'slug'     => 'importexport',
+		'name'     => __( 'Import / Export options', 'relevanssi' ),
+		'require'  => dirname( $relevanssi_variables['file'] )
+					. '/premium/tabs/import-export-tab.php',
+		'callback' => 'relevanssi_import_export_tab',
+		'save'     => true,
+	);
+	$tabs[] = array(
+		'slug'     => 'related',
+		'name'     => __( 'Related', 'relevanssi' ),
+		'require'  => dirname( $relevanssi_variables['file'] )
+			. '/premium/tabs/related-tab.php',
+		'callback' => 'relevanssi_related_tab',
+		'save'     => true,
+	);
+	$tabs[] = array(
+		'slug'     => 'spamblock',
+		'name'     => __( 'Spam Block', 'relevanssi' ),
+		'require'  => dirname( $relevanssi_variables['file'] )
+			. '/premium/tabs/spamblock-tab.php',
+		'callback' => 'relevanssi_spamblock_tab',
+		'save'     => true,
+	);
+	$tabs[] = array(
+		'slug'     => 'support',
+		'name'     => __( 'Support', 'relevanssi' ),
+		'require'  => dirname( $relevanssi_variables['file'] )
+			. '/premium/tabs/support-tab.php',
+		'callback' => 'relevanssi_support_tab',
+		'save'     => false,
+	);
+	return $tabs;
+}
+
+/**
+ * Handles the "Reset relevanssi_words" functionality on the debugging tab.
+ */
+function relevanssi_form_reset_words() {
+	$text  = esc_attr__( 'Reset the option', 'relevanssi' );
+	$reset = <<<EOH
+	<p>
+		<input
+			type='submit' name='relevanssi_words'
+			value='$text'
+			class='button button-primary' />
+	</p>
+EOH;
+
+	if ( isset( $_REQUEST['relevanssi_words'] ) ) {
+		wp_verify_nonce( '_relevanssi_nonce', 'relevanssi_how_relevanssi_sees' );
+		$success = delete_option( 'relevanssi_words' );
+		if ( $success ) {
+			$reset = '<p>' . esc_html__( 'Option successfully reset!', 'relevanssi' ) . '</p>';
+		} else {
+			$reset = '<p>' . esc_html__( "Couldn't reset the option, reload the page to try again.", 'relevanssi' ) . '</p>';
+		}
+	}
+
+	$words = get_option( 'relevanssi_words', false );
+	if ( ! $words ) {
+		$word_text = sprintf(
+			// Translators: %1$s is <code>relevanssi_words</code>.
+			esc_html__( 'The %1$s option doesn\'t exist. You can\'t reset it; it should be regenerated when you search for something.', 'relevanssi' ),
+			'<code>relevanssi_words</code>'
+		);
+	} elseif ( isset( $words['words'] ) && isset( $words['expire'] ) ) {
+		$word_count = count( $words['words'] );
+		$word_text  = sprintf(
+			// Translators: %1$s is <code>relevanssi_words</code>, %2$d is the number of words in the option, %3$s is the expiration date of the option.
+			esc_html__( 'The %1$s option has %2$d words in it and the cache expires on %3$s.', 'relevanssi' ),
+			'<code>relevanssi_words</code>',
+			$word_count,
+			date_i18n( get_option( 'date_format' ), $words['expire'] )
+		);
+	} else {
+		$word_text = sprintf(
+			// Translators: %1$s is <code>relevanssi_words</code>.
+			esc_html__( 'The %1$s option is empty.', 'relevanssi' ),
+			'<code>relevanssi_words</code>'
+		);
+	}
+
+	?>
+	<h2><?php esc_html_e( 'Reset the relevanssi_words option', 'relevanssi' ); ?></h2>
+
+	<p>
+	<?php
+		echo $word_text; // phpcs:ignore WordPress.Security.EscapeOutput
+	?>
+	</p>
+
+	<p>
+	<?php
+	printf(
+		// Translators: %1$s is <code>relevanssi_words</code>.
+		esc_html__(
+			'If you are having problems with the Did you mean? feature, you can reset the %1$s option that keeps a cache. Next time the Did you mean? suggestions are needed the option is regenerated.',
+			'relevanssi'
+		),
+		'<code>relevanssi_words</code>'
+	);
+	?>
+	</p>
+
+	<?php
+	echo $reset; // phpcs:ignore WordPress.Security.EscapeOutput
+}
+
+/**
+ * Adds the license notification to the Plugins screen for unlicensed users.
+ *
+ * @param array $data Plugin update data.
+ */
+function relevanssi_premium_modify_plugin_update_message( $data ) {
+	if ( isset( $data['package'] ) && ! empty( $data['package'] ) ) {
+		return;
+	}
+
+	$message = relevanssi_get_api_key_notification();
+	echo '<br /><br />' . $message; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+}
+
+/**
+ * Generates a message giving the reason for API key and license problems.
+ *
+ * @return string The message.
+ */
+function relevanssi_get_api_key_notification() {
+	global $relevanssi_variables;
+
+	$api_key = get_network_option( null, 'relevanssi_api_key' );
+	if ( ! $api_key ) {
+		$api_key = get_option( 'relevanssi_api_key' );
+	}
+
+	if ( ! $api_key ) {
+		$url = add_query_arg(
+			'page',
+			'relevanssi-premium%2Frelevanssi.php',
+			get_admin_url() . 'options-general.php'
+		);
+		if ( is_plugin_active_for_network( plugin_basename( $relevanssi_variables['file'] ) ) ) {
+			$url = network_admin_url( 'admin.php?page=relevanssi-premium%2Frelevanssi.php' );
+		}
+		$message = sprintf(
+			// Translators: %1$s opens the link to the Relevanssi Premium settings page, %3$s opens the link to the Relevanssi Premium license purchase page. %2$s closes the links.
+			esc_html__( "The API key is not set. Please enter your API key in the %1\$sthe Relevanssi settings%2\$s. If you don't have one, %3\$syou can buy a new license here%2\$s.", 'relevanssi' ),
+			'<a href="' . esc_url( $url ) . '">',
+			'</a>',
+			'<a href="https://www.relevanssi.com/buy-premium/">'
+		);
+	} else {
+		$message = sprintf(
+			// Translators: %1$s opens the link to the Relevanssi Premium license purchase page. %2$s closes the link.
+			esc_html__( "Your API key is set, but it looks like you don't have a valid license. %1\$sYou can buy a new license here%2\$s.", 'relevanssi' ),
+			'<a href="https://www.relevanssi.com/buy-premium/">',
+			'</a>'
+		);
+	}
+	return $message;
+}
+
+/**
+ * Adds the Relevanssi columns to the post list.
+ *
+ * @param array  $columns   The columns.
+ * @param string $post_type The post type.
+ */
+function relevanssi_manage_columns( $columns, $post_type = 'page' ) {
+	$post_types = get_option( 'relevanssi_index_post_types', array() );
+	if ( ! in_array( $post_type, $post_types, true ) ) {
+		return $columns;
+	}
+
+	$columns['pinned_keywords']   = __( 'Pinned keywords', 'relevanssi' );
+	$columns['unpinned_keywords'] = __( 'Excluded keywords', 'relevanssi' );
+	$columns['pin_for_all']       = __( 'Pin for all searches', 'relevanssi' );
+	$columns['exclude_post']      = __( 'Exclude post', 'relevanssi' );
+	$columns['ignore_content']    = __( 'Ignore post content', 'relevanssi' );
+	return $columns;
+}
+
+/**
+ * Adds the Relevanssi Premium columns to the post list.
+ *
+ * @param array $column  The column name.
+ * @param int   $post_id The post ID.
+ */
+function relevanssi_manage_custom_column( $column, $post_id ) {
+	switch ( $column ) {
+		case 'pinned_keywords':
+			$keywords = get_post_meta( $post_id, '_relevanssi_pin_keywords', true );
+			if ( ! empty( $keywords ) ) {
+				echo esc_html( $keywords );
+			}
+			break;
+		case 'unpinned_keywords':
+			$keywords = get_post_meta( $post_id, '_relevanssi_unpin_keywords', true );
+			if ( ! empty( $keywords ) ) {
+				echo esc_html( $keywords );
+			}
+			break;
+		case 'pin_for_all':
+			$pin_for_all = get_post_meta( $post_id, '_relevanssi_pin_for_all', true );
+			if ( ! empty( $pin_for_all ) ) {
+				echo '✓';
+			} else {
+				echo '✗';
+			}
+			break;
+		case 'exclude_post':
+			$hide_post = get_post_meta( $post_id, '_relevanssi_hide_post', true );
+			if ( ! empty( $hide_post ) ) {
+				echo '✓';
+			} else {
+				echo '✗';
+			}
+			break;
+		case 'ignore_content':
+			$hide_content = get_post_meta( $post_id, '_relevanssi_hide_content', true );
+			if ( ! empty( $hide_content ) ) {
+				echo '✓';
+			} else {
+				echo '✗';
+			}
+			break;
+	}
+}
+
+/**
+ * Adds the Relevanssi custom fields to the quick edit box.
+ *
+ * @param string $column    The column name.
+ */
+function relevanssi_quick_edit_custom_box( $column ) {
+	switch ( $column ) {
+		case 'pinned_keywords':
+			?>
+			<style>
+				.relevanssi-quick-edit-columns {
+					width: 100%;
+					display: block;
+					clear: both;
+				}
+
+				#wpbody-content fieldset.rlv-inline-edit-col-wide {
+					width: 40%;
+					margin-right: 1em;
+				}
+
+				.inline-edit-row fieldset label span.rlv-title, .rlv-input {
+					width: 100%;
+				}
+			</style>
+			<div class="relevanssi-quick-edit-columns">
+				<legend class="inline-edit-legend"><?php esc_html_e( 'Relevanssi pinning', 'relevanssi' ); ?></legend>
+				<fieldset class="rlv-inline-edit-col-wide">
+					<div class="inline-edit-col">
+						<label class="inline-edit-group">
+							<span class="title rlv-title"><?php esc_html_e( 'Pinned keywords', 'relevanssi' ); ?></span>
+							<input type="text" class="rlv-input" name="relevanssi_pin_keywords" value="" />
+						</label>
+			<?php
+			wp_nonce_field( 'relevanssi_quick_edit_nonce', 'relevanssi_quick_edit_nonce' );
+			break;
+		case 'unpinned_keywords':
+			?>
+						<label class="inline-edit-group">
+							<span class="title rlv-title"><?php esc_html_e( 'Excluded keywords', 'relevanssi' ); ?></span>
+							<input type="text" class="rlv-input" name="relevanssi_unpin_keywords" value="" />
+						</label>
+					</div>
+				</fieldset>
+			</div>
+			<?php
+			break;
+		case 'pin_for_all':
+			?>
+				<fieldset class="rlv-inline-edit-col-wide">
+					<div class="inline-edit-col">
+						<label class="inline-edit-group">
+							<input type="checkbox" name="relevanssi_pin_for_all" value="" />
+							<span class="checkbox-title"><?php esc_html_e( 'Pin this post for all searches it appears in.', 'relevanssi' ); ?></span>
+						</label>
+			<?php
+			break;
+		case 'exclude_post':
+			?>
+						<label class="inline-edit-group">
+							<input type="checkbox" name="relevanssi_hide_post" value="" />
+							<span class="checkbox-title"><?php esc_html_e( 'Exclude this post or page from the index.', 'relevanssi' ); ?></span>
+						</label>
+			<?php
+			break;
+		case 'ignore_content':
+			?>
+						<label class="inline-edit-group">
+							<input type="checkbox" name="relevanssi_hide_content" value="" />
+							<span class="checkbox-title"><?php esc_html_e( 'Ignore post content in the indexing.', 'relevanssi' ); ?></span>
+						</label>
+					</div>
+				</fieldset>
+			<?php
+			break;
+	}
+}
+
+/**
+ * Updates the custom fields from the quick edit saves.
+ *
+ * @param int $post_id The post ID.
+ */
+function relevanssi_quick_edit_save( $post_id ) {
+	if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
+		return;
+	}
+	if ( ! current_user_can( 'edit_post', $post_id ) ) {
+		return;
+	}
+	if ( ! wp_verify_nonce( filter_input( INPUT_POST, 'relevanssi_quick_edit_nonce', FILTER_SANITIZE_SPECIAL_CHARS ), 'relevanssi_quick_edit_nonce' ) ) {
+		return;
+	}
+	if ( isset( $_POST['relevanssi_pin_keywords'] ) ) {
+		$keywords = filter_input( INPUT_POST, 'relevanssi_pin_keywords', FILTER_SANITIZE_FULL_SPECIAL_CHARS, FILTER_FLAG_NO_ENCODE_QUOTES );
+		update_post_meta( $post_id, '_relevanssi_pin_keywords', $keywords );
+		relevanssi_update_pin_fields( $post_id, $keywords );
+	}
+	if ( isset( $_POST['relevanssi_unpin_keywords'] ) ) {
+		$keywords = filter_input( INPUT_POST, 'relevanssi_unpin_keywords', FILTER_SANITIZE_FULL_SPECIAL_CHARS, FILTER_FLAG_NO_ENCODE_QUOTES );
+		update_post_meta( $post_id, '_relevanssi_unpin_keywords', $keywords );
+		relevanssi_update_unpin_fields( $post_id, $keywords );
+	}
+	if ( isset( $_POST['relevanssi_pin_for_all'] ) ) {
+		update_post_meta( $post_id, '_relevanssi_pin_for_all', 'on' );
+	} else {
+		delete_post_meta( $post_id, '_relevanssi_pin_for_all' );
+	}
+	if ( isset( $_POST['relevanssi_hide_post'] ) ) {
+		update_post_meta( $post_id, '_relevanssi_hide_post', 'on' );
+	} else {
+		delete_post_meta( $post_id, '_relevanssi_hide_post' );
+	}
+	if ( isset( $_POST['relevanssi_hide_content'] ) ) {
+		update_post_meta( $post_id, '_relevanssi_hide_content', 'on' );
+	} else {
+		delete_post_meta( $post_id, '_relevanssi_hide_content' );
+	}
+}
+
+/**
+ * Adds the quick edit JS on admin edit.php pages.
+ */
+function relevanssi_quick_edit_js() {
+	wp_enqueue_script( 'jquery' );
+	?>
+	<script type="text/javascript">
+		jQuery(function($) {
+			var relevanssiInlineEditor = inlineEditPost.edit;
+			inlineEditPost.edit = function(id) {
+				relevanssiInlineEditor.apply(this, arguments);
+				var postId = 0;
+				if ( typeof(id) == 'object' ) {
+					postId = parseInt(this.getId(id));
+				}
+				if ( postId !== 0 ) {
+					var editRow = $("#edit-" + postId);
+					var postRow = $("#post-" + postId);
+					var pinnedKeywords = $(".pinned_keywords", postRow).text();
+					$("input[name='relevanssi_pin_keywords']", editRow).val(pinnedKeywords);
+					var unpinnedKeywords = $(".unpinned_keywords", postRow).text();
+					$("input[name='relevanssi_unpin_keywords']", editRow).val(unpinnedKeywords);
+					if ($(".pin_for_all", postRow).text() == '✓') {
+						$("input[name='relevanssi_pin_for_all']", editRow).prop('checked', true);
+					} else {
+						$("input[name='relevanssi_pin_for_all']", editRow).prop('checked', false);
+					}
+					if ($(".exclude_post", postRow).text() == '✓') {
+						$("input[name='relevanssi_hide_post']", editRow).prop('checked', true);
+					} else {
+						$("input[name='relevanssi_hide_post']", editRow).prop('checked', false);
+					}
+					if ($(".ignore_content", postRow).text() == '✓') {
+						$("input[name='relevanssi_hide_content']", editRow).prop('checked', true);
+					} else {
+						$("input[name='relevanssi_hide_content']", editRow).prop('checked', false);
+					}
+				}
+			}
+		})
+	</script>
+	<?php
+}
+
+/**
+ * By default, hide the Relevanssi columns.
+ *
+ * @param array $columns The columns to hide.
+ */
+function relevanssi_hide_columns( $columns ) {
+	$columns[] = 'pinned_keywords';
+	$columns[] = 'unpinned_keywords';
+	$columns[] = 'pin_for_all';
+	$columns[] = 'exclude_post';
+	$columns[] = 'ignore_content';
+	return $columns;
 }

@@ -15,11 +15,14 @@
  */
 function relevanssi_profile_update( $user ) {
 	if ( 'on' === get_option( 'relevanssi_index_users' ) ) {
+		if ( is_integer( $user ) ) {
+			$user = get_user_by( 'id', $user );
+		}
 		/**
 		 * Checks if the user can be indexed.
 		 *
-		 * @param boolean    $index Should the user be indexed, default true.
-		 * @param object|int $user  The user object or user ID.
+		 * @param boolean $index Should the user be indexed, default true.
+		 * @param object  $user  The user object.
 		 *
 		 * @return boolean $index If false, do not index the user.
 		 */
@@ -28,7 +31,7 @@ function relevanssi_profile_update( $user ) {
 			$update = true;
 			relevanssi_index_user( $user, $update );
 		} else {
-			relevanssi_delete_user( $user );
+			relevanssi_delete_user( $user->ID );
 		}
 	}
 }
@@ -83,7 +86,7 @@ function relevanssi_do_term_indexing( $term, $taxonomy, $update ) {
  *
  * @param int $user User ID to delete.
  */
-function relevanssi_delete_user( $user ) {
+function relevanssi_delete_user( int $user ) {
 	global $wpdb, $relevanssi_variables;
 	$user = intval( $user );
 	$wpdb->query( 'DELETE FROM ' . $relevanssi_variables['relevanssi_table'] . " WHERE item = $user AND type = 'user'" ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
@@ -103,13 +106,20 @@ function relevanssi_delete_user( $user ) {
  */
 function relevanssi_delete_taxonomy_term( $term, $term_taxonomy_id, $taxonomy ) {
 	global $wpdb, $relevanssi_variables;
-	$wpdb->query( 'DELETE FROM ' . $relevanssi_variables['relevanssi_table'] . " WHERE item = $term AND type = '$taxonomy'" ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+	$wpdb->query(
+		$wpdb->prepare(
+			'DELETE FROM ' . $relevanssi_variables['relevanssi_table'] . ' WHERE item = %d AND type = %s', // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+			$term,
+			$taxonomy
+		)
+	);
 }
 
 /**
  * Generates the custom field detail field for indexing.
  *
- * Premium stores more detail about custom field indexing. This function generates the custom field detail.
+ * Premium stores more detail about custom field indexing. This function
+ * generates the custom field detail.
  *
  * @param array  $insert_data Data used to generate the INSERT queries.
  * @param string $token       The indexed token.
@@ -126,13 +136,9 @@ function relevanssi_customfield_detail( $insert_data, $token, $count, $field ) {
 		// Nothing yet, create new.
 		$custom_field_detail = array();
 	}
-	if ( isset( $custom_field_detail[ $field ] ) ) {
-		// Matches in this field already exist, add to those.
-		$custom_field_detail[ $field ] += $count;
-	} else {
-		// No matches, create new.
-		$custom_field_detail[ $field ] = $count;
-	}
+
+	relevanssi_increase_value( $custom_field_detail[ $field ], $count );
+
 	$insert_data[ $token ]['customfield_detail'] = wp_json_encode( $custom_field_detail );
 	return $insert_data;
 }
@@ -180,9 +186,13 @@ function relevanssi_index_mysql_columns( $insert_data, $post_id ) {
 		$remove_stopwords    = true;
 		$minimum_word_length = get_option( 'relevanssi_min_word_length', 3 );
 		if ( is_array( $custom_column_data ) ) {
-			foreach ( $custom_column_data as $data ) {
+			foreach ( $custom_column_data as $column => $data ) {
 				/** This filter is documented in common/indexing.php */
-				$data = apply_filters( 'relevanssi_indexing_tokens', relevanssi_tokenize( $data, $remove_stopwords, $minimum_word_length ), 'mysql-content' );
+				$data = apply_filters(
+					'relevanssi_indexing_tokens',
+					relevanssi_tokenize( $data, $remove_stopwords, $minimum_word_length, 'indexing' ),
+					'mysql-content'
+				);
 				if ( count( $data ) > 0 ) {
 					foreach ( $data as $term => $count ) {
 						if ( isset( $insert_data[ $term ]['mysqlcolumn'] ) ) {
@@ -190,11 +200,40 @@ function relevanssi_index_mysql_columns( $insert_data, $post_id ) {
 						} else {
 							$insert_data[ $term ]['mysqlcolumn'] = $count;
 						}
+						$insert_data = relevanssi_mysqlcolumn_detail( $insert_data, $term, $count, $column );
 					}
 				}
 			}
 		}
 	}
+	return $insert_data;
+}
+
+/**
+ * Generates the MySQL column detail field for indexing.
+ *
+ * This function generates the MySQL column detail.
+ *
+ * @param array  $insert_data Data used to generate the INSERT queries.
+ * @param string $token       The indexed token.
+ * @param int    $count       The number of matches.
+ * @param string $column      Name of the column.
+ *
+ * @return array $insert_data New source data for the INSERT queries added.
+ */
+function relevanssi_mysqlcolumn_detail( $insert_data, $token, $count, $column ) {
+	if ( isset( $insert_data[ $token ]['mysqlcolumn_detail'] ) ) {
+		// Custom field detail for this token already exists.
+		$mysqlcolumn_detail = json_decode( $insert_data[ $token ]['mysqlcolumn_detail'], true );
+	} else {
+		// Nothing yet, create new.
+		$mysqlcolumn_detail = array();
+	}
+
+	relevanssi_increase_value( $mysqlcolumn_detail[ $column ], $count );
+
+	$insert_data[ $token ]['mysqlcolumn_detail'] = wp_json_encode( $mysqlcolumn_detail );
+
 	return $insert_data;
 }
 
@@ -226,7 +265,7 @@ function relevanssi_process_internal_links( $contents, $post_id ) {
 				$link_id = url_to_postid( $link );
 				if ( ! empty( $link_id ) ) {
 					/** This filter is documented in common/indexing.php */
-					$link_words = apply_filters( 'relevanssi_indexing_tokens', relevanssi_tokenize( $text, true, $min_word_length ), 'internal-links' );
+					$link_words = apply_filters( 'relevanssi_indexing_tokens', relevanssi_tokenize( $text, true, $min_word_length, 'indexing' ), 'internal-links' );
 					if ( count( $link_words ) > 0 ) {
 						foreach ( $link_words as $word => $count ) {
 							$wpdb->query(
@@ -318,17 +357,17 @@ function relevanssi_strip_internal_links( $text ) {
  *
  * Finds numbers separated by the chosen thousand separator and combine them.
  *
- * @param string $string The string to fix.
+ * @param string $str The string to fix.
  *
- * @return string $string The fixed string.
+ * @return string $str The fixed string.
  */
-function relevanssi_apply_thousands_separator( $string ) {
+function relevanssi_apply_thousands_separator( $str ) {
 	$thousands_separator = get_option( 'relevanssi_thousand_separator', '' );
 	if ( ! empty( $thousands_separator ) ) {
 		$pattern = '/(\d+)' . preg_quote( $thousands_separator, '/' ) . '(\d+)/u';
-		$string  = preg_replace( $pattern, '$1$2', $string );
+		$str     = preg_replace( $pattern, '$1$2', $str );
 	}
-	return $string;
+	return $str;
 }
 
 /**
@@ -336,20 +375,22 @@ function relevanssi_apply_thousands_separator( $string ) {
  *
  * This filter introduces a new filter hook that runs the stemmers.
  *
- * @param string $string The string that is stemmed.
+ * @param string $str The string that is stemmed.
  *
- * @return string $string The string after stemming.
+ * @return string $str The string after stemming.
  */
-function relevanssi_enable_stemmer( $string ) {
+function relevanssi_enable_stemmer( $str ) {
+	add_filter( 'pre_option_relevanssi_implicit_operator', 'relevanssi_return_or' );
 	/**
 	 * Applies stemmer to document content and search terms.
 	 *
-	 * @param string $string The string that is stemmed.
+	 * @param string $str The string that is stemmed.
 	 *
-	 * @return string $string The string after stemming.
+	 * @return string $str The string after stemming.
 	 */
-	$string = apply_filters( 'relevanssi_stemmer', $string );
-	return $string;
+	$str = apply_filters( 'relevanssi_stemmer', $str );
+	remove_filter( 'pre_option_relevanssi_implicit_operator', 'relevanssi_return_or' );
+	return $str;
 }
 
 /**
@@ -367,7 +408,7 @@ function relevanssi_simple_english_stemmer( $term ) {
 	$end1 = substr( $term, -1, 1 );
 	if ( 's' === $end1 && $len > 3 ) {
 		$term = substr( $term, 0, -1 );
-		$len--;
+		--$len;
 	}
 	$end = substr( $term, -3, 3 );
 
@@ -419,13 +460,18 @@ function relevanssi_simple_english_stemmer( $term ) {
 function relevanssi_create_synonym_replacement_array() {
 	global $relevanssi_variables;
 
-	$synonym_data = get_option( 'relevanssi_synonyms' );
-	$synonyms     = array();
-	if ( $synonym_data ) {
-		$synonym_data = relevanssi_strtolower( $synonym_data );
+	$synonym_data     = get_option( 'relevanssi_synonyms' );
+	$current_language = relevanssi_get_current_language();
+	$synonyms         = array();
+
+	if ( isset( $synonym_data[ $current_language ] ) ) {
+		$synonym_data = relevanssi_strtolower( $synonym_data[ $current_language ] );
 		$pairs        = explode( ';', $synonym_data );
 
 		foreach ( $pairs as $pair ) {
+			if ( empty( $pair ) ) {
+				continue;
+			}
 			$parts = explode( '=', $pair );
 			$key   = strval( trim( $parts[0] ) );
 			$value = trim( $parts[1] );
@@ -494,7 +540,7 @@ function relevanssi_prepare_indexing_content( $content ) {
 	$synonyms = $relevanssi_variables['synonyms'];
 	$content  = relevanssi_strtolower( $content );
 	$content  = preg_split( '/[\s,.()!?]/', $content );
-	$ret      = [];
+	$ret      = array();
 	$len      = count( $content );
 	for ( $i = 0; $i < $len; ++$i ) {
 		$val = $content[ $i ];
@@ -525,30 +571,31 @@ function relevanssi_prepare_indexing_content( $content ) {
  * @param int   $post_id       The post ID of the current post.
  */
 function relevanssi_add_repeater_fields( &$custom_fields, $post_id ) {
+	global $wpdb;
+
+	/**
+	 * Filters the list of custom fields to index before the repeater fields
+	 * are expanded. If you want to add repeater fields using the
+	 * field_%_subfield notation from code, you can use this filter hook.
+	 *
+	 * @param array $custom_fields The list of custom fields. This array
+	 * includes all custom fields that are to be indexed, so make sure you add
+	 * new fields here and don't remove anything you want included in the index.
+	 */
+	$custom_fields   = apply_filters( 'relevanssi_custom_fields_before_repeaters', $custom_fields );
 	$repeater_fields = array();
 	foreach ( $custom_fields as $field ) {
-		if ( 1 === substr_count( $field, '%' ) ) { // Only one level of repeaters supported.
-			$field = str_replace( '/', '\/', $field );
-			preg_match( '/([a-z0-9\_\-]+)_\%_([a-z0-9\_\-]+)/i', $field, $matches );
-			$field_name    = '';
-			$subfield_name = '';
-			if ( count( $matches ) > 1 ) {
-				$field_name    = $matches[1];
-				$subfield_name = $matches[2];
-			}
-			if ( $field_name ) {
-				$num_fields = get_post_meta( $post_id, $field_name, true );
-				if ( is_array( $num_fields ) ) {
-					$num_fields = count( $num_fields );
-				}
-				for ( $i = 0; $i < $num_fields; $i++ ) {
-					$repeater_fields[] = $field_name . '_' . $i . '_' . $subfield_name;
-				}
-			}
+		$number_of_levels = substr_count( $field, '%' );
+		if ( $number_of_levels > 0 ) {
+			$field  = str_replace( '\%', '%', $wpdb->esc_like( $field ) );
+			$fields = $wpdb->get_col( $wpdb->prepare( "SELECT meta_key FROM $wpdb->postmeta WHERE meta_key LIKE %s AND post_id = %d", $field, $post_id ) );
+
+			$repeater_fields = array_merge( $repeater_fields, $fields );
 		} else {
 			continue;
 		}
 	}
+
 	$custom_fields = array_merge( $custom_fields, $repeater_fields );
 }
 
@@ -584,9 +631,17 @@ function relevanssi_index_pdf_for_parent( $insert_data, $post_id ) {
 	$pdf_content = $wpdb->get_col( $query ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 
 	if ( is_array( $pdf_content ) ) {
+		/**
+		 * Filters the custom field value before indexing.
+		 *
+		 * @param array            Custom field values.
+		 * @param string $field    The custom field name.
+		 * @param int    $post_id The post ID.
+		 */
+		$pdf_content = apply_filters( 'relevanssi_custom_field_value', $pdf_content, '_relevanssi_pdf_content', $post_id );
 		foreach ( $pdf_content as $row ) {
 			/** This filter is documented in common/indexing.php */
-			$data = apply_filters( 'relevanssi_indexing_tokens', relevanssi_tokenize( $row, true, get_option( 'relevanssi_min_word_length', 3 ) ), 'pdf-content' );
+			$data = apply_filters( 'relevanssi_indexing_tokens', relevanssi_tokenize( $row, true, get_option( 'relevanssi_min_word_length', 3 ), 'indexing' ), 'pdf-content' );
 			if ( count( $data ) > 0 ) {
 				foreach ( $data as $term => $count ) {
 					if ( isset( $insert_data[ $term ]['customfield'] ) ) {
@@ -624,26 +679,7 @@ function relevanssi_index_users() {
 	// Delete all users from the Relevanssi index first.
 	$wpdb->query( 'DELETE FROM ' . $relevanssi_variables['relevanssi_table'] . " WHERE type = 'user'" ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 
-	$args = array();
-
-	$index_subscribers = get_option( 'relevanssi_index_subscribers' );
-	if ( 'on' !== $index_subscribers ) {
-		$args['role__not_in'] = array( 'subscriber' );
-	}
-
-	/**
-	 * Filters the user fetching arguments.
-	 *
-	 * Useful to control the user role, for example: just set 'role__in' to whatever
-	 * you need.
-	 *
-	 * @param array User fetching arguments.
-	 */
-	$users_list = get_users( apply_filters( 'relevanssi_user_indexing_args', $args ) );
-	$users      = array();
-	foreach ( $users_list as $user ) {
-		$users[] = get_userdata( $user->ID );
-	}
+	$users = relevanssi_get_users( array() );
 
 	if ( defined( 'WP_CLI' ) && WP_CLI ) {
 		$progress = WP_CLI\Utils\make_progress_bar( 'Indexing users', count( $users ) );
@@ -688,38 +724,16 @@ function relevanssi_index_users() {
  * @return array $response AJAX response, number of users indexed in the $response['indexed'].
  */
 function relevanssi_index_users_ajax( $limit, $offset ) {
-	global $wpdb, $relevanssi_variables;
-
 	$args = array(
 		'number' => intval( $limit ),
 		'offset' => intval( $offset ),
 	);
 
-	$index_subscribers = get_option( 'relevanssi_index_subscribers' );
-	if ( 'on' !== $index_subscribers ) {
-		$args['role__not_in'] = array( 'subscriber' );
-	}
-
-	$users_list = get_users( $args );
-
-	if ( empty( $users_list ) ) {
-		$response = array(
-			'indexed' => 0,
-		);
-		return $response;
-	}
-
-	$users = array();
-	foreach ( $users_list as $user ) {
-		$users[] = get_userdata( $user->ID );
-	}
+	$users = relevanssi_get_users( $args );
 
 	$indexed_users = 0;
+	$update        = false;
 	foreach ( $users as $user ) {
-		$update = false;
-		if ( empty( $user->roles ) ) {
-			continue;
-		}
 		/**
 		 * Checks if the user can be indexed.
 		 *
@@ -731,7 +745,7 @@ function relevanssi_index_users_ajax( $limit, $offset ) {
 		$index_this_user = apply_filters( 'relevanssi_user_index_ok', true, $user );
 		if ( $index_this_user ) {
 			relevanssi_index_user( $user, $update );
-			$indexed_users++;
+			++$indexed_users;
 		}
 	}
 
@@ -740,6 +754,36 @@ function relevanssi_index_users_ajax( $limit, $offset ) {
 	);
 
 	return $response;
+}
+
+/**
+ * Gets the list of users.
+ *
+ * @param array $args The user indexing arguments.
+ *
+ * @return array An array of user profiles.
+ */
+function relevanssi_get_users( array $args ) {
+	$index_subscribers = get_option( 'relevanssi_index_subscribers' );
+	if ( 'on' !== $index_subscribers ) {
+		$args['role__not_in'] = array( 'subscriber' );
+	}
+
+	/**
+	 * Filters the user fetching arguments.
+	 *
+	 * Useful to control the user role, for example: just set 'role__in' to whatever
+	 * you need.
+	 *
+	 * @param array User fetching arguments.
+	 */
+	$users_list = get_users( apply_filters( 'relevanssi_user_indexing_args', $args ) );
+	$users      = array();
+	foreach ( $users_list as $user ) {
+		$users[] = get_userdata( $user->ID );
+	}
+
+	return $users;
 }
 
 /**
@@ -772,9 +816,9 @@ function relevanssi_index_user( $user, $remove_first = false ) {
 	/**
 	 * Allows manipulating the user object before indexing.
 	 *
-	 * This filter can be used to manipulate the user object before it is processed for indexing.
-	 * It's possible to add extra data (for example to user description field) or to change the
-	 * existing data.
+	 * This filter can be used to manipulate the user object before it is
+	 * processed for indexing. It's possible to add extra data (for example to
+	 * user description field) or to change the existing data.
 	 *
 	 * @param object $user The user object.
 	 */
@@ -784,61 +828,23 @@ function relevanssi_index_user( $user, $remove_first = false ) {
 	$min_length       = get_option( 'relevanssi_min_word_length', 3 );
 	$remove_stopwords = true;
 
-	$user_meta = get_option( 'relevanssi_index_user_meta' );
-	if ( $user_meta ) {
-		$user_meta_fields = explode( ',', $user_meta );
-		foreach ( $user_meta_fields as $key ) {
-			$key    = trim( $key );
-			$values = get_user_meta( $user->ID, $key, false );
-			foreach ( $values as $value ) {
-				/** This filter is documented in common/indexing.php */
-				$tokens = apply_filters( 'relevanssi_indexing_tokens', relevanssi_tokenize( $value, $remove_stopwords, $min_length ), 'user-meta' );
-				foreach ( $tokens as $term => $tf ) {
-					if ( isset( $insert_data[ $term ]['customfield'] ) ) {
-						$insert_data[ $term ]['customfield'] += $tf;
-					} else {
-						$insert_data[ $term ]['customfield'] = $tf;
-					}
-					$insert_data = relevanssi_customfield_detail( $insert_data, $term, $tf, $key );
-				}
+	$values = relevanssi_get_user_field_content( $user->ID );
+	foreach ( $values as $field => $value ) {
+		/** This filter is documented in common/indexing.php */
+		$tokens = apply_filters( 'relevanssi_indexing_tokens', relevanssi_tokenize( $value, $remove_stopwords, $min_length, 'indexing' ), 'user-fields' );
+		foreach ( $tokens as $term => $tf ) {
+			if ( isset( $insert_data[ $term ]['customfield'] ) ) {
+				$insert_data[ $term ]['customfield'] += $tf;
+			} else {
+				$insert_data[ $term ]['customfield'] = $tf;
 			}
-		}
-	}
-
-	$extra_fields = get_option( 'relevanssi_index_user_fields' );
-	if ( $extra_fields ) {
-		$extra_fields = explode( ',', $extra_fields );
-		$user_vars    = get_object_vars( $user );
-		foreach ( $extra_fields as $field ) {
-			$field = trim( $field );
-			if ( isset( $user_vars[ $field ] ) || isset( $user_vars['data']->$field ) || get_user_meta( $user->ID, $field, true ) ) {
-				$to_tokenize = '';
-				if ( isset( $user_vars[ $field ] ) ) {
-					$to_tokenize = $user_vars[ $field ];
-				}
-				if ( empty( $to_tokenize ) && isset( $user_vars['data']->$field ) ) {
-					$to_tokenize = $user_vars['data']->$field;
-				}
-				if ( empty( $to_tokenize ) ) {
-					$to_tokenize = get_user_meta( $user->ID, $field, true );
-				}
-				/** This filter is documented in common/indexing.php */
-				$tokens = apply_filters( 'relevanssi_indexing_tokens', relevanssi_tokenize( $to_tokenize, $remove_stopwords, $min_length ), 'user-fields' );
-				foreach ( $tokens as $term => $tf ) {
-					if ( isset( $insert_data[ $term ]['customfield'] ) ) {
-						$insert_data[ $term ]['customfield'] += $tf;
-					} else {
-						$insert_data[ $term ]['customfield'] = $tf;
-					}
-					$insert_data = relevanssi_customfield_detail( $insert_data, $term, $tf, $field );
-				}
-			}
+			$insert_data = relevanssi_customfield_detail( $insert_data, $term, $tf, $field );
 		}
 	}
 
 	if ( isset( $user->description ) && '' !== $user->description ) {
 		/** This filter is documented in common/indexing.php */
-		$tokens = apply_filters( 'relevanssi_indexing_tokens', relevanssi_tokenize( $user->description, $remove_stopwords, $min_length ), 'user-description' );
+		$tokens = apply_filters( 'relevanssi_indexing_tokens', relevanssi_tokenize( $user->description, $remove_stopwords, $min_length, 'indexing' ), 'user-description' );
 		foreach ( $tokens as $term => $tf ) {
 			if ( isset( $insert_data[ $term ]['content'] ) ) {
 				$insert_data[ $term ]['content'] += $tf;
@@ -855,7 +861,7 @@ function relevanssi_index_user( $user, $remove_first = false ) {
 				continue;
 			}
 			if ( isset( $insert_data[ $part ]['title'] ) ) {
-				$insert_data[ $part ]['title']++;
+				++$insert_data[ $part ]['title'];
 			} else {
 				$insert_data[ $part ]['title'] = 1;
 			}
@@ -869,7 +875,7 @@ function relevanssi_index_user( $user, $remove_first = false ) {
 				continue;
 			}
 			if ( isset( $insert_data[ $part ]['title'] ) ) {
-				$insert_data[ $part ]['title']++;
+				++$insert_data[ $part ]['title'];
 			} else {
 				$insert_data[ $part ]['title'] = 1;
 			}
@@ -883,7 +889,7 @@ function relevanssi_index_user( $user, $remove_first = false ) {
 				continue;
 			}
 			if ( isset( $insert_data[ $part ]['title'] ) ) {
-				$insert_data[ $part ]['title']++;
+				++$insert_data[ $part ]['title'];
 			} else {
 				$insert_data[ $part ]['title'] = 1;
 			}
@@ -963,20 +969,22 @@ function relevanssi_count_users() {
 		return -1;
 	}
 
-	global $wpdb;
+	$args = array(
+		'fields' => 'ID',
+	);
 
-	$users             = count_users( 'time' );
 	$index_subscribers = get_option( 'relevanssi_index_subscribers' );
-
-	$count_users = $users['total_users'];
-	if ( empty( $index_subscribers ) || 'off' === $index_subscribers ) {
-		if ( isset( $users['avail_roles']['subscriber'] ) ) {
-			$count_users -= $users['avail_roles']['subscriber'];
-		}
+	if ( 'on' !== $index_subscribers ) {
+		$args['role__not_in'] = array( 'subscriber' );
 	}
 
-	// Exclude users with no role in the current blog.
-	$count_users -= $users['avail_roles']['none'];
+	$users = get_users(
+		/**
+		 * Documented in /premium/indexing.php.
+		 */
+		apply_filters( 'relevanssi_user_indexing_args', $args )
+	);
+	$count_users = count( $users );
 
 	return $count_users;
 }
@@ -1062,45 +1070,22 @@ function relevanssi_index_taxonomies_ajax( $taxonomy, $limit, $offset ) {
 	$indexed_terms = 0;
 	$end_reached   = false;
 
-	/**
-	 * Determines whether empty terms are indexed or not.
-	 *
-	 * @param boolean $hide_empty_terms If true, empty terms are not indexed. Default true.
-	 */
-	$hide_empty = apply_filters( 'relevanssi_hide_empty_terms', true );
-	$count      = '';
-	if ( $hide_empty ) {
-		$count = 'AND tt.count > 0';
-	}
-
-	$terms = $wpdb->get_col(
-		$wpdb->prepare(
-			"SELECT t.term_id FROM $wpdb->terms AS t, $wpdb->term_taxonomy AS tt WHERE t.term_id = tt.term_id $count AND tt.taxonomy = %s LIMIT %d OFFSET %d", // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-			$taxonomy,
-			intval( $limit ),
-			intval( $offset )
-		)
-	);
+	$terms = relevanssi_get_terms( $taxonomy, intval( $limit ), intval( $offset ) );
 
 	if ( count( $terms ) < $limit ) {
 		$end_reached = true;
 	}
 
+	do_action( 'relevanssi_pre_index_taxonomies' );
+
 	foreach ( $terms as $term_id ) {
 		$update = false;
 		$term   = get_term( $term_id, $taxonomy );
-		/**
-		 * Allows the term object to be handled before indexing.
-		 *
-		 * This filter can be used to add data to term objects before indexing, or to manipulate the object somehow.
-		 *
-		 * @param object $term     The term object.
-		 * @param string $taxonomy The taxonomy.
-		 */
-		$term = apply_filters( 'relevanssi_term_add_data', $term, $taxonomy );
 		relevanssi_index_taxonomy_term( $term, $taxonomy, $update );
-		$indexed_terms++;
+		++$indexed_terms;
 	}
+
+	do_action( 'relevanssi_post_index_taxonomies' );
 
 	$response = array(
 		'indexed'            => $indexed_terms,
@@ -1130,19 +1115,12 @@ function relevanssi_index_taxonomies( $is_ajax = false ) {
 
 	$wpdb->query( 'DELETE FROM ' . $relevanssi_variables['relevanssi_table'] . " WHERE doc = -1 AND type NOT IN ('user', 'post_type')" ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 
+	do_action( 'relevanssi_pre_index_taxonomies' );
+
 	$taxonomies    = get_option( 'relevanssi_index_terms' );
 	$indexed_terms = 0;
 	foreach ( $taxonomies as $taxonomy ) {
-		/**
-		 * Adjusts the get_terms() arguments for taxonomy indexing.
-		 *
-		 * Get_terms() is used to get the terms for indexing. By default, no parameters are passed.
-		 * This filter can be used to change that.
-		 *
-		 * @param array $args Arguments to pass to get_terms(). Default just the 'taxonomy' parameter.
-		 */
-		$args  = apply_filters( 'relevanssi_index_taxonomies_args', array( 'taxonomy' => $taxonomy ) );
-		$terms = get_terms( $args );
+		$terms = relevanssi_get_terms( $taxonomy, 0, 0 );
 
 		if ( defined( 'WP_CLI' ) && WP_CLI ) {
 			$progress = WP_CLI\Utils\make_progress_bar( "Indexing $taxonomy", count( $terms ) );
@@ -1150,17 +1128,8 @@ function relevanssi_index_taxonomies( $is_ajax = false ) {
 
 		$update = false;
 		foreach ( $terms as $term ) {
-			/**
-			 * Allows the term object to be handled before indexing.
-			 *
-			 * This filter can be used to add data to term objects before indexing, or to manipulate the object somehow.
-			 *
-			 * @param object $term     The term object.
-			 * @param string $taxonomy The taxonomy.
-			 */
-			$term = apply_filters( 'relevanssi_term_add_data', $term, $taxonomy );
 			relevanssi_index_taxonomy_term( $term, $taxonomy, $update );
-			$indexed_terms++;
+			++$indexed_terms;
 			if ( defined( 'WP_CLI' ) && WP_CLI ) {
 				$progress->tick();
 			}
@@ -1170,6 +1139,8 @@ function relevanssi_index_taxonomies( $is_ajax = false ) {
 		}
 	}
 
+	do_action( 'relevanssi_post_index_taxonomies' );
+
 	if ( $is_ajax ) {
 		if ( $indexed_terms > 0 ) {
 			// translators: the number of taxonomy terms.
@@ -1178,6 +1149,45 @@ function relevanssi_index_taxonomies( $is_ajax = false ) {
 			return __( 'No taxonomies to index.', 'relevanssi' );
 		}
 	}
+}
+
+/**
+ * Gets a list of taxonomy terms.
+ *
+ * @param string $taxonomy The taxonomy to index.
+ * @param int    $limit    Number of users to index on one go.
+ * @param int    $offset   Indexing offset.
+ *
+ * @return array A list of taxonomy terms.
+ */
+function relevanssi_get_terms( string $taxonomy, int $limit = 0, int $offset = 0 ): array {
+	global $wpdb;
+
+	/**
+	 * Determines whether empty terms are indexed or not.
+	 *
+	 * @param boolean $hide_empty_terms If true, empty terms are not indexed. Default true.
+	 */
+	$hide_empty = apply_filters( 'relevanssi_hide_empty_terms', true );
+	$count      = '';
+	if ( $hide_empty ) {
+		$count = 'AND tt.count > 0';
+	}
+
+	$limit_sql = '';
+	if ( $limit && $offset ) {
+		$limit_sql = $wpdb->prepare( 'LIMIT %d OFFSET %d', $limit, $offset );
+	}
+
+	$terms = $wpdb->get_col(
+		$wpdb->prepare(
+			"SELECT t.term_id FROM $wpdb->terms AS t, $wpdb->term_taxonomy AS tt
+			WHERE t.term_id = tt.term_id $count AND tt.taxonomy = %s $limit_sql ", // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+			$taxonomy
+		)
+	);
+
+	return $terms;
 }
 
 /**
@@ -1198,6 +1208,16 @@ function relevanssi_index_taxonomy_term( $term, $taxonomy, $remove_first = false
 		// Not an object, so let's get the object.
 		$term = get_term( $term, $taxonomy );
 	}
+
+	/**
+	 * Allows the term object to be handled before indexing.
+	 *
+	 * This filter can be used to add data to term objects before indexing, or to manipulate the object somehow.
+	 *
+	 * @param object $term     The term object.
+	 * @param string $taxonomy The taxonomy.
+	 */
+	$term = apply_filters( 'relevanssi_term_add_data', $term, $taxonomy );
 
 	$temp_post               = new stdClass();
 	$temp_post->post_content = $term->description;
@@ -1226,7 +1246,7 @@ function relevanssi_index_taxonomy_term( $term, $taxonomy, $remove_first = false
 	 * If this filter returns true, this term should not be indexed.
 	 *
 	 * @param boolean $block    If true, do not index this post. Default false.
-	 * @param object  $term     The term object.
+	 * @param WP_Term $term     The term object.
 	 * @param string  $taxonomy The term taxonomy.
 	 */
 	if ( true === apply_filters( 'relevanssi_do_not_index_term', false, $term, $taxonomy ) ) {
@@ -1268,7 +1288,7 @@ function relevanssi_index_taxonomy_term( $term, $taxonomy, $remove_first = false
 	$description = apply_filters( 'relevanssi_tax_term_additional_content', $term->description, $term );
 	if ( ! empty( $description ) ) {
 		/** This filter is documented in common/indexing.php */
-		$tokens = apply_filters( 'relevanssi_indexing_tokens', relevanssi_tokenize( $description, $remove_stopwords, $min_length ), 'term-description' );
+		$tokens = apply_filters( 'relevanssi_indexing_tokens', relevanssi_tokenize( $description, $remove_stopwords, $min_length, 'indexing' ), 'term-description' );
 		foreach ( $tokens as $t_term => $tf ) {
 			if ( ! isset( $insert_data[ $t_term ]['content'] ) ) {
 				$insert_data[ $t_term ]['content'] = 0;
@@ -1279,7 +1299,7 @@ function relevanssi_index_taxonomy_term( $term, $taxonomy, $remove_first = false
 
 	if ( isset( $term->name ) && ! empty( $term->name ) ) {
 		/** This filter is documented in common/indexing.php */
-		$tokens = apply_filters( 'relevanssi_indexing_tokens', relevanssi_tokenize( $term->name, $remove_stopwords, $min_length ), 'term-name' );
+		$tokens = apply_filters( 'relevanssi_indexing_tokens', relevanssi_tokenize( $term->name, $remove_stopwords, $min_length, 'indexing' ), 'term-name' );
 		foreach ( $tokens as $t_term => $tf ) {
 			if ( ! isset( $insert_data[ $t_term ]['title'] ) ) {
 				$insert_data[ $t_term ]['title'] = 0;
@@ -1366,8 +1386,6 @@ function relevanssi_premium_remove_doc( $post_id, $keep_internal_linking ) {
 	if ( ! $keep_internal_linking ) {
 		$wpdb->query( $wpdb->prepare( 'DELETE FROM ' . $relevanssi_variables['relevanssi_table'] . ' WHERE link > 0 AND doc=%s', $post_id ) ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 	}
-
-	relevanssi_update_doc_count();
 }
 
 /**
@@ -1449,15 +1467,11 @@ function relevanssi_index_post_type_archives() {
 			if ( defined( 'WP_CLI' ) && WP_CLI ) {
 				$progress->finish();
 			}
-		} else {
-			if ( defined( 'WP_CLI' ) && WP_CLI ) {
-				WP_CLI::log( 'No post types available for post type archive indexing.' );
-			}
+		} elseif ( defined( 'WP_CLI' ) && WP_CLI ) {
+			WP_CLI::log( 'No post types available for post type archive indexing.' );
 		}
-	} else {
-		if ( defined( 'WP_CLI' ) && WP_CLI ) {
-			WP_CLI::error( 'Post type archive indexing disabled.' );
-		}
+	} elseif ( defined( 'WP_CLI' ) && WP_CLI ) {
+		WP_CLI::error( 'Post type archive indexing disabled.' );
 	}
 }
 
@@ -1482,7 +1496,7 @@ function relevanssi_index_post_type_archives_ajax() {
 	$indexed_post_types = 0;
 	foreach ( $post_types as $post_type ) {
 		relevanssi_index_post_type_archive( $post_type );
-		$indexed_post_types++;
+		++$indexed_post_types;
 	}
 
 	$response = array(
@@ -1516,7 +1530,7 @@ function relevanssi_assign_post_type_ids() {
 	foreach ( $post_types as $post_type ) {
 		$post_type_ids_by_id[ $id ]          = $post_type;
 		$post_type_ids_by_name[ $post_type ] = $id;
-		$id++;
+		++$id;
 	}
 	update_option(
 		'relevanssi_post_type_ids',
@@ -1616,6 +1630,20 @@ function relevanssi_index_post_type_archive( $post_type, $remove_first = true ) 
 	$post_type_object = get_post_type_object( $post_type );
 	global $wpdb, $relevanssi_variables;
 
+	/**
+	 * Allows excluding post type archives from the index.
+	 *
+	 * If this filter hook returns false, the post type archive won't be
+	 * indexed and if it's already indexed, it will be removed from the index.
+	 *
+	 * @param boolean If true, index the archive. Default true.
+	 * @param object  The post type object.
+	 */
+	if ( ! apply_filters( 'relevanssi_post_type_archive_ok', true, $post_type ) ) {
+		relevanssi_delete_post_type_object( $post_type );
+		return;
+	}
+
 	$temp_post               = new stdClass();
 	$temp_post->post_content = $post_type_object->description;
 	$temp_post->post_title   = $post_type_object->name;
@@ -1666,10 +1694,10 @@ function relevanssi_index_post_type_archive( $post_type, $remove_first = true ) 
 		$post_type_object
 	);
 	if ( ! empty( $description ) ) {
-		/** This filter is documented in common/indexing.php */
+		/** This filter is documented in lib/indexing.php */
 		$tokens = apply_filters(
-			'relevanssi_indexing_terms',
-			relevanssi_tokenize( $description, $remove_stopwords, $min_length ),
+			'relevanssi_indexing_tokens',
+			relevanssi_tokenize( $description, $remove_stopwords, $min_length, 'indexing' ),
 			'posttype-description'
 		);
 		foreach ( $tokens as $t_term => $tf ) {
@@ -1681,10 +1709,10 @@ function relevanssi_index_post_type_archive( $post_type, $remove_first = true ) 
 	}
 
 	if ( isset( $post_type_object->name ) && ! empty( $post_type_object->name ) ) {
-		/** This filter is documented in common/indexing.php */
+		/** This filter is documented in lib/indexing.php */
 		$tokens = apply_filters(
-			'relevanssi_indexing_terms',
-			relevanssi_tokenize( $post_type_object->label, $remove_stopwords, $min_length ),
+			'relevanssi_indexing_tokens',
+			relevanssi_tokenize( $post_type_object->label, $remove_stopwords, $min_length, 'indexing' ),
 			'posttype-name'
 		);
 		foreach ( $tokens as $t_term => $tf ) {

@@ -28,6 +28,7 @@ __webpack_require__.d(__webpack_exports__, {
   fw: () => (/* reexport */ getContext),
   sb: () => (/* reexport */ getElement),
   YH: () => (/* binding */ privateApis),
+  QN: () => (/* reexport */ splitTask),
   h: () => (/* reexport */ store),
   I4: () => (/* reexport */ useCallback),
   d4: () => (/* reexport */ useEffect),
@@ -68,7 +69,7 @@ var deepsignal_module_a=new WeakMap,deepsignal_module_o=new WeakMap,deepsignal_m
  * Internal dependencies
  */
 
-const isObject = item => item && typeof item === 'object' && item.constructor === Object;
+const isObject = item => Boolean(item && typeof item === 'object' && item.constructor === Object);
 const deepMerge = (target, source) => {
   if (isObject(target) && isObject(source)) {
     for (const key in source) {
@@ -78,28 +79,20 @@ const deepMerge = (target, source) => {
           get: getter
         });
       } else if (isObject(source[key])) {
-        if (!target[key]) Object.assign(target, {
-          [key]: {}
-        });
+        if (!target[key]) {
+          target[key] = {};
+        }
         deepMerge(target[key], source[key]);
       } else {
-        Object.assign(target, {
-          [key]: source[key]
-        });
+        try {
+          target[key] = source[key];
+        } catch (e) {
+          // Assignemnts fail for properties that are only getters.
+          // When that's the case, the assignment is simply ignored.
+        }
       }
     }
   }
-};
-const parseInitialData = () => {
-  const storeTag = document.querySelector(`script[type="application/json"]#wp-interactivity-data`);
-  if (storeTag?.textContent) {
-    try {
-      return JSON.parse(storeTag.textContent);
-    } catch (e) {
-      // Do nothing.
-    }
-  }
-  return {};
 };
 const stores = new Map();
 const rawStores = new Map();
@@ -143,13 +136,13 @@ const handlers = {
         return getters.get(getter).value;
       }
     }
-    const result = Reflect.get(target, key, receiver);
+    const result = Reflect.get(target, key);
 
     // Check if the proxy is the store root and no key with that name exist. In
     // that case, return an empty object for the requested key.
     if (typeof result === 'undefined' && receiver === stores.get(ns)) {
       const obj = {};
-      Reflect.set(target, key, obj, receiver);
+      Reflect.set(target, key, obj);
       return proxify(obj, ns);
     }
 
@@ -174,9 +167,16 @@ const handlers = {
           try {
             value = await it.value;
           } catch (e) {
+            setNamespace(ns);
+            setScope(scope);
             gen.throw(e);
+          } finally {
+            resetScope();
+            resetNamespace();
           }
-          if (it.done) break;
+          if (it.done) {
+            break;
+          }
         }
         return value;
       };
@@ -197,8 +197,14 @@ const handlers = {
     }
 
     // Check if the property is an object. If it is, proxyify it.
-    if (isObject(result)) return proxify(result, ns);
+    if (isObject(result)) {
+      return proxify(result, ns);
+    }
     return result;
+  },
+  // Prevents passing the current proxy as the receiver to the deepSignal.
+  set(target, key, value) {
+    return Reflect.set(target, key, value);
   }
 };
 
@@ -271,7 +277,7 @@ function store(namespace, {
       storeLocks.set(namespace, lock);
     }
     const rawStore = {
-      state: deepsignal_module_g(state),
+      state: deepsignal_module_g(isObject(state) ? state : {}),
       ...block
     };
     const proxiedStore = new Proxy(rawStore, handlers);
@@ -301,25 +307,43 @@ function store(namespace, {
   }
   return stores.get(namespace);
 }
+const parseInitialData = (dom = document) => {
+  var _dom$getElementById;
+  const jsonDataScriptTag =
+  // Preferred Script Module data passing form
+  (_dom$getElementById = dom.getElementById('wp-script-module-data-@wordpress/interactivity')) !== null && _dom$getElementById !== void 0 ? _dom$getElementById :
+  // Legacy form
+  dom.getElementById('wp-interactivity-data');
+  if (jsonDataScriptTag?.textContent) {
+    try {
+      return JSON.parse(jsonDataScriptTag.textContent);
+    } catch {}
+  }
+  return {};
+};
+const populateInitialData = data => {
+  if (isObject(data?.state)) {
+    Object.entries(data.state).forEach(([namespace, state]) => {
+      store(namespace, {
+        state
+      }, {
+        lock: universalUnlock
+      });
+    });
+  }
+  if (isObject(data?.config)) {
+    Object.entries(data.config).forEach(([namespace, config]) => {
+      storeConfigs.set(namespace, config);
+    });
+  }
+};
 
 // Parse and populate the initial state and config.
 const data = parseInitialData();
-if (isObject(data?.state)) {
-  Object.entries(data.state).forEach(([namespace, state]) => {
-    store(namespace, {
-      state
-    }, {
-      lock: universalUnlock
-    });
-  });
-}
-if (isObject(data?.config)) {
-  Object.entries(data.config).forEach(([namespace, config]) => {
-    storeConfigs.set(namespace, config);
-  });
-}
+populateInitialData(data);
 ;// CONCATENATED MODULE: ./packages/interactivity/build-module/hooks.js
-/* @jsx createElement */
+// eslint-disable-next-line eslint-comments/disable-enable-pair
+/* eslint-disable react-hooks/exhaustive-deps */
 
 /**
  * External dependencies
@@ -329,6 +353,7 @@ if (isObject(data?.config)) {
 /**
  * Internal dependencies
  */
+
 
 // Main context.
 const context = F({});
@@ -347,7 +372,9 @@ const immutableHandlers = {
   deleteProperty: immutableError
 };
 const deepImmutable = target => {
-  if (!immutableMap.has(target)) immutableMap.set(target, new Proxy(target, immutableHandlers));
+  if (!immutableMap.has(target)) {
+    immutableMap.set(target, new Proxy(target, immutableHandlers));
+  }
   return immutableMap.get(target);
 };
 
@@ -453,7 +480,7 @@ const directivePriorities = {};
  * ```js
  * directive(
  *   'color', // Name without prefix and suffix.
- *   ( { directives: { color }, ref, evaluate } ) =>
+ *   ( { directives: { color: colors }, ref, evaluate } ) =>
  *     colors.forEach( ( color ) => {
  *       if ( color.suffix = 'text' ) {
  *         ref.style.setProperty(
@@ -487,12 +514,24 @@ const directive = (name, callback, {
 
 // Resolve the path to some property of the store object.
 const resolve = (path, namespace) => {
-  let current = {
-    ...stores.get(namespace),
+  if (!namespace) {
+    warn(`Namespace missing for "${path}". The value for that path won't be resolved.`);
+    return;
+  }
+  let resolvedStore = stores.get(namespace);
+  if (typeof resolvedStore === 'undefined') {
+    resolvedStore = store(namespace, undefined, {
+      lock: universalUnlock
+    });
+  }
+  const current = {
+    ...resolvedStore,
     context: getScope().context[namespace]
   };
-  path.split('.').forEach(p => current = current[p]);
-  return current;
+  try {
+    // TODO: Support lazy/dynamically initialized stores
+    return path.split('.').reduce((acc, key) => acc[key], current);
+  } catch (e) {}
 };
 
 // Generate the evaluate function.
@@ -557,10 +596,10 @@ const Directives = ({
 
   // Recursively render the wrapper for the next priority level.
   const children = nextPriorityLevels.length > 0 ? y(Directives, {
-    directives: directives,
+    directives,
     priorityLevels: nextPriorityLevels,
-    element: element,
-    originalProps: originalProps,
+    element,
+    originalProps,
     previousScope: scope
   }) : element;
   const props = {
@@ -577,7 +616,9 @@ const Directives = ({
   setScope(scope);
   for (const directiveName of currentPriorityLevel) {
     const wrapper = directiveCallbacks[directiveName]?.(directiveArgs);
-    if (wrapper !== undefined) props.children = wrapper;
+    if (wrapper !== undefined) {
+      props.children = wrapper;
+    }
   }
   resetScope();
   return props.children;
@@ -589,9 +630,11 @@ l.vnode = vnode => {
   if (vnode.props.__directives) {
     const props = vnode.props;
     const directives = props.__directives;
-    if (directives.key) vnode.key = directives.key.find(({
-      suffix
-    }) => suffix === 'default').value;
+    if (directives.key) {
+      vnode.key = directives.key.find(({
+        suffix
+      }) => suffix === 'default').value;
+    }
     delete props.__directives;
     const priorityLevels = getPriorityLevels(directives);
     if (priorityLevels.length > 0) {
@@ -606,7 +649,9 @@ l.vnode = vnode => {
       vnode.type = Directives;
     }
   }
-  if (old) old(vnode);
+  if (old) {
+    old(vnode);
+  }
 };
 ;// CONCATENATED MODULE: ./packages/interactivity/build-module/utils.js
 /**
@@ -619,6 +664,12 @@ l.vnode = vnode => {
  * Internal dependencies
  */
 
+/**
+ * Executes a callback function after the next frame is rendered.
+ *
+ * @param callback The callback function to be executed.
+ * @return A promise that resolves after the callback function is executed.
+ */
 const afterNextFrame = callback => {
   return new Promise(resolve => {
     const done = () => {
@@ -634,12 +685,32 @@ const afterNextFrame = callback => {
   });
 };
 
-// Using the mangled properties:
-// this.c: this._callback
-// this.x: this._compute
-// https://github.com/preactjs/signals/blob/main/mangle.json
+/**
+ * Returns a promise that resolves after yielding to main.
+ *
+ * @return Promise
+ */
+const splitTask = () => {
+  return new Promise(resolve => {
+    // TODO: Use scheduler.yield() when available.
+    setTimeout(resolve, 0);
+  });
+};
+
+/**
+ * Creates a Flusher object that can be used to flush computed values and notify listeners.
+ *
+ * Using the mangled properties:
+ * this.c: this._callback
+ * this.x: this._compute
+ * https://github.com/preactjs/signals/blob/main/mangle.json
+ *
+ * @param compute The function that computes the value to be flushed.
+ * @param notify  The function that notifies listeners when the value is flushed.
+ * @return The Flusher object with `flush` and `dispose` properties.
+ */
 function createFlusher(compute, notify) {
-  let flush;
+  let flush = () => undefined;
   const dispose = signals_core_module_E(function () {
     flush = this.c.bind(this);
     this.x = compute;
@@ -652,9 +723,14 @@ function createFlusher(compute, notify) {
   };
 }
 
-// Version of `useSignalEffect` with a `useEffect`-like execution. This hook
-// implementation comes from this PR, but we added short-cirtuiting to avoid
-// infinite loops: https://github.com/preactjs/signals/pull/290
+/**
+ * Custom hook that executes a callback function whenever a signal is triggered.
+ * Version of `useSignalEffect` with a `useEffect`-like execution. This hook
+ * implementation comes from this PR, but we added short-cirtuiting to avoid
+ * infinite loops: https://github.com/preactjs/signals/pull/290
+ *
+ * @param callback The callback function to be executed.
+ */
 function utils_useSignalEffect(callback) {
   hooks_module_p(() => {
     let eff = null;
@@ -676,10 +752,14 @@ function utils_useSignalEffect(callback) {
  * accessible whenever the function runs. This is primarily to make the scope
  * available inside hook callbacks.
  *
- * @param {Function} func The passed function.
- * @return {Function} The wrapped function.
+ * Asyncronous functions should use generators that yield promises instead of awaiting them.
+ * See the documentation for details: https://developer.wordpress.org/block-editor/reference-guides/packages/packages-interactivity/packages-interactivity-api-reference/#the-store
+ *
+ * @param func The passed function.
+ * @return The wrapped function.
  */
-const withScope = func => {
+
+function withScope(func) {
   const scope = getScope();
   const ns = getNamespace();
   if (func?.constructor?.name === 'GeneratorFunction') {
@@ -701,7 +781,9 @@ const withScope = func => {
         } catch (e) {
           gen.throw(e);
         }
-        if (it.done) break;
+        if (it.done) {
+          break;
+        }
       }
       return value;
     };
@@ -716,7 +798,7 @@ const withScope = func => {
       resetScope();
     }
   };
-};
+}
 
 /**
  * Accepts a function that contains imperative code which runs whenever any of
@@ -726,7 +808,7 @@ const withScope = func => {
  * This hook makes the element's scope available so functions like
  * `getElement()` and `getContext()` can be used inside the passed callback.
  *
- * @param {Function} callback The hook callback.
+ * @param callback The hook callback.
  */
 function useWatch(callback) {
   utils_useSignalEffect(withScope(callback));
@@ -739,7 +821,7 @@ function useWatch(callback) {
  * This hook makes the element's scope available so functions like
  * `getElement()` and `getContext()` can be used inside the passed callback.
  *
- * @param {Function} callback The hook callback.
+ * @param callback The hook callback.
  */
 function useInit(callback) {
   hooks_module_p(withScope(callback), []);
@@ -753,10 +835,10 @@ function useInit(callback) {
  * available so functions like `getElement()` and `getContext()` can be used
  * inside the passed callback.
  *
- * @param {Function} callback Imperative function that can return a cleanup
- *                            function.
- * @param {any[]}    inputs   If present, effect will only activate if the
- *                            values in the list change (using `===`).
+ * @param callback Imperative function that can return a cleanup
+ *                 function.
+ * @param inputs   If present, effect will only activate if the
+ *                 values in the list change (using `===`).
  */
 function useEffect(callback, inputs) {
   hooks_module_p(withScope(callback), inputs);
@@ -770,10 +852,10 @@ function useEffect(callback, inputs) {
  * scope available so functions like `getElement()` and `getContext()` can be
  * used inside the passed callback.
  *
- * @param {Function} callback Imperative function that can return a cleanup
- *                            function.
- * @param {any[]}    inputs   If present, effect will only activate if the
- *                            values in the list change (using `===`).
+ * @param callback Imperative function that can return a cleanup
+ *                 function.
+ * @param inputs   If present, effect will only activate if the
+ *                 values in the list change (using `===`).
  */
 function useLayoutEffect(callback, inputs) {
   hooks_module_y(withScope(callback), inputs);
@@ -787,13 +869,14 @@ function useLayoutEffect(callback, inputs) {
  * scope available so functions like `getElement()` and `getContext()` can be
  * used inside the passed callback.
  *
- * @param {Function} callback Imperative function that can return a cleanup
- *                            function.
- * @param {any[]}    inputs   If present, effect will only activate if the
- *                            values in the list change (using `===`).
+ * @param callback Callback function.
+ * @param inputs   If present, the callback will only be updated if the
+ *                 values in the list change (using `===`).
+ *
+ * @return The callback function.
  */
 function useCallback(callback, inputs) {
-  hooks_module_T(withScope(callback), inputs);
+  return hooks_module_T(withScope(callback), inputs);
 }
 
 /**
@@ -804,22 +887,30 @@ function useCallback(callback, inputs) {
  * available so functions like `getElement()` and `getContext()` can be used
  * inside the passed factory function.
  *
- * @param {Function} factory Imperative function that can return a cleanup
- *                           function.
- * @param {any[]}    inputs  If present, effect will only activate if the
- *                           values in the list change (using `===`).
+ * @param factory Factory function that returns that value for memoization.
+ * @param inputs  If present, the factory will only be run to recompute if
+ *                the values in the list change (using `===`).
+ *
+ * @return The memoized value.
  */
 function useMemo(factory, inputs) {
-  hooks_module_F(withScope(factory), inputs);
+  return hooks_module_F(withScope(factory), inputs);
 }
 
-// For wrapperless hydration.
-// See https://gist.github.com/developit/f4c67a2ede71dc2fab7f357f39cff28c
+/**
+ * Creates a root fragment by replacing a node or an array of nodes in a parent element.
+ * For wrapperless hydration.
+ * See https://gist.github.com/developit/f4c67a2ede71dc2fab7f357f39cff28c
+ *
+ * @param parent      The parent element where the nodes will be replaced.
+ * @param replaceNode The node or array of nodes to replace in the parent element.
+ * @return The created root fragment.
+ */
 const createRootFragment = (parent, replaceNode) => {
   replaceNode = [].concat(replaceNode);
-  const s = replaceNode[replaceNode.length - 1].nextSibling;
-  function insert(c, r) {
-    parent.insertBefore(c, r || s);
+  const sibling = replaceNode[replaceNode.length - 1].nextSibling;
+  function insert(child, root) {
+    parent.insertBefore(child, root || sibling);
   }
   return parent.__k = {
     nodeType: 1,
@@ -833,20 +924,33 @@ const createRootFragment = (parent, replaceNode) => {
     }
   };
 };
-;// CONCATENATED MODULE: ./packages/interactivity/build-module/utils/kebab-to-camelcase.js
+
 /**
  * Transforms a kebab-case string to camelCase.
  *
- * @param {string} str The kebab-case string to transform to camelCase.
- * @return {string} The transformed camelCase string.
+ * @param str The kebab-case string to transform to camelCase.
+ * @return The transformed camelCase string.
  */
 function kebabToCamelCase(str) {
-  return str.replace(/^-+|-+$/g, '').toLowerCase().replace(/-([a-z])/g, function (match, group1) {
+  return str.replace(/^-+|-+$/g, '').toLowerCase().replace(/-([a-z])/g, function (_match, group1) {
     return group1.toUpperCase();
   });
 }
+const logged = new Set();
+
+/**
+ * Shows a warning with `message` if environment is not `production`.
+ *
+ * Based on the `@wordpress/warning` package.
+ *
+ * @param message Message to show in the warning.
+ */
+const warn = message => {
+  if (false) {}
+};
 ;// CONCATENATED MODULE: ./packages/interactivity/build-module/directives.js
-/* @jsx createElement */
+// eslint-disable-next-line eslint-comments/disable-enable-pair
+/* eslint-disable react-hooks/exhaustive-deps */
 
 /**
  * External dependencies
@@ -861,16 +965,130 @@ function kebabToCamelCase(str) {
 
 
 
-const directives_isObject = item => item && typeof item === 'object' && !Array.isArray(item);
-const mergeDeepSignals = (target, source, overwrite) => {
+// Assigned objects should be ignored during proxification.
+const contextAssignedObjects = new WeakMap();
+
+// Store the context proxy and fallback for each object in the context.
+const contextObjectToProxy = new WeakMap();
+const contextProxyToObject = new WeakMap();
+const contextObjectToFallback = new WeakMap();
+const isPlainObject = item => Boolean(item && typeof item === 'object' && item.constructor === Object);
+const descriptor = Reflect.getOwnPropertyDescriptor;
+
+/**
+ * Wrap a context object with a proxy to reproduce the context stack. The proxy
+ * uses the passed `inherited` context as a fallback to look up for properties
+ * that don't exist in the given context. Also, updated properties are modified
+ * where they are defined, or added to the main context when they don't exist.
+ *
+ * By default, all plain objects inside the context are wrapped, unless it is
+ * listed in the `ignore` option.
+ *
+ * @param current   Current context.
+ * @param inherited Inherited context, used as fallback.
+ *
+ * @return The wrapped context object.
+ */
+const proxifyContext = (current, inherited = {}) => {
+  // Update the fallback object reference when it changes.
+  contextObjectToFallback.set(current, inherited);
+  if (!contextObjectToProxy.has(current)) {
+    const proxy = new Proxy(current, {
+      get: (target, k) => {
+        const fallback = contextObjectToFallback.get(current);
+        // Always subscribe to prop changes in the current context.
+        const currentProp = target[k];
+
+        // Return the inherited prop when missing in target.
+        if (!(k in target) && k in fallback) {
+          return fallback[k];
+        }
+
+        // Proxify plain objects that were not directly assigned.
+        if (k in target && !contextAssignedObjects.get(target)?.has(k) && isPlainObject(deepsignal_module_p(target, k))) {
+          return proxifyContext(currentProp, fallback[k]);
+        }
+
+        // Return the stored proxy for `currentProp` when it exists.
+        if (contextObjectToProxy.has(currentProp)) {
+          return contextObjectToProxy.get(currentProp);
+        }
+
+        /*
+         * For other cases, return the value from target, also
+         * subscribing to changes in the parent context when the current
+         * prop is not defined.
+         */
+        return k in target ? currentProp : fallback[k];
+      },
+      set: (target, k, value) => {
+        const fallback = contextObjectToFallback.get(current);
+        const obj = k in target || !(k in fallback) ? target : fallback;
+
+        /*
+         * Assigned object values should not be proxified so they point
+         * to the original object and don't inherit unexpected
+         * properties.
+         */
+        if (value && typeof value === 'object') {
+          if (!contextAssignedObjects.has(obj)) {
+            contextAssignedObjects.set(obj, new Set());
+          }
+          contextAssignedObjects.get(obj).add(k);
+        }
+
+        /*
+         * When the value is a proxy, it's because it comes from the
+         * context, so the inner value is assigned instead.
+         */
+        if (contextProxyToObject.has(value)) {
+          const innerValue = contextProxyToObject.get(value);
+          obj[k] = innerValue;
+        } else {
+          obj[k] = value;
+        }
+        return true;
+      },
+      ownKeys: target => [...new Set([...Object.keys(contextObjectToFallback.get(current)), ...Object.keys(target)])],
+      getOwnPropertyDescriptor: (target, k) => descriptor(target, k) || descriptor(contextObjectToFallback.get(current), k)
+    });
+    contextObjectToProxy.set(current, proxy);
+    contextProxyToObject.set(proxy, current);
+  }
+  return contextObjectToProxy.get(current);
+};
+
+/**
+ * Recursively update values within a deepSignal object.
+ *
+ * @param target A deepSignal instance.
+ * @param source Object with properties to update in `target`.
+ */
+const updateSignals = (target, source) => {
   for (const k in source) {
-    if (directives_isObject(deepsignal_module_p(target, k)) && directives_isObject(deepsignal_module_p(source, k))) {
-      mergeDeepSignals(target[`$${k}`].peek(), source[`$${k}`].peek(), overwrite);
-    } else if (overwrite || typeof deepsignal_module_p(target, k) === 'undefined') {
-      target[`$${k}`] = source[`$${k}`];
+    if (isPlainObject(deepsignal_module_p(target, k)) && isPlainObject(deepsignal_module_p(source, k))) {
+      updateSignals(target[`$${k}`].peek(), source[k]);
+    } else {
+      target[k] = source[k];
     }
   }
 };
+
+/**
+ * Recursively clone the passed object.
+ *
+ * @param source Source object.
+ * @return Cloned object.
+ */
+function deepClone(source) {
+  if (isPlainObject(source)) {
+    return Object.fromEntries(Object.entries(source).map(([key, value]) => [key, deepClone(value)]));
+  }
+  if (Array.isArray(source)) {
+    return source.map(i => deepClone(i));
+  }
+  return source;
+}
 const newRule = /(?:([\u0080-\uFFFF\w-%@]+) *:? *([^{;]+?);|([^;}{]*?) *{)|(}\s*)/g;
 const ruleClean = /\/\*[^]*?\*\/|  +/g;
 const ruleNewline = /\n+/g;
@@ -882,8 +1100,8 @@ const empty = ' ';
  * Made by Cristian Bote (@cristianbote) for Goober.
  * https://unpkg.com/browse/goober@2.1.13/src/core/astish.js
  *
- * @param {string} val CSS string.
- * @return {Object} CSS object.
+ * @param val CSS string.
+ * @return CSS object.
  */
 const cssStringToObject = val => {
   const tree = [{}];
@@ -905,27 +1123,61 @@ const cssStringToObject = val => {
  * Creates a directive that adds an event listener to the global window or
  * document object.
  *
- * @param {string} type 'window' or 'document'
- * @return {void}
+ * @param type 'window' or 'document'
  */
-const getGlobalEventDirective = type => ({
-  directives,
-  evaluate
-}) => {
-  directives[`on-${type}`].filter(({
-    suffix
-  }) => suffix !== 'default').forEach(entry => {
-    useInit(() => {
-      const cb = event => evaluate(entry, event);
-      const globalVar = type === 'window' ? window : document;
-      globalVar.addEventListener(entry.suffix, cb);
-      return () => globalVar.removeEventListener(entry.suffix, cb);
-    }, []);
-  });
+const getGlobalEventDirective = type => {
+  return ({
+    directives,
+    evaluate
+  }) => {
+    directives[`on-${type}`].filter(({
+      suffix
+    }) => suffix !== 'default').forEach(entry => {
+      const eventName = entry.suffix.split('--', 1)[0];
+      useInit(() => {
+        const cb = event => evaluate(entry, event);
+        const globalVar = type === 'window' ? window : document;
+        globalVar.addEventListener(eventName, cb);
+        return () => globalVar.removeEventListener(eventName, cb);
+      });
+    });
+  };
+};
+
+/**
+ * Creates a directive that adds an async event listener to the global window or
+ * document object.
+ *
+ * @param type 'window' or 'document'
+ */
+const getGlobalAsyncEventDirective = type => {
+  return ({
+    directives,
+    evaluate
+  }) => {
+    directives[`on-async-${type}`].filter(({
+      suffix
+    }) => suffix !== 'default').forEach(entry => {
+      const eventName = entry.suffix.split('--', 1)[0];
+      useInit(() => {
+        const cb = async event => {
+          await splitTask();
+          evaluate(entry, event);
+        };
+        const globalVar = type === 'window' ? window : document;
+        globalVar.addEventListener(eventName, cb, {
+          passive: true
+        });
+        return () => globalVar.removeEventListener(eventName, cb);
+      });
+    });
+  };
 };
 /* harmony default export */ const directives = (() => {
   // data-wp-context
-  directive('context', ({
+  directive('context',
+  // @ts-ignore-next-line
+  ({
     directives: {
       context
     },
@@ -942,24 +1194,27 @@ const getGlobalEventDirective = type => ({
     const defaultEntry = context.find(({
       suffix
     }) => suffix === 'default');
-    currentValue.current = hooks_module_F(() => {
-      if (!defaultEntry) return null;
-      const {
-        namespace,
-        value
-      } = defaultEntry;
-      const newValue = deepsignal_module_g({
-        [namespace]: value
-      });
-      mergeDeepSignals(newValue, inheritedValue);
-      mergeDeepSignals(currentValue.current, newValue, true);
-      return currentValue.current;
-    }, [inheritedValue, defaultEntry]);
-    if (currentValue.current) {
-      return y(Provider, {
-        value: currentValue.current
-      }, children);
-    }
+
+    // No change should be made if `defaultEntry` does not exist.
+    const contextStack = hooks_module_F(() => {
+      if (defaultEntry) {
+        const {
+          namespace,
+          value
+        } = defaultEntry;
+        // Check that the value is a JSON object. Send a console warning if not.
+        if (!isPlainObject(value)) {
+          warn(`The value of data-wp-context in "${namespace}" store must be a valid stringified JSON object.`);
+        }
+        updateSignals(currentValue.current, {
+          [namespace]: deepClone(value)
+        });
+      }
+      return proxifyContext(currentValue.current, inheritedValue);
+    }, [defaultEntry, inheritedValue]);
+    return y(Provider, {
+      value: contextStack
+    }, children);
   }, {
     priority: 5
   });
@@ -997,11 +1252,57 @@ const getGlobalEventDirective = type => ({
     element,
     evaluate
   }) => {
+    const events = new Map();
     on.filter(({
       suffix
     }) => suffix !== 'default').forEach(entry => {
-      element.props[`on${entry.suffix}`] = event => {
-        evaluate(entry, event);
+      const event = entry.suffix.split('--')[0];
+      if (!events.has(event)) {
+        events.set(event, new Set());
+      }
+      events.get(event).add(entry);
+    });
+    events.forEach((entries, eventType) => {
+      const existingHandler = element.props[`on${eventType}`];
+      element.props[`on${eventType}`] = event => {
+        entries.forEach(entry => {
+          if (existingHandler) {
+            existingHandler(event);
+          }
+          evaluate(entry, event);
+        });
+      };
+    });
+  });
+
+  // data-wp-on-async--[event]
+  directive('on-async', ({
+    directives: {
+      'on-async': onAsync
+    },
+    element,
+    evaluate
+  }) => {
+    const events = new Map();
+    onAsync.filter(({
+      suffix
+    }) => suffix !== 'default').forEach(entry => {
+      const event = entry.suffix.split('--')[0];
+      if (!events.has(event)) {
+        events.set(event, new Set());
+      }
+      events.get(event).add(entry);
+    });
+    events.forEach((entries, eventType) => {
+      const existingHandler = element.props[`on${eventType}`];
+      element.props[`on${eventType}`] = event => {
+        if (existingHandler) {
+          existingHandler(event);
+        }
+        entries.forEach(async entry => {
+          await splitTask();
+          evaluate(entry, event);
+        });
       };
     });
   });
@@ -1010,6 +1311,11 @@ const getGlobalEventDirective = type => ({
   directive('on-window', getGlobalEventDirective('window'));
   // data-wp-on-document--[event]
   directive('on-document', getGlobalEventDirective('document'));
+
+  // data-wp-on-async-window--[event]
+  directive('on-async-window', getGlobalAsyncEventDirective('window'));
+  // data-wp-on-async-document--[event]
+  directive('on-async-document', getGlobalAsyncEventDirective('document'));
 
   // data-wp-class--[classname]
   directive('class', ({
@@ -1026,7 +1332,11 @@ const getGlobalEventDirective = type => ({
       const result = evaluate(entry);
       const currentClass = element.props.class || '';
       const classFinder = new RegExp(`(^|\\s)${className}(\\s|$)`, 'g');
-      if (!result) element.props.class = currentClass.replace(classFinder, ' ').trim();else if (!classFinder.test(currentClass)) element.props.class = currentClass ? `${currentClass} ${className}` : className;
+      if (!result) {
+        element.props.class = currentClass.replace(classFinder, ' ').trim();
+      } else if (!classFinder.test(currentClass)) {
+        element.props.class = currentClass ? `${currentClass} ${className}` : className;
+      }
       useInit(() => {
         /*
          * This seems necessary because Preact doesn't change the class
@@ -1056,8 +1366,14 @@ const getGlobalEventDirective = type => ({
       const styleProp = entry.suffix;
       const result = evaluate(entry);
       element.props.style = element.props.style || {};
-      if (typeof element.props.style === 'string') element.props.style = cssStringToObject(element.props.style);
-      if (!result) delete element.props.style[styleProp];else element.props.style[styleProp] = result;
+      if (typeof element.props.style === 'string') {
+        element.props.style = cssStringToObject(element.props.style);
+      }
+      if (!result) {
+        delete element.props.style[styleProp];
+      } else {
+        element.props.style[styleProp] = result;
+      }
       useInit(() => {
         /*
          * This seems necessary because Preact doesn't change the styles on
@@ -1102,7 +1418,9 @@ const getGlobalEventDirective = type => ({
          * logic: https://github.com/preactjs/preact/blob/ea49f7a0f9d1ff2c98c0bdd66aa0cbc583055246/src/diff/props.js#L110-L129
          */
         if (attribute === 'style') {
-          if (typeof result === 'string') el.style.cssText = result;
+          if (typeof result === 'string') {
+            el.style.cssText = result;
+          }
           return;
         } else if (attribute !== 'width' && attribute !== 'height' && attribute !== 'href' && attribute !== 'list' && attribute !== 'form' &&
         /*
@@ -1168,6 +1486,10 @@ const getGlobalEventDirective = type => ({
     const entry = text.find(({
       suffix
     }) => suffix === 'default');
+    if (!entry) {
+      element.props.children = null;
+      return;
+    }
     try {
       const result = evaluate(entry);
       element.props.children = typeof result === 'object' ? null : result.toString();
@@ -1196,7 +1518,9 @@ const getGlobalEventDirective = type => ({
     element,
     evaluate
   }) => {
-    if (element.type !== 'template') return;
+    if (element.type !== 'template') {
+      return;
+    }
     const {
       Provider
     } = inheritedContext;
@@ -1208,15 +1532,14 @@ const getGlobalEventDirective = type => ({
     } = entry;
     const list = evaluate(entry);
     return list.map(item => {
-      const mergedContext = deepsignal_module_g({});
       const itemProp = suffix === 'default' ? 'item' : kebabToCamelCase(suffix);
-      const newValue = deepsignal_module_g({
-        [namespace]: {
-          [itemProp]: item
-        }
+      const itemContext = deepsignal_module_g({
+        [namespace]: {}
       });
-      mergeDeepSignals(newValue, inheritedValue);
-      mergeDeepSignals(mergedContext, newValue, true);
+      const mergedContext = proxifyContext(itemContext, inheritedValue);
+
+      // Set the item after proxifying the context.
+      mergedContext[namespace][itemProp] = item;
       const scope = {
         ...getScope(),
         context: mergedContext
@@ -1226,13 +1549,15 @@ const getGlobalEventDirective = type => ({
       })(eachKey[0]) : item;
       return y(Provider, {
         value: mergedContext,
-        key: key
+        key
       }, element.props.content);
     });
   }, {
     priority: 20
   });
-  directive('each-child', () => null);
+  directive('each-child', () => null, {
+    priority: 1
+  });
 });
 ;// CONCATENATED MODULE: ./packages/interactivity/build-module/constants.js
 const directivePrefix = 'wp';
@@ -1245,6 +1570,7 @@ const directivePrefix = 'wp';
  * Internal dependencies
  */
 
+
 const ignoreAttr = `data-${directivePrefix}-ignore`;
 const islandAttr = `data-${directivePrefix}-interactive`;
 const fullPrefix = `data-${directivePrefix}-`;
@@ -1253,6 +1579,7 @@ const currentNamespace = () => {
   var _namespaces;
   return (_namespaces = namespaces[namespaces.length - 1]) !== null && _namespaces !== void 0 ? _namespaces : null;
 };
+const vdom_isObject = item => Boolean(item && typeof item === 'object' && item.constructor === Object);
 
 // Regular expression for directive parsing.
 const directiveParser = new RegExp(`^data-${directivePrefix}-` +
@@ -1271,76 +1598,104 @@ const directiveParser = new RegExp(`^data-${directivePrefix}-` +
 // the reference, separated by `::`, like `some-namespace::state.somePath`.
 // Namespaces can contain any alphanumeric characters, hyphens, underscores or
 // forward slashes. References don't have any restrictions.
-const nsPathRegExp = /^([\w-_\/]+)::(.+)$/;
+const nsPathRegExp = /^([\w_\/-]+)::(.+)$/;
 const hydratedIslands = new WeakSet();
 
 /**
  * Recursive function that transforms a DOM tree into vDOM.
  *
- * @param {Node} root The root element or node to start traversing on.
- * @return {import('preact').VNode[]} The resulting vDOM tree.
+ * @param root The root element or node to start traversing on.
+ * @return The resulting vDOM tree.
  */
 function toVdom(root) {
-  const treeWalker = document.createTreeWalker(root, 205 // ELEMENT + TEXT + COMMENT + CDATA_SECTION + PROCESSING_INSTRUCTION
+  const treeWalker = document.createTreeWalker(root, 205 // TEXT + CDATA_SECTION + COMMENT + PROCESSING_INSTRUCTION + ELEMENT
   );
   function walk(node) {
     const {
-      attributes,
-      nodeType,
-      localName
+      nodeType
     } = node;
-    if (nodeType === 3) return [node.data];
+
+    // TEXT_NODE (3)
+    if (nodeType === 3) {
+      return [node.data];
+    }
+
+    // CDATA_SECTION_NODE (4)
     if (nodeType === 4) {
+      var _nodeValue;
       const next = treeWalker.nextSibling();
-      node.replaceWith(new window.Text(node.nodeValue));
+      node.replaceWith(new window.Text((_nodeValue = node.nodeValue) !== null && _nodeValue !== void 0 ? _nodeValue : ''));
       return [node.nodeValue, next];
     }
+
+    // COMMENT_NODE (8) || PROCESSING_INSTRUCTION_NODE (7)
     if (nodeType === 8 || nodeType === 7) {
       const next = treeWalker.nextSibling();
       node.remove();
       return [null, next];
     }
+    const elementNode = node;
+    const {
+      attributes
+    } = elementNode;
+    const localName = elementNode.localName;
     const props = {};
     const children = [];
     const directives = [];
     let ignore = false;
     let island = false;
     for (let i = 0; i < attributes.length; i++) {
-      const n = attributes[i].name;
-      if (n[fullPrefix.length] && n.slice(0, fullPrefix.length) === fullPrefix) {
-        if (n === ignoreAttr) {
+      const attributeName = attributes[i].name;
+      const attributeValue = attributes[i].value;
+      if (attributeName[fullPrefix.length] && attributeName.slice(0, fullPrefix.length) === fullPrefix) {
+        if (attributeName === ignoreAttr) {
           ignore = true;
         } else {
-          var _nsPathRegExp$exec$sl;
-          let [ns, value] = (_nsPathRegExp$exec$sl = nsPathRegExp.exec(attributes[i].value)?.slice(1)) !== null && _nsPathRegExp$exec$sl !== void 0 ? _nsPathRegExp$exec$sl : [null, attributes[i].value];
+          var _regexResult$, _regexResult$2;
+          const regexResult = nsPathRegExp.exec(attributeValue);
+          const namespace = (_regexResult$ = regexResult?.[1]) !== null && _regexResult$ !== void 0 ? _regexResult$ : null;
+          let value = (_regexResult$2 = regexResult?.[2]) !== null && _regexResult$2 !== void 0 ? _regexResult$2 : attributeValue;
           try {
-            value = JSON.parse(value);
-          } catch (e) {}
-          if (n === islandAttr) {
-            var _value$namespace;
+            const parsedValue = JSON.parse(value);
+            value = vdom_isObject(parsedValue) ? parsedValue : value;
+          } catch {}
+          if (attributeName === islandAttr) {
             island = true;
-            namespaces.push(typeof value === 'string' ? value : (_value$namespace = value?.namespace) !== null && _value$namespace !== void 0 ? _value$namespace : null);
+            const islandNamespace =
+            // eslint-disable-next-line no-nested-ternary
+            typeof value === 'string' ? value : typeof value?.namespace === 'string' ? value.namespace : null;
+            namespaces.push(islandNamespace);
           } else {
-            directives.push([n, ns, value]);
+            directives.push([attributeName, namespace, value]);
           }
         }
-      } else if (n === 'ref') {
+      } else if (attributeName === 'ref') {
         continue;
       }
-      props[n] = attributes[i].value;
+      props[attributeName] = attributeValue;
     }
-    if (ignore && !island) return [y(localName, {
-      ...props,
-      innerHTML: node.innerHTML,
-      __directives: {
-        ignore: true
-      }
-    })];
-    if (island) hydratedIslands.add(node);
+    if (ignore && !island) {
+      return [y(localName, {
+        ...props,
+        innerHTML: elementNode.innerHTML,
+        __directives: {
+          ignore: true
+        }
+      })];
+    }
+    if (island) {
+      hydratedIslands.add(elementNode);
+    }
     if (directives.length) {
       props.__directives = directives.reduce((obj, [name, ns, value]) => {
-        const [, prefix, suffix = 'default'] = directiveParser.exec(name);
-        if (!obj[prefix]) obj[prefix] = [];
+        const directiveMatch = directiveParser.exec(name);
+        if (directiveMatch === null) {
+          warn(`Found malformed directive name: ${name}.`);
+          return obj;
+        }
+        const prefix = directiveMatch[1] || '';
+        const suffix = directiveMatch[2] || 'default';
+        obj[prefix] = obj[prefix] || [];
         obj[prefix].push({
           namespace: ns !== null && ns !== void 0 ? ns : currentNamespace(),
           value,
@@ -1349,14 +1704,18 @@ function toVdom(root) {
         return obj;
       }, {});
     }
+
+    // @ts-expect-error Fixed in upcoming preact release https://github.com/preactjs/preact/pull/4334
     if (localName === 'template') {
-      props.content = [...node.content.childNodes].map(childNode => toVdom(childNode));
+      props.content = [...elementNode.content.childNodes].map(childNode => toVdom(childNode));
     } else {
       let child = treeWalker.firstChild();
       if (child) {
         while (child) {
           const [vnode, nextChild] = walk(child);
-          if (vnode) children.push(vnode);
+          if (vnode) {
+            children.push(vnode);
+          }
           child = nextChild || treeWalker.nextSibling();
         }
         treeWalker.parentNode();
@@ -1364,7 +1723,9 @@ function toVdom(root) {
     }
 
     // Restore previous namespace.
-    if (island) namespaces.pop();
+    if (island) {
+      namespaces.pop();
+    }
     return [y(localName, props, children)];
   }
   return walk(treeWalker.currentNode);
@@ -1384,17 +1745,14 @@ function toVdom(root) {
 // Keep the same root fragment for each interactive region node.
 const regionRootFragments = new WeakMap();
 const getRegionRootFragment = region => {
+  if (!region.parentElement) {
+    throw Error('The passed region should be an element with a parent.');
+  }
   if (!regionRootFragments.has(region)) {
     regionRootFragments.set(region, createRootFragment(region.parentElement, region));
   }
   return regionRootFragments.get(region);
 };
-function yieldToMain() {
-  return new Promise(resolve => {
-    // TODO: Use scheduler.yield() when available.
-    setTimeout(resolve, 0);
-  });
-}
 
 // Initial vDOM regions associated with its DOM element.
 const initialVdom = new WeakMap();
@@ -1404,11 +1762,11 @@ const init = async () => {
   const nodes = document.querySelectorAll(`[data-${directivePrefix}-interactive]`);
   for (const node of nodes) {
     if (!hydratedIslands.has(node)) {
-      await yieldToMain();
+      await splitTask();
       const fragment = getRegionRootFragment(node);
       const vdom = toVdom(node);
       initialVdom.set(node, vdom);
-      await yieldToMain();
+      await splitTask();
       B(vdom, fragment);
     }
   }
@@ -1420,9 +1778,11 @@ const init = async () => {
 
 
 
+
 /**
  * Internal dependencies
  */
+
 
 
 
@@ -1445,7 +1805,10 @@ const privateApis = lock => {
       h: y,
       cloneElement: E,
       render: q,
-      deepSignal: deepsignal_module_g
+      deepSignal: deepsignal_module_g,
+      parseInitialData: parseInitialData,
+      populateInitialData: populateInitialData,
+      batch: signals_core_module_r
     };
   }
   throw new Error('Forbidden access.');
@@ -1458,6 +1821,7 @@ var __webpack_exports__getConfig = __webpack_exports__.iE;
 var __webpack_exports__getContext = __webpack_exports__.fw;
 var __webpack_exports__getElement = __webpack_exports__.sb;
 var __webpack_exports__privateApis = __webpack_exports__.YH;
+var __webpack_exports__splitTask = __webpack_exports__.QN;
 var __webpack_exports__store = __webpack_exports__.h;
 var __webpack_exports__useCallback = __webpack_exports__.I4;
 var __webpack_exports__useEffect = __webpack_exports__.d4;
@@ -1468,4 +1832,4 @@ var __webpack_exports__useRef = __webpack_exports__.sO;
 var __webpack_exports__useState = __webpack_exports__.eJ;
 var __webpack_exports__useWatch = __webpack_exports__.qo;
 var __webpack_exports__withScope = __webpack_exports__.$e;
-export { __webpack_exports__getConfig as getConfig, __webpack_exports__getContext as getContext, __webpack_exports__getElement as getElement, __webpack_exports__privateApis as privateApis, __webpack_exports__store as store, __webpack_exports__useCallback as useCallback, __webpack_exports__useEffect as useEffect, __webpack_exports__useInit as useInit, __webpack_exports__useLayoutEffect as useLayoutEffect, __webpack_exports__useMemo as useMemo, __webpack_exports__useRef as useRef, __webpack_exports__useState as useState, __webpack_exports__useWatch as useWatch, __webpack_exports__withScope as withScope };
+export { __webpack_exports__getConfig as getConfig, __webpack_exports__getContext as getContext, __webpack_exports__getElement as getElement, __webpack_exports__privateApis as privateApis, __webpack_exports__splitTask as splitTask, __webpack_exports__store as store, __webpack_exports__useCallback as useCallback, __webpack_exports__useEffect as useEffect, __webpack_exports__useInit as useInit, __webpack_exports__useLayoutEffect as useLayoutEffect, __webpack_exports__useMemo as useMemo, __webpack_exports__useRef as useRef, __webpack_exports__useState as useState, __webpack_exports__useWatch as useWatch, __webpack_exports__withScope as withScope };

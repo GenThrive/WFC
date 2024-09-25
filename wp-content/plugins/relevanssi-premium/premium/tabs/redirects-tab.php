@@ -19,7 +19,9 @@ function relevanssi_redirects_tab() {
 	if ( ! isset( $redirects['empty'] ) ) {
 		$redirects['empty'] = '';
 	}
-
+	if ( ! isset( $redirects['no_terms'] ) ) {
+		$redirects['no_terms'] = '';
+	}
 	?>
 <h2 id="options"><?php esc_html_e( 'Redirects', 'relevanssi' ); ?></h2>
 
@@ -27,12 +29,19 @@ function relevanssi_redirects_tab() {
 
 <p><?php esc_html_e( 'Enter the search term and the target URL, which may be relative to your site home page or an absolute URL. If "Partial match" is checked, the redirect happens if the query word appears anywhere in the search query, even inside a word, so use it with care. If the search query matches multiple redirections, the first one it matches will trigger.', 'relevanssi' ); ?></p>
 
+<p><?php esc_html_e( 'The "Hits" column shows how many times each redirect has been used.', 'relevanssi' ); ?></p>
+
 <table class="form-table" role="presentation">
 	<tbody>
 		<tr>
 			<th scope="row"><label for="redirect_empty_searches"><?php esc_html_e( 'Redirect empty searches', 'relevanssi' ); ?></label></th>
 			<td><input type="text" id="redirect_empty_searches" name="redirect_empty_searches" size="60" value="<?php echo esc_attr( str_replace( $site_url, '', $redirects['empty'] ) ); ?>" />
 			<p class="description"><?php esc_html_e( 'Enter an URL here to redirect all searches that find nothing to this URL.', 'relevanssi' ); ?></p></td>
+		</tr>
+		<tr>
+			<th scope="row"><label for="redirect_no_terms"><?php esc_html_e( 'Redirect searches without terms', 'relevanssi' ); ?></label></th>
+			<td><input type="text" id="redirect_no_terms" name="redirect_no_terms" size="60" value="<?php echo esc_attr( str_replace( $site_url, '', $redirects['no_terms'] ) ); ?>" />
+			<p class="description"><?php esc_html_e( 'Enter an URL here to redirect all searches without any search terms.', 'relevanssi' ); ?></p></td>
 		</tr>
 	</tbody>
 </table>
@@ -43,11 +52,12 @@ function relevanssi_redirects_tab() {
 	<th><?php esc_html_e( 'Query', 'relevanssi' ); ?></th>
 	<th><?php esc_html_e( 'Partial match', 'relevanssi' ); ?></th>
 	<th><?php esc_html_e( 'URL', 'relevanssi' ); ?></th>
+	<th><?php esc_html_e( 'Hits', 'relevanssi' ); ?></th>
 	</tr>
 	</thead>
 	<tbody>
 	<?php
-	if ( 1 === count( $redirects ) ) {
+	if ( ! isset( $redirects[0] ) ) {
 		?>
 	<tr class="redirect_table_row" id="row_0">
 	<td><input type="text" name="query_0" size="60" />
@@ -58,6 +68,7 @@ function relevanssi_redirects_tab() {
 	</td>
 	<td><input type="checkbox" name="partial_0" /></td>
 	<td><input type="text" name="url_0" size="60" /></td>
+	<td><input type="hidden" name="hits_0" /><span>0</span></td>
 	</tbody>
 	</tr>
 		<?php
@@ -76,6 +87,8 @@ function relevanssi_redirects_tab() {
 			}
 			$url = esc_attr( $redirect['url'] );
 			$url = str_replace( $site_url, '', $url );
+
+			$hits = $redirect['hits'] ?? 0;
 			// phpcs:disable WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 	<tr class="redirect_table_row" id="row_<?php echo $row_id; ?>">
 		<td>
@@ -120,9 +133,17 @@ function relevanssi_redirects_tab() {
 				size="60"
 				value="<?php echo $url; ?>" />
 		</td>
+		<td>
+			<input
+				type="hidden"
+				name="hits_<?php echo $row_id; ?>"
+				id="hits_<?php echo $row_id; ?>"
+				value="<?php echo $hits; ?>" />
+			<span><?php echo $hits; ?></span>
+		</td>
 		</tr>
 			<?php
-			$row++;
+			++$row;
 		}
 	}
 	?>

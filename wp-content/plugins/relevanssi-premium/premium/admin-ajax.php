@@ -10,6 +10,7 @@
 
 add_action( 'wp_ajax_relevanssi_list_pdfs', 'relevanssi_list_pdfs_action' );
 add_action( 'wp_ajax_relevanssi_wipe_pdfs', 'relevanssi_wipe_pdfs_action' );
+add_action( 'wp_ajax_relevanssi_wipe_server_errors', 'relevanssi_wipe_server_errors_action' );
 add_action( 'wp_ajax_relevanssi_index_pdfs', 'relevanssi_index_pdfs_action' );
 add_action( 'wp_ajax_relevanssi_send_pdf', 'relevanssi_send_pdf' );
 add_action( 'wp_ajax_relevanssi_send_url', 'relevanssi_send_url' );
@@ -39,6 +40,8 @@ add_action( 'wp_ajax_relevanssi_index_pdf', 'relevanssi_ajax_index_pdf' );
  */
 function relevanssi_list_pdfs_action() {
 	check_ajax_referer( 'relevanssi-list-pdfs', 'security' );
+	relevanssi_current_user_can_access_options();
+
 	$limit = 0;
 	if ( isset( $_POST['limit'] ) ) { // WPCS: input var ok.
 		$limit = intval( wp_unslash( $_POST['limit'] ) ); // WPCS: input var ok.
@@ -60,6 +63,7 @@ function relevanssi_list_pdfs_action() {
  */
 function relevanssi_wipe_pdfs_action() {
 	check_ajax_referer( 'relevanssi-wipe-pdfs', 'security' );
+	relevanssi_current_user_can_access_options();
 
 	$deleted_content = relevanssi_delete_all_but(
 		'_relevanssi_pdf_content',
@@ -78,6 +82,36 @@ function relevanssi_wipe_pdfs_action() {
 	if ( $deleted_errors ) {
 		$response['deleted_errors'] = true;
 	}
+
+	echo wp_json_encode( $response );
+
+	wp_die();
+}
+
+/**
+ * Performs the "wipe server errors" AJAX action.
+ *
+ * Removes all '_relevanssi_pdf_error' post meta fields from the wp_postmeta
+ * table where the meta_value is 'R_ERR06: Server did not respond.'.
+ */
+function relevanssi_wipe_server_errors_action() {
+	check_ajax_referer( 'relevanssi-wipe-errors', 'security' );
+	relevanssi_current_user_can_access_options();
+
+	global $wpdb;
+	$result = $wpdb->delete(
+		$wpdb->postmeta,
+		array(
+			'meta_key'   => '_relevanssi_pdf_error',
+			'meta_value' => 'R_ERR06: Server did not respond.',
+		),
+		array(
+			'%s',
+			'%s',
+		)
+	);
+
+	$response['deleted_rows'] = $result;
 
 	echo wp_json_encode( $response );
 
@@ -135,6 +169,7 @@ function relevanssi_delete_all_but( $meta_key, $exclusion_key, $value ) {
  */
 function relevanssi_index_pdfs_action() {
 	check_ajax_referer( 'relevanssi-index-pdfs', 'security' );
+	relevanssi_current_user_can_access_options();
 
 	$pdfs = relevanssi_get_posts_with_attachments( 3 );
 
@@ -163,7 +198,7 @@ function relevanssi_index_pdfs_action() {
 			}
 
 			$index_response = relevanssi_index_pdf( $post_id, $echo_and_die, $send_files );
-			$completed++;
+			++$completed;
 
 			if ( $index_response['success'] ) {
 				// translators: placeholder is the post ID.
@@ -195,6 +230,9 @@ function relevanssi_index_pdfs_action() {
  */
 function relevanssi_send_pdf() {
 	check_ajax_referer( 'relevanssi_send_pdf', 'security' );
+	if ( ! current_user_can( 'upload_files' ) ) {
+		wp_die();
+	}
 
 	if ( ! isset( $_REQUEST['post_id'] ) ) { // WPCS: input var ok.
 		wp_die();
@@ -217,6 +255,9 @@ function relevanssi_send_pdf() {
  */
 function relevanssi_send_url() {
 	check_ajax_referer( 'relevanssi_send_pdf', 'security' );
+	if ( ! current_user_can( 'upload_files' ) ) {
+		wp_die();
+	}
 
 	if ( ! isset( $_REQUEST['post_id'] ) ) { // WPCS: input var ok.
 		wp_die();
@@ -240,6 +281,10 @@ function relevanssi_send_url() {
  * @since 2.0.0
  */
 function relevanssi_get_pdf_errors_action() {
+	if ( ! current_user_can( 'upload_files' ) ) {
+		wp_die();
+	}
+
 	global $wpdb;
 
 	$errors        = $wpdb->get_results( "SELECT post_id, meta_value FROM $wpdb->postmeta WHERE meta_key = '_relevanssi_pdf_error'" );
@@ -262,6 +307,8 @@ function relevanssi_get_pdf_errors_action() {
  * @since 2.0.0
  */
 function relevanssi_list_taxonomies_wrapper() {
+	relevanssi_current_user_can_access_options();
+
 	$taxonomies = array();
 	if ( function_exists( 'relevanssi_list_taxonomies' ) ) {
 		$taxonomies = relevanssi_list_taxonomies();
@@ -279,6 +326,7 @@ function relevanssi_list_taxonomies_wrapper() {
  */
 function relevanssi_index_taxonomies_ajax_wrapper() {
 	check_ajax_referer( 'relevanssi_taxonomy_indexing_nonce', 'security' );
+	relevanssi_current_user_can_access_options();
 
 	if ( ! isset( $_POST['completed'] ) || ! isset( $_POST['total'] ) || ! isset( $_POST['taxonomy'] ) || ! isset( $_POST['offset'] ) || ! isset( $_POST['limit'] ) ) { // WPCS: input var ok.
 		wp_die();
@@ -288,9 +336,14 @@ function relevanssi_index_taxonomies_ajax_wrapper() {
 
 	$completed = absint( $post_data['completed'] );
 	$total     = absint( $post_data['total'] );
-	$taxonomy  = $post_data['taxonomy'];
-	$offset    = $post_data['offset'];
-	$limit     = $post_data['limit'];
+	$taxonomy  = relevanssi_validate_taxonomy( $post_data['taxonomy'] );
+	$offset    = intval( $post_data['offset'] );
+	$limit     = intval( $post_data['limit'] );
+
+	if ( empty( $taxonomy ) ) {
+		// Non-valid taxonomy.
+		wp_die();
+	}
 
 	$response = array();
 
@@ -336,6 +389,7 @@ function relevanssi_index_taxonomies_ajax_wrapper() {
  */
 function relevanssi_index_post_type_archives_ajax_wrapper() {
 	check_ajax_referer( 'relevanssi_post_type_archive_indexing_nonce', 'security' );
+	relevanssi_current_user_can_access_options();
 
 	$response = array();
 
@@ -364,6 +418,7 @@ function relevanssi_index_post_type_archives_ajax_wrapper() {
  */
 function relevanssi_index_users_ajax_wrapper() {
 	check_ajax_referer( 'relevanssi_user_indexing_nonce', 'security' );
+	relevanssi_current_user_can_access_options();
 
 	if ( ! isset( $_POST['completed'] ) || ! isset( $_POST['total'] ) || ! isset( $_POST['limit'] ) ) { // WPCS: input var ok.
 		wp_die();
@@ -419,6 +474,8 @@ function relevanssi_index_users_ajax_wrapper() {
  * @since 2.0.0
  */
 function relevanssi_count_users_ajax_wrapper() {
+	relevanssi_current_user_can_access_options();
+
 	$count = -1;
 	if ( function_exists( 'relevanssi_count_users' ) ) {
 		$count = relevanssi_count_users();
@@ -435,6 +492,8 @@ function relevanssi_count_users_ajax_wrapper() {
  * @since 2.0.0
  */
 function relevanssi_count_taxonomies_ajax_wrapper() {
+	relevanssi_current_user_can_access_options();
+
 	$count = -1;
 	if ( function_exists( 'relevanssi_count_taxonomy_terms' ) ) {
 		$count = relevanssi_count_taxonomy_terms();
@@ -450,14 +509,15 @@ function relevanssi_count_taxonomies_ajax_wrapper() {
  */
 function relevanssi_get_related_posts() {
 	check_ajax_referer( 'relevanssi_metabox_nonce', 'security' );
+	if ( ! current_user_can( 'edit_posts' ) ) {
+		wp_die();
+	}
 
 	$post_id = (int) $_POST['post_id']; // WPCS: input var ok.
 
 	if ( 0 === $post_id ) {
 		wp_die();
 	}
-
-	$related_posts = get_post_meta( $post_id, '_relevanssi_related_posts', true );
 
 	if ( isset( $_POST['keywords'] ) ) {
 		$keywords = sanitize_text_field( $_POST['keywords'] ); // WPCS: input var ok.
@@ -466,7 +526,6 @@ function relevanssi_get_related_posts() {
 		add_post_meta( $post_id, '_relevanssi_related_keywords', $keywords );
 
 		// Keywords have changed, flush the cache.
-		$related_posts = null;
 		delete_post_meta( $post_id, '_relevanssi_related_posts' );
 	}
 
@@ -507,6 +566,9 @@ function relevanssi_get_related_posts() {
  */
 function relevanssi_add_to_exclude_list() {
 	check_ajax_referer( 'relevanssi_metabox_nonce', 'security' );
+	if ( ! current_user_can( 'edit_posts' ) ) {
+		wp_die();
+	}
 
 	$post_id = (int) $_POST['post_id']; // WPCS: input var ok.
 
@@ -560,6 +622,9 @@ function relevanssi_exclude_a_related_post( $post_id, $excluded_post ) {
  */
 function relevanssi_remove_from_exclude_list() {
 	check_ajax_referer( 'relevanssi_metabox_nonce', 'security' );
+	if ( ! current_user_can( 'edit_posts' ) ) {
+		wp_die();
+	}
 
 	$post_id = (int) $_POST['post_id']; // WPCS: input var ok.
 
@@ -609,6 +674,9 @@ function relevanssi_unexclude_a_related_post( $post_id, $unexcluded_post ) {
  */
 function relevanssi_pin_post() {
 	check_ajax_referer( 'relevanssi_admin_search_nonce', 'security' );
+	if ( ! current_user_can( 'edit_posts' ) ) {
+		wp_die();
+	}
 
 	$post_id = (int) $_POST['post_id']; // WPCS: input var ok.
 	$keyword = $_POST['keyword']; // WPCS: input var ok.
@@ -645,6 +713,9 @@ function relevanssi_pin_post() {
  */
 function relevanssi_unpin_post() {
 	check_ajax_referer( 'relevanssi_admin_search_nonce', 'security' );
+	if ( ! current_user_can( 'edit_posts' ) ) {
+		wp_die();
+	}
 
 	$post_id = (int) $_POST['post_id']; // WPCS: input var ok.
 	$keyword = $_POST['keyword']; // WPCS: input var ok.
@@ -666,52 +737,18 @@ function relevanssi_unpin_post() {
 /**
  * Fetches database words to the relevanssi_words option.
  *
- * @global $wpdb The WordPress database interface.
- * @global $relevanssi_variables The global Relevanssi variables, used for the
- * database table names.
+ * An AJAX wrapper for relevanssi_update_words_option().
+ *
+ * @see relevanssi_update_words_option()
  *
  * @since 2.5.0
  */
 function relevanssi_ajax_get_words() {
-	global $wpdb, $relevanssi_variables;
-
 	if ( ! wp_verify_nonce( $_REQUEST['_nonce'], 'relevanssi_get_words' ) ) {
 		wp_die();
 	}
 
-	/**
-	 * The minimum limit of occurrances to include a word.
-	 *
-	 * To save resources, only words with more than this many occurrances are
-	 * fed to the spelling corrector. If there are problems with the spelling
-	 * corrector, increasing this value may fix those problems.
-	 *
-	 * @param int $number The number of occurrances must be more than this
-	 * value, default 2.
-	 */
-	$count = apply_filters( 'relevanssi_get_words_having', 2 );
-	if ( ! is_numeric( $count ) ) {
-		$count = 2;
-	}
-	$q = 'SELECT term,
-		SUM(title + content + comment + tag + link + author + category + excerpt + taxonomy + customfield)
-		AS c FROM ' . $relevanssi_variables['relevanssi_table'] .
-		" GROUP BY term HAVING c > $count"; // Safe: $count is numeric.
-
-	$results = $wpdb->get_results( $q ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-
-	$words = array();
-	foreach ( $results as $result ) {
-		$words[ $result->term ] = $result->c;
-	}
-
-	$expire = time() + MONTH_IN_SECONDS;
-	$data   = array(
-		'expire' => $expire,
-		'words'  => $words,
-	);
-
-	update_option( 'relevanssi_words', $data );
+	relevanssi_update_words_option();
 
 	wp_die();
 }
@@ -729,9 +766,15 @@ function relevanssi_ajax_index_pdf() {
 		wp_die();
 	}
 
-	update_post_meta( $_REQUEST['post_id'], '_relevanssi_pdf_error', RELEVANSSI_ERROR_05 );
+	if ( ! current_user_can( 'upload_files' ) ) {
+		wp_die();
+	}
 
-	relevanssi_index_pdf( $_REQUEST['post_id'] );
+	$post_id = intval( $_REQUEST['post_id'] );
+
+	update_post_meta( $post_id, '_relevanssi_pdf_error', RELEVANSSI_ERROR_05 );
+
+	relevanssi_index_pdf( $post_id );
 
 	wp_die();
 }

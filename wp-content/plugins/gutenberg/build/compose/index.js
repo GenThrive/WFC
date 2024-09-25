@@ -2097,6 +2097,7 @@ __webpack_require__.d(__webpack_exports__, {
   createHigherOrderComponent: () => (/* reexport */ createHigherOrderComponent),
   debounce: () => (/* reexport */ debounce),
   ifCondition: () => (/* reexport */ if_condition),
+  observableMap: () => (/* reexport */ observableMap),
   pipe: () => (/* reexport */ higher_order_pipe),
   pure: () => (/* reexport */ higher_order_pure),
   throttle: () => (/* reexport */ throttle),
@@ -2115,6 +2116,7 @@ __webpack_require__.d(__webpack_exports__, {
   useKeyboardShortcut: () => (/* reexport */ use_keyboard_shortcut),
   useMediaQuery: () => (/* reexport */ useMediaQuery),
   useMergeRefs: () => (/* reexport */ useMergeRefs),
+  useObservableValue: () => (/* reexport */ useObservableValue),
   usePrevious: () => (/* reexport */ usePrevious),
   useReducedMotion: () => (/* reexport */ use_reduced_motion),
   useRefEffect: () => (/* reexport */ useRefEffect),
@@ -2360,8 +2362,9 @@ function __await(v) {
 function __asyncGenerator(thisArg, _arguments, generator) {
   if (!Symbol.asyncIterator) throw new TypeError("Symbol.asyncIterator is not defined.");
   var g = generator.apply(thisArg, _arguments || []), i, q = [];
-  return i = {}, verb("next"), verb("throw"), verb("return"), i[Symbol.asyncIterator] = function () { return this; }, i;
-  function verb(n) { if (g[n]) i[n] = function (v) { return new Promise(function (a, b) { q.push([n, v, a, b]) > 1 || resume(n, v); }); }; }
+  return i = {}, verb("next"), verb("throw"), verb("return", awaitReturn), i[Symbol.asyncIterator] = function () { return this; }, i;
+  function awaitReturn(f) { return function (v) { return Promise.resolve(v).then(f, reject); }; }
+  function verb(n, f) { if (g[n]) { i[n] = function (v) { return new Promise(function (a, b) { q.push([n, v, a, b]) > 1 || resume(n, v); }); }; if (f) i[n] = f(i[n]); } }
   function resume(n, v) { try { step(g[n](v)); } catch (e) { settle(q[0][3], e); } }
   function step(r) { r.value instanceof __await ? Promise.resolve(r.value.v).then(fulfill, reject) : settle(q[0][2], r); }
   function fulfill(value) { resume("next", value); }
@@ -2427,16 +2430,18 @@ function __classPrivateFieldIn(state, receiver) {
 function __addDisposableResource(env, value, async) {
   if (value !== null && value !== void 0) {
     if (typeof value !== "object" && typeof value !== "function") throw new TypeError("Object expected.");
-    var dispose;
+    var dispose, inner;
     if (async) {
-        if (!Symbol.asyncDispose) throw new TypeError("Symbol.asyncDispose is not defined.");
-        dispose = value[Symbol.asyncDispose];
+      if (!Symbol.asyncDispose) throw new TypeError("Symbol.asyncDispose is not defined.");
+      dispose = value[Symbol.asyncDispose];
     }
     if (dispose === void 0) {
-        if (!Symbol.dispose) throw new TypeError("Symbol.dispose is not defined.");
-        dispose = value[Symbol.dispose];
+      if (!Symbol.dispose) throw new TypeError("Symbol.dispose is not defined.");
+      dispose = value[Symbol.dispose];
+      if (async) inner = dispose;
     }
     if (typeof dispose !== "function") throw new TypeError("Object not disposable.");
+    if (inner) dispose = function() { try { inner.call(this); } catch (e) { return Promise.reject(e); } };
     env.stack.push({ value: value, dispose: dispose, async: async });
   }
   else if (async) {
@@ -2920,6 +2925,59 @@ const throttle = (func, wait, options) => {
   });
 };
 
+;// CONCATENATED MODULE: ./packages/compose/build-module/utils/observable-map/index.js
+/**
+ * A constructor (factory) for `ObservableMap`, a map-like key/value data structure
+ * where the individual entries are observable: using the `subscribe` method, you can
+ * subscribe to updates for a particular keys. Each subscriber always observes one
+ * specific key and is not notified about any unrelated changes (for different keys)
+ * in the `ObservableMap`.
+ *
+ * @template K The type of the keys in the map.
+ * @template V The type of the values in the map.
+ * @return   A new instance of the `ObservableMap` type.
+ */
+function observableMap() {
+  const map = new Map();
+  const listeners = new Map();
+  function callListeners(name) {
+    const list = listeners.get(name);
+    if (!list) {
+      return;
+    }
+    for (const listener of list) {
+      listener();
+    }
+  }
+  return {
+    get(name) {
+      return map.get(name);
+    },
+    set(name, value) {
+      map.set(name, value);
+      callListeners(name);
+    },
+    delete(name) {
+      map.delete(name);
+      callListeners(name);
+    },
+    subscribe(name, listener) {
+      let list = listeners.get(name);
+      if (!list) {
+        list = new Set();
+        listeners.set(name, list);
+      }
+      list.add(listener);
+      return () => {
+        list.delete(listener);
+        if (list.size === 0) {
+          listeners.delete(name);
+        }
+      };
+    }
+  };
+}
+
 ;// CONCATENATED MODULE: ./packages/compose/build-module/higher-order/pipe.js
 /**
  * Parts of this source were derived and modified from lodash,
@@ -2966,7 +3024,7 @@ const throttle = (func, wait, options) => {
  *
  * Allows to choose whether to perform left-to-right or right-to-left composition.
  *
- * @see https://docs-lodash.com/v4/flow/
+ * @see https://lodash.com/docs/4#flow
  *
  * @param {boolean} reverse True if right-to-left, false for left-to-right composition.
  */
@@ -2984,7 +3042,7 @@ const basePipe = (reverse = false) => (...funcs) => (...args) => {
  *
  * This is inspired by `lodash`'s `flow` function.
  *
- * @see https://docs-lodash.com/v4/flow/
+ * @see https://lodash.com/docs/4#flow
  */
 const pipe = basePipe();
 
@@ -3002,15 +3060,14 @@ const pipe = basePipe();
  *
  * This is inspired by `lodash`'s `flowRight` function.
  *
- * @see https://docs-lodash.com/v4/flow-right/
+ * @see https://lodash.com/docs/4#flow-right
  */
 const compose = basePipe(true);
 /* harmony default export */ const higher_order_compose = (compose);
 
-;// CONCATENATED MODULE: external "React"
-const external_React_namespaceObject = window["React"];
+;// CONCATENATED MODULE: external "ReactJSXRuntime"
+const external_ReactJSXRuntime_namespaceObject = window["ReactJSXRuntime"];
 ;// CONCATENATED MODULE: ./packages/compose/build-module/higher-order/if-condition/index.js
-
 /**
  * External dependencies
  */
@@ -3037,12 +3094,13 @@ const external_React_namespaceObject = window["React"];
  *
  * @return Higher-order component.
  */
+
 function ifCondition(predicate) {
   return createHigherOrderComponent(WrappedComponent => props => {
     if (!predicate(props)) {
       return null;
     }
-    return (0,external_React_namespaceObject.createElement)(WrappedComponent, {
+    return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(WrappedComponent, {
       ...props
     });
   }, 'ifCondition');
@@ -3055,7 +3113,6 @@ var external_wp_isShallowEqual_default = /*#__PURE__*/__webpack_require__.n(exte
 ;// CONCATENATED MODULE: external ["wp","element"]
 const external_wp_element_namespaceObject = window["wp"]["element"];
 ;// CONCATENATED MODULE: ./packages/compose/build-module/higher-order/pure/index.js
-
 /**
  * External dependencies
  */
@@ -3077,6 +3134,7 @@ const external_wp_element_namespaceObject = window["wp"]["element"];
  *
  * @deprecated Use `memo` or `PureComponent` instead.
  */
+
 const pure = createHigherOrderComponent(function (WrappedComponent) {
   if (WrappedComponent.prototype instanceof external_wp_element_namespaceObject.Component) {
     return class extends WrappedComponent {
@@ -3090,7 +3148,7 @@ const pure = createHigherOrderComponent(function (WrappedComponent) {
       return !external_wp_isShallowEqual_default()(nextProps, this.props);
     }
     render() {
-      return (0,external_React_namespaceObject.createElement)(WrappedComponent, {
+      return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(WrappedComponent, {
         ...this.props
       });
     }
@@ -3141,7 +3199,6 @@ class Listener {
 /* harmony default export */ const listener = (Listener);
 
 ;// CONCATENATED MODULE: ./packages/compose/build-module/higher-order/with-global-events/index.js
-
 /**
  * WordPress dependencies
  */
@@ -3157,6 +3214,7 @@ class Listener {
 /**
  * Listener instance responsible for managing document event handling.
  */
+
 const with_global_events_listener = new listener();
 
 /* eslint-disable jsdoc/no-undefined-types */
@@ -3222,14 +3280,14 @@ function withGlobalEvents(eventTypesToHandlers) {
         }
       }
       render() {
-        return (0,external_React_namespaceObject.createElement)(WrappedComponent, {
+        return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(WrappedComponent, {
           ...this.props.ownProps,
           ref: this.handleRef
         });
       }
     }
     return (0,external_wp_element_namespaceObject.forwardRef)((props, ref) => {
-      return (0,external_React_namespaceObject.createElement)(Wrapper, {
+      return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(Wrapper, {
         ownProps: props,
         forwardedRef: ref
       });
@@ -3279,7 +3337,9 @@ function createId(object) {
  */
 function useInstanceId(object, prefix, preferredId) {
   return (0,external_wp_element_namespaceObject.useMemo)(() => {
-    if (preferredId) return preferredId;
+    if (preferredId) {
+      return preferredId;
+    }
     const id = createId(object);
     return prefix ? `${prefix}-${id}` : id;
   }, [object, preferredId, prefix]);
@@ -3287,22 +3347,21 @@ function useInstanceId(object, prefix, preferredId) {
 /* harmony default export */ const use_instance_id = (useInstanceId);
 
 ;// CONCATENATED MODULE: ./packages/compose/build-module/higher-order/with-instance-id/index.js
-
 /**
  * Internal dependencies
  */
 
 
 
+
 /**
- * A Higher Order Component used to be provide a unique instance ID by
- * component.
+ * A Higher Order Component used to provide a unique instance ID by component.
  */
 const withInstanceId = createHigherOrderComponent(WrappedComponent => {
   return props => {
     const instanceId = use_instance_id(WrappedComponent);
     // @ts-ignore
-    return (0,external_React_namespaceObject.createElement)(WrappedComponent, {
+    return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(WrappedComponent, {
       ...props,
       instanceId: instanceId
     });
@@ -3311,7 +3370,6 @@ const withInstanceId = createHigherOrderComponent(WrappedComponent => {
 /* harmony default export */ const with_instance_id = (withInstanceId);
 
 ;// CONCATENATED MODULE: ./packages/compose/build-module/higher-order/with-safe-timeout/index.js
-
 /**
  * WordPress dependencies
  */
@@ -3361,8 +3419,9 @@ const withSafeTimeout = createHigherOrderComponent(OriginalComponent => {
     }
     render() {
       return (
+        /*#__PURE__*/
         // @ts-ignore
-        (0,external_React_namespaceObject.createElement)(OriginalComponent, {
+        (0,external_ReactJSXRuntime_namespaceObject.jsx)(OriginalComponent, {
           ...this.props,
           setTimeout: this.setTimeout,
           clearTimeout: this.clearTimeout
@@ -3374,7 +3433,6 @@ const withSafeTimeout = createHigherOrderComponent(OriginalComponent => {
 /* harmony default export */ const with_safe_timeout = (withSafeTimeout);
 
 ;// CONCATENATED MODULE: ./packages/compose/build-module/higher-order/with-state/index.js
-
 /**
  * WordPress dependencies
  */
@@ -3396,6 +3454,7 @@ const withSafeTimeout = createHigherOrderComponent(OriginalComponent => {
  *
  * @return {any} A higher order component wrapper accepting a component that takes the state props + its own props + `setState` and returning a component that only accepts the own props.
  */
+
 function withState(initialState = {}) {
   external_wp_deprecated_default()('wp.compose.withState', {
     since: '5.8',
@@ -3409,7 +3468,7 @@ function withState(initialState = {}) {
         this.state = initialState;
       }
       render() {
-        return (0,external_React_namespaceObject.createElement)(OriginalComponent, {
+        return /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)(OriginalComponent, {
           ...this.props,
           ...this.state,
           setState: this.setState
@@ -3515,7 +3574,6 @@ function useConstrainedTabbing() {
       // See https://github.com/WordPress/gutenberg/issues/46041.
       if ( /** @type {HTMLElement} */target.contains(nextElement)) {
         event.preventDefault();
-        /** @type {HTMLElement} */
         nextElement?.focus();
         return;
       }
@@ -3706,6 +3764,11 @@ const external_wp_keycodes_namespaceObject = window["wp"]["keycodes"];
 
 
 /**
+ * Internal dependencies
+ */
+
+
+/**
  * Hook used to focus the first tabbable element on mount.
  *
  * @param {boolean | 'firstElement'} focusOnMount Focus on mount mode.
@@ -3749,14 +3812,7 @@ function useFocusOnMount(focusOnMount = 'firstElement') {
   (0,external_wp_element_namespaceObject.useEffect)(() => {
     focusOnMountRef.current = focusOnMount;
   }, [focusOnMount]);
-  (0,external_wp_element_namespaceObject.useEffect)(() => {
-    return () => {
-      if (timerId.current) {
-        clearTimeout(timerId.current);
-      }
-    };
-  }, []);
-  return (0,external_wp_element_namespaceObject.useCallback)(node => {
+  return useRefEffect(node => {
     var _node$ownerDocument$a;
     if (!node || focusOnMountRef.current === false) {
       return;
@@ -3768,12 +3824,17 @@ function useFocusOnMount(focusOnMount = 'firstElement') {
       timerId.current = setTimeout(() => {
         const firstTabbable = external_wp_dom_namespaceObject.focus.tabbable.find(node)[0];
         if (firstTabbable) {
-          setFocus( /** @type {HTMLElement} */firstTabbable);
+          setFocus(firstTabbable);
         }
       }, 0);
       return;
     }
     setFocus(node);
+    return () => {
+      if (timerId.current) {
+        clearTimeout(timerId.current);
+      }
+    };
   }, []);
 }
 
@@ -4460,6 +4521,7 @@ shortcuts, callback, {
  * WordPress dependencies
  */
 
+const matchMediaCache = new Map();
 
 /**
  * A new MediaQueryList object for the media query
@@ -4468,8 +4530,17 @@ shortcuts, callback, {
  * @return {MediaQueryList|null} A new object for the media query
  */
 function getMediaQueryList(query) {
-  if (query && typeof window !== 'undefined' && typeof window.matchMedia === 'function') {
-    return window.matchMedia(query);
+  if (!query) {
+    return null;
+  }
+  let match = matchMediaCache.get(query);
+  if (match) {
+    return match;
+  }
+  if (typeof window !== 'undefined' && typeof window.matchMedia === 'function') {
+    match = window.matchMedia(query);
+    matchMediaCache.set(query, match);
+    return match;
   }
   return null;
 }
@@ -4817,7 +4888,7 @@ function useStateWithHistory(initialValue) {
 
 
 /**
- * @typedef {"huge" | "wide" | "large" | "medium" | "small" | "mobile"} WPBreakpoint
+ * @typedef {"xhuge" | "huge" | "wide" | "xlarge" | "large" | "medium" | "small" | "mobile"} WPBreakpoint
  */
 
 /**
@@ -4828,8 +4899,10 @@ function useStateWithHistory(initialValue) {
  * @type {Record<WPBreakpoint, number>}
  */
 const BREAKPOINTS = {
+  xhuge: 1920,
   huge: 1440,
   wide: 1280,
+  xlarge: 1080,
   large: 960,
   medium: 782,
   small: 600,
@@ -4889,7 +4962,6 @@ useViewportMatch.__experimentalWidthProvider = ViewportMatchWidthContext.Provide
 /* harmony default export */ const use_viewport_match = (useViewportMatch);
 
 ;// CONCATENATED MODULE: ./packages/compose/build-module/hooks/use-resize-observer/index.js
-
 /**
  * External dependencies
  */
@@ -4897,6 +4969,7 @@ useViewportMatch.__experimentalWidthProvider = ViewportMatchWidthContext.Provide
 /**
  * WordPress dependencies
  */
+
 
 // This of course could've been more streamlined with internal state instead of
 // refs, but then host hooks / components could not opt out of renders.
@@ -4950,6 +5023,10 @@ function useResolvedElement(subscriber, refOrElement) {
     callSubscriber();
   }, [callSubscriber]);
 }
+
+// Declaring my own type here instead of using the one provided by TS (available since 4.2.2), because this way I'm not
+// forcing consumers to use a specific TS version.
+
 // We're only using the first element of the size sequences, until future versions of the spec solidify on how
 // exactly it'll be used for fragments in multi-column scenarios:
 // From the spec:
@@ -5112,7 +5189,7 @@ function useResizeAware() {
       height: height !== null && height !== void 0 ? height : null
     };
   }, [width, height]);
-  const resizeListener = (0,external_React_namespaceObject.createElement)("div", {
+  const resizeListener = /*#__PURE__*/(0,external_ReactJSXRuntime_namespaceObject.jsx)("div", {
     style: {
       position: 'absolute',
       top: 0,
@@ -5233,6 +5310,8 @@ function useWarnOnChange(object, prefix = 'Change detection') {
 }
 /* harmony default export */ const use_warn_on_change = (useWarnOnChange);
 
+;// CONCATENATED MODULE: external "React"
+const external_React_namespaceObject = window["React"];
 ;// CONCATENATED MODULE: ./node_modules/use-memo-one/dist/use-memo-one.esm.js
 
 
@@ -5300,7 +5379,7 @@ var useCallback = (/* unused pure expression or super */ null && (useCallbackOne
  * including the function to debounce, so please wrap functions created on
  * render in components in `useCallback`.
  *
- * @see https://docs-lodash.com/v4/debounce/
+ * @see https://lodash.com/docs/4#debounce
  *
  * @template {(...args: any[]) => void} TFunc
  *
@@ -5329,8 +5408,8 @@ function useDebounce(fn, wait, options) {
 /**
  * Helper hook for input fields that need to debounce the value before using it.
  *
- * @param {any} defaultValue The default value to use.
- * @return {[string, Function, string]} The input value, the setter and the debounced input value.
+ * @param defaultValue The default value to use.
+ * @return The input value, the setter and the debounced input value.
  */
 function useDebouncedInput(defaultValue = '') {
   const [input, setInput] = (0,external_wp_element_namespaceObject.useState)(defaultValue);
@@ -5338,7 +5417,7 @@ function useDebouncedInput(defaultValue = '') {
   const setDebouncedInput = useDebounce(setDebouncedState, 250);
   (0,external_wp_element_namespaceObject.useEffect)(() => {
     setDebouncedInput(input);
-  }, [input]);
+  }, [input, setDebouncedInput]);
   return [input, setInput, debouncedInput];
 }
 
@@ -5364,7 +5443,7 @@ function useDebouncedInput(defaultValue = '') {
  * including the function to throttle, so please wrap functions created on
  * render in components in `useCallback`.
  *
- * @see https://docs-lodash.com/v4/throttle/
+ * @see https://lodash.com/docs/4#throttle
  *
  * @template {(...args: any[]) => void} TFunc
  *
@@ -5610,11 +5689,15 @@ function useFocusableIframe() {
     const {
       ownerDocument
     } = element;
-    if (!ownerDocument) return;
+    if (!ownerDocument) {
+      return;
+    }
     const {
       defaultView
     } = ownerDocument;
-    if (!defaultView) return;
+    if (!defaultView) {
+      return;
+    }
 
     /**
      * Checks whether the iframe is the activeElement, inferring that it has
@@ -5768,12 +5851,41 @@ function useFixedWindowList(elementRef, itemHeight, totalItems, options) {
   return [fixedListWindow, setFixedListWindow];
 }
 
+;// CONCATENATED MODULE: ./packages/compose/build-module/hooks/use-observable-value/index.js
+/**
+ * WordPress dependencies
+ */
+
+
+/**
+ * Internal dependencies
+ */
+
+/**
+ * React hook that lets you observe an entry in an `ObservableMap`. The hook returns the
+ * current value corresponding to the key, or `undefined` when there is no value stored.
+ * It also observes changes to the value and triggers an update of the calling component
+ * in case the value changes.
+ *
+ * @template K    The type of the keys in the map.
+ * @template V    The type of the values in the map.
+ * @param    map  The `ObservableMap` to observe.
+ * @param    name The map key to observe.
+ * @return   The value corresponding to the map key requested.
+ */
+function useObservableValue(map, name) {
+  const [subscribe, getValue] = (0,external_wp_element_namespaceObject.useMemo)(() => [listener => map.subscribe(name, listener), () => map.get(name)], [map, name]);
+  return (0,external_wp_element_namespaceObject.useSyncExternalStore)(subscribe, getValue, getValue);
+}
+
 ;// CONCATENATED MODULE: ./packages/compose/build-module/index.js
 // The `createHigherOrderComponent` helper and helper types.
 
 // The `debounce` helper and its types.
 
 // The `throttle` helper and its types.
+
+// The `ObservableMap` data structure
 
 
 // The `compose` and `pipe` helpers (inspired by `flowRight` and `flow` from Lodash).
@@ -5789,6 +5901,7 @@ function useFixedWindowList(elementRef, itemHeight, totalItems, options) {
 
 
 // Hooks.
+
 
 
 

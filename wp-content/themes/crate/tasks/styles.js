@@ -1,10 +1,7 @@
 'use strict';
 
 import gulp from 'gulp';
-// import sass from 'gulp-sass';
-import dartSass from 'sass';
-import gulpSass from 'gulp-sass';
-const sass = gulpSass( dartSass );
+import sass from 'gulp-sass';
 import postcss from 'gulp-postcss';
 import short from 'postcss-short';
 import sorting from 'postcss-sorting';

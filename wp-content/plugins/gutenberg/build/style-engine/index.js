@@ -274,8 +274,9 @@ function __await(v) {
 function __asyncGenerator(thisArg, _arguments, generator) {
   if (!Symbol.asyncIterator) throw new TypeError("Symbol.asyncIterator is not defined.");
   var g = generator.apply(thisArg, _arguments || []), i, q = [];
-  return i = {}, verb("next"), verb("throw"), verb("return"), i[Symbol.asyncIterator] = function () { return this; }, i;
-  function verb(n) { if (g[n]) i[n] = function (v) { return new Promise(function (a, b) { q.push([n, v, a, b]) > 1 || resume(n, v); }); }; }
+  return i = {}, verb("next"), verb("throw"), verb("return", awaitReturn), i[Symbol.asyncIterator] = function () { return this; }, i;
+  function awaitReturn(f) { return function (v) { return Promise.resolve(v).then(f, reject); }; }
+  function verb(n, f) { if (g[n]) { i[n] = function (v) { return new Promise(function (a, b) { q.push([n, v, a, b]) > 1 || resume(n, v); }); }; if (f) i[n] = f(i[n]); } }
   function resume(n, v) { try { step(g[n](v)); } catch (e) { settle(q[0][3], e); } }
   function step(r) { r.value instanceof __await ? Promise.resolve(r.value.v).then(fulfill, reject) : settle(q[0][2], r); }
   function fulfill(value) { resume("next", value); }
@@ -341,16 +342,18 @@ function __classPrivateFieldIn(state, receiver) {
 function __addDisposableResource(env, value, async) {
   if (value !== null && value !== void 0) {
     if (typeof value !== "object" && typeof value !== "function") throw new TypeError("Object expected.");
-    var dispose;
+    var dispose, inner;
     if (async) {
-        if (!Symbol.asyncDispose) throw new TypeError("Symbol.asyncDispose is not defined.");
-        dispose = value[Symbol.asyncDispose];
+      if (!Symbol.asyncDispose) throw new TypeError("Symbol.asyncDispose is not defined.");
+      dispose = value[Symbol.asyncDispose];
     }
     if (dispose === void 0) {
-        if (!Symbol.dispose) throw new TypeError("Symbol.dispose is not defined.");
-        dispose = value[Symbol.dispose];
+      if (!Symbol.dispose) throw new TypeError("Symbol.dispose is not defined.");
+      dispose = value[Symbol.dispose];
+      if (async) inner = dispose;
     }
     if (typeof dispose !== "function") throw new TypeError("Object not disposable.");
+    if (inner) dispose = function() { try { inner.call(this); } catch (e) { return Promise.reject(e); } };
     env.stack.push({ value: value, dispose: dispose, async: async });
   }
   else if (async) {
@@ -826,33 +829,27 @@ const backgroundImage = {
   name: 'backgroundImage',
   generate: (style, options) => {
     const _backgroundImage = style?.background?.backgroundImage;
-    const _backgroundSize = style?.background?.backgroundSize;
-    const styleRules = [];
-    if (!_backgroundImage) {
-      return styleRules;
-    }
-    if (_backgroundImage?.source === 'file' && _backgroundImage?.url) {
-      styleRules.push({
+    if (typeof _backgroundImage === 'object' && _backgroundImage?.url) {
+      return [{
         selector: options.selector,
         key: 'backgroundImage',
         // Passed `url` may already be encoded. To prevent double encoding, decodeURI is executed to revert to the original string.
         value: `url( '${encodeURI(safeDecodeURI(_backgroundImage.url))}' )`
-      });
+      }];
     }
 
-    // If no background size is set, but an image is, default to cover.
-    if (_backgroundSize === undefined) {
-      styleRules.push({
-        selector: options.selector,
-        key: 'backgroundSize',
-        value: 'cover'
-      });
+    /*
+     * If the background image is a string, it could already contain a url() function,
+     * or have a linear-gradient value.
+     */
+    if (typeof _backgroundImage === 'string') {
+      return generateRule(style, options, ['background', 'backgroundImage'], 'backgroundImage');
     }
-    return styleRules;
+    return [];
   }
 };
 const backgroundPosition = {
-  name: 'backgroundRepeat',
+  name: 'backgroundPosition',
   generate: (style, options) => {
     return generateRule(style, options, ['background', 'backgroundPosition'], 'backgroundPosition');
   }
@@ -866,26 +863,16 @@ const backgroundRepeat = {
 const backgroundSize = {
   name: 'backgroundSize',
   generate: (style, options) => {
-    const _backgroundSize = style?.background?.backgroundSize;
-    const _backgroundPosition = style?.background?.backgroundPosition;
-    const styleRules = [];
-    if (_backgroundSize === undefined) {
-      return styleRules;
-    }
-    styleRules.push(...generateRule(style, options, ['background', 'backgroundSize'], 'backgroundSize'));
-
-    // If background size is set to contain, but no position is set, default to center.
-    if (_backgroundSize === 'contain' && _backgroundPosition === undefined) {
-      styleRules.push({
-        selector: options.selector,
-        key: 'backgroundPosition',
-        value: 'center'
-      });
-    }
-    return styleRules;
+    return generateRule(style, options, ['background', 'backgroundSize'], 'backgroundSize');
   }
 };
-/* harmony default export */ const styles_background = ([backgroundImage, backgroundPosition, backgroundRepeat, backgroundSize]);
+const backgroundAttachment = {
+  name: 'backgroundAttachment',
+  generate: (style, options) => {
+    return generateRule(style, options, ['background', 'backgroundAttachment'], 'backgroundAttachment');
+  }
+};
+/* harmony default export */ const styles_background = ([backgroundImage, backgroundPosition, backgroundRepeat, backgroundSize, backgroundAttachment]);
 
 ;// CONCATENATED MODULE: ./packages/style-engine/build-module/styles/shadow/index.js
 /**

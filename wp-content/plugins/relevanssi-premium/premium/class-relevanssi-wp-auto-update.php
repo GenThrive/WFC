@@ -74,6 +74,10 @@ class Relevanssi_WP_Auto_Update {
 	 * @return object $transient
 	 */
 	public function check_update( $transient ) {
+		if ( ! is_object( $transient ) ) {
+			return $transient;
+		}
+
 		// Get the remote version.
 		$info           = $this->get_remote_information();
 		$remote_version = 0;
@@ -86,13 +90,32 @@ class Relevanssi_WP_Auto_Update {
 			$obj              = new stdClass();
 			$obj->slug        = $this->slug;
 			$obj->new_version = $remote_version;
-			$obj->url         = $this->update_path;
-			$obj->package     = $this->update_path;
+			$obj->url         = $info->package;
+			$obj->package     = $info->package;
 			$obj->icons       = $info->icons;
 			$obj->banners     = $info->banners;
 
 			$transient->response[ $this->plugin_slug ] = $obj;
+		} else {
+			global $relevanssi_variables;
+			// No update is available.
+			$item = (object) array(
+				'id'            => 'relevanssi-premium/relevanssi.php',
+				'slug'          => 'relevanssi-premium',
+				'plugin'        => 'relevanssi-premium/relevanssi.php',
+				'new_version'   => $relevanssi_variables['plugin_version'],
+				'url'           => '',
+				'package'       => '',
+				'icons'         => array(),
+				'banners'       => array(),
+				'banners_rtl'   => array(),
+				'tested'        => '',
+				'requires_php'  => '',
+				'compatibility' => new stdClass(),
+			);
+			$transient->no_update['relevanssi-premium/relevanssi.php'] = $item;
 		}
+
 		return $transient;
 	}
 
@@ -189,29 +212,11 @@ class Relevanssi_WP_Auto_Update {
 			)
 		);
 		if ( ! is_wp_error( $request ) || 200 === wp_remote_retrieve_response_code( $request ) ) {
+			if ( 'false' === $request['body'] ) {
+				return false;
+			}
 			return $request['body'];
 		}
 		return false;
 	}
-}
-
-/**
- * Activates the auto update mechanism.
- *
- * @global array $relevanssi_variables Relevanssi global variables, used for plugin file name and version number.
- *
- * Hooks into 'init' filter hook to activate the auto update mechanism.
- */
-function relevanssi_activate_auto_update() {
-	global $relevanssi_variables;
-	$api_key = get_network_option( null, 'relevanssi_api_key' );
-	if ( ! $api_key ) {
-		$api_key = get_option( 'relevanssi_api_key' );
-	}
-	if ( 'su9qtC30xCLLA' === crypt( $api_key, 'suolaa' ) ) {
-		$relevanssi_plugin_remote_path = 'https://www.relevanssi.com/update/update-development.php';
-	} else {
-		$relevanssi_plugin_remote_path = 'https://www.relevanssi.com/update/update.php';
-	}
-	new Relevanssi_WP_Auto_Update( $relevanssi_variables['plugin_version'], $relevanssi_plugin_remote_path, $relevanssi_variables['plugin_basename'] );
 }

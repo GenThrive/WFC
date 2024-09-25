@@ -25,16 +25,16 @@ function relevanssi_related_tab() {
 		update_option( 'relevanssi_related_settings', $settings );
 	}
 
-	$enabled          = $settings['enabled'];
-	$append           = $settings['append'];
-	$number           = $settings['number'];
-	$months           = $settings['months'];
-	$keyword          = $settings['keyword'];
-	$restrict         = $settings['restrict'];
-	$nothing          = $settings['nothing'];
-	$notenough        = $settings['notenough'];
-	$post_types       = $settings['post_types'];
-	$cache_for_admins = $settings['cache_for_admins'];
+	$enabled          = $settings['enabled'] ?? 'off';
+	$append           = $settings['append'] ?? '';
+	$number           = $settings['number'] ?? 6;
+	$months           = $settings['months'] ?? 0;
+	$keyword          = $settings['keyword'] ?? 'title';
+	$restrict         = $settings['restrict'] ?? '';
+	$nothing          = $settings['nothing'] ?? 'nothing';
+	$notenough        = $settings['notenough'] ?? 'random';
+	$post_types       = $settings['post_types'] ?? 'post';
+	$cache_for_admins = $settings['cache_for_admins'] ?? 'off';
 
 	$keyword_sources = explode( ',', $keyword );
 	$restrict_taxos  = explode( ',', $restrict );
@@ -74,16 +74,16 @@ function relevanssi_related_tab() {
 		$matching_checked = 'checked="checked"';
 	}
 
-	$enabled          = relevanssi_check( $settings['enabled'] );
-	$cache_for_admins = relevanssi_check( $settings['cache_for_admins'] );
+	$enabled          = relevanssi_check( $enabled );
+	$cache_for_admins = relevanssi_check( $cache_for_admins );
 
 	$disabled = '';
 	if ( empty( $enabled ) ) {
 		$disabled = 'disabled="disabled"';
 	}
 
-	$style = get_option( 'relevanssi_related_style', relevanssi_related_default_styles() );
-
+	$style        = get_option( 'relevanssi_related_style', array() );
+	$style        = array_merge( relevanssi_related_default_styles(), $style );
 	$width        = $style['width'];
 	$titles       = relevanssi_check( $style['titles'] );
 	$excerpts     = relevanssi_check( $style['excerpts'] );
@@ -454,15 +454,8 @@ function relevanssi_related_tab() {
  * @author Mike Jolly
  */
 function relevanssi_media_selector_print_scripts() {
-	$style = get_option(
-		'relevanssi_related_style',
-		array(
-			'width'             => 250,
-			'excerpts'          => 'off',
-			'thumbnails'        => 'on',
-			'default_thumbnail' => '',
-		)
-	);
+	$style = get_option( 'relevanssi_related_style', array() );
+	$style = array_merge( relevanssi_related_default_styles(), $style );
 
 	$thumbnail_id = $style['default_thumbnail'];
 	if ( empty( $thumbnail_id ) ) {

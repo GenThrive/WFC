@@ -2699,7 +2699,10 @@ function ShowSettings( element ) {
 		//hide field and form pagination setting fields
 		jQuery( '.field_setting' ).hide();
 		jQuery( '.pagination_setting' ).hide();
+		jQuery("#gfield_post_category_initial_item_container").hide();
+		jQuery("#gfield_min_strength_container").hide();
 		// Show last pagination setting fields
+		fieldObject = GetSelectedField();
 		jQuery( '.last_pagination_setting' ).show();
 		var label = jQuery( '#gform_last_page_settings' ).data( 'title' );
 		var description = jQuery( '#gform_last_page_settings' ).data( 'description' );
@@ -2742,6 +2745,7 @@ function ShowSettings( element ) {
 		var icon_img = $button_icon.find( 'img' );
 		var icon_classes = $button_icon.children().attr( 'class' );
 	}
+
 	// Show field icon and description in sidebar
 	jQuery( '#nothing_selected' ).hide();
 	jQuery( '#sidebar_field_label' )
@@ -2956,7 +2960,12 @@ function SelectCustomChoice( name ){
 }
 
 function SelectPredefinedChoice(name){
-    jQuery('#gfield_bulk_add_input').val(gform_predefined_choices[name].join('\n'));
+	var list = gform_predefined_choices[name];
+	// Countries can also be an object if the gform_countries filter is used, so convert to array with just the values.
+	if( name == "Countries" && Array.isArray( list ) !== true ) {
+		list = Object.values( list );
+	}
+    jQuery('#gfield_bulk_add_input').val(list.join('\n'));
     gform_selected_custom_choice = "";
     InitBulkCustomPanel();
 }
