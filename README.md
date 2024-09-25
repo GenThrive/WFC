@@ -88,5 +88,3 @@ wp help produce
 ```
 
 More information on Produce may be available at https://bitbucket.org/cornershopcreative/plugin-produce
-
-TEsting to make this thing work
