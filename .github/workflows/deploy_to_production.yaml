@@ -1,23 +1,23 @@
-# name: Deploy to production
+name: Deploy to production
 
-# on:
-#   release:
-#     types: [released]
+on:
+  release:
+    types: [released]
 
-# jobs:
-#   deploy:
-#     runs-on: ubuntu-latest
-#     steps:
-#       - name: Checkout code
-#         uses: actions/checkout@v2
-#         with:
-#           fetch-depth: 0 # Fetch all history for all tags and branches
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0 # Fetch all history for all tags and branches
 
-#       - name: Deploy to server
-#         env:
-#           SSH_PASSWORD: ${{ secrets.SSH_PASSWORD }}
-#         run: |
-#           sshpass -p "$SSH_PASSWORD" ssh -p 14644 -o StrictHostKeyChecking=no ${{secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} << EOF
-#           cd ${{ secrets.SERVER_WP_PATH }}
-#           git pull origin main
-#           EOF
+      - name: Deploy to server
+        env:
+          SSH_PASSWORD: ${{ secrets.SSH_PASSWORD }}
+        run: |
+          sshpass -p "$SSH_PASSWORD" ssh -p 14644 -o StrictHostKeyChecking=no ${{secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} << EOF
+          cd ${{ secrets.SERVER_WP_PATH }}
+          git pull origin main
+          EOF
