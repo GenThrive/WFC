@@ -17,6 +17,7 @@ jobs:
         run: |
           sshpass -p "$SSH_PASSWORD" ssh -p 14644 -o StrictHostKeyChecking=no ${{secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} << EOF
           cd ${{ secrets.SERVER_WP_PATH }}
+          git pull
           git add .
           git commit -m "Automated deployment" 
           git push origin main

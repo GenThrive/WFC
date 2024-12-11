@@ -3,8 +3,8 @@ wp-content/advanced-cache.php
 wp-content/advanced-cache.php
 object-cache.php
 wp-content/db.php
-wp-content/uploads/
-wp-content/uploads
+# wp-content/uploads/
+# wp-content/uploads
 wp-content/upgrade/*
 wp-content/backup-db/*
 wp-content/cache/*
