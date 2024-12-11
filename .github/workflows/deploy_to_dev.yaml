@@ -7,6 +7,7 @@ on:
 
 jobs:
   deploy:
+    permissions: write-all
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -16,32 +17,31 @@ jobs:
 
       - name: Deploy to server
         env:
-          SSH_PASSWORD: ${{ secrets.SSH_PASSWORD }}
+          SSH_DEV_PASSWORD: ${{ secrets.SSH_DEV_PASSWORD }}
+          SSH_DEV_USERNAME: ${{ secrets.SSH_DEV_USERNAME }}
+          SSH_DEV_HOST: ${{ secrets.SSH_DEV_HOST }}
+          SERVER_WP_PATH: ${{ secrets.SERVER_WP_PATH }} # /var/www/html/wordpress
+          SSH_DEV_PORT: ${{ secrets.SSH_DEV_PORT }}
         run: |
-          sshpass -p "$SSH_PASSWORD" ssh -p 14644 -o StrictHostKeyChecking=no ${{secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} << EOF
-          cd ${{ secrets.SERVER_WP_PATH }}
-          echo date
+          sshpass -p "$SSH_DEV_PASSWORD" ssh -p $SSH_DEV_PORT -o StrictHostKeyChecking=no "$SSH_DEV_USERNAME"@"$SSH_DEV_HOST" << EOF
+          cd "$SERVER_WP_PATH"
+          git pull origin main          
           EOF
 
       - name: Bump version and push tag
         id: tag_version
-        uses: anothrNick/github-tag-action@1.35.0
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          DEFAULT_BUMP: patch
-          WITH_V: true
-          PRERELEASE: true
+        uses: mathieudutour/github-tag-action@v6.1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          default_bump: patch
+          release_branches: master
 
       - name: Create Release
-        id: create_release
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
+          prerelease: true
           tag_name: ${{ steps.tag_version.outputs.new_tag }}
           release_name: Release ${{ steps.tag_version.outputs.new_tag }}
-          body: |
-            Changes in this Release:
-            ${{ github.event.head_commit.message }}
-          draft: false
-          prerelease: true
+          body: ${{ steps.tag_version.outputs.changelog }}
