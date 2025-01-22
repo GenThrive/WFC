@@ -50,16 +50,19 @@ if (!class_exists('MGHelper')) :
 			return array_key_first($array);
 		}
 
-		public static function safePregReplace($replace_regex, $replace_string, $element) {
-			if (!is_string($replace_regex) || !is_string($replace_string) || !is_string($element)) {
+		public static function safePregReplace($replace_regex, $replace_string, $element, $limit = -1) {
+			if (!is_string($replace_regex) || !is_string($replace_string) || !is_string($element) || !is_int($limit)) {
 				return $element;
 			}
-			$updated_element = preg_replace($replace_regex, $replace_string, $element);
+
+			$updated_element = preg_replace($replace_regex, $replace_string, $element, $limit);
+
 			if ($updated_element === null && preg_last_error() !== PREG_NO_ERROR) {
 				return $element;
 			}
+
 			return $updated_element;
-		}
+		}	
 
 		public static function safeStrReplace($search, $replace, $subject) {
 			if (!is_string($search) || !is_string($replace) || !is_string($subject)) {
@@ -95,6 +98,145 @@ if (!class_exists('MGHelper')) :
 				'function' => $function_name,
 				'accepted_args' => $accepted_args,
 			);
+		}
+
+		public static function removePatternFromWpConfig($pattern) {
+			if (!defined('ABSPATH')) {
+				return;
+			}
+
+			$wp_conf_paths = array(
+				rtrim(ABSPATH, DIRECTORY_SEPARATOR) . "/wp-config.php",
+				rtrim(ABSPATH, DIRECTORY_SEPARATOR) . "../wp-config.php"
+			);
+
+			if (file_exists($wp_conf_paths[0])) {
+				$fname = $wp_conf_paths[0];
+			} elseif (file_exists($wp_conf_paths[1])) {
+				$fname = $wp_conf_paths[1];
+			} else {
+				return;
+			}
+
+			self::fileRemovePattern($fname, $pattern);
+		}
+
+		public static function fileRemovePattern($fname, $pattern, $is_regex = false) {
+			if (!is_string($fname) || !is_string($pattern)) {
+				return;
+			}
+
+			$filesystem = self::get_direct_filesystem();
+
+			if (!$filesystem->exists($fname)) {
+				return;
+			}
+
+			$content = $filesystem->get_contents($fname);
+			if ($content !== false) {
+				if ($is_regex !== false) {
+					$modified_content = preg_replace($pattern, "", $content);
+				} else {
+					$modified_content = str_replace($pattern, "", $content);
+				}
+
+				if (empty($modified_content)) {
+					return;
+				}
+
+				if ($content !== $modified_content) {
+					$filesystem->put_contents($fname, $modified_content, intval($filesystem->getchmod($fname), 8));
+				}
+			}
+		}
+
+		public static function opensslEncrypt($plain_text, $cipher_algo, $encryption_key, $iv = null) {
+			if (!function_exists('openssl_encrypt') || !function_exists('openssl_get_cipher_methods') ||
+					!function_exists('openssl_random_pseudo_bytes') || !function_exists('openssl_cipher_iv_length')) {
+				return array(false, "OpenSSL extension not found.");
+			}
+
+			if (empty($plain_text) || !is_string($plain_text) ||
+					empty($encryption_key) || !is_string($encryption_key)) {
+				return array(false, "Plain text or encryption key is not a valid string.");
+			}
+
+			if (!in_array($cipher_algo, openssl_get_cipher_methods(), true)) {
+				return array(false, "Invalid cipher algorithm - " . $cipher_algo);
+			}
+
+			if ($iv === null) {
+				$iv_length = openssl_cipher_iv_length($cipher_algo);
+				if ($iv_length === false) {
+					return array(false, "IV length not found.");
+				}
+				$iv = openssl_random_pseudo_bytes($iv_length);
+				if ($iv === false) {
+					return array(false, "IV generation failed.");
+				}
+			}
+
+			if (strlen($iv) !== $iv_length) {
+				return array(false, "Invalid IV length. Expected length is " . $iv_length . " bytes.");
+			}
+
+			$encrypted_data = openssl_encrypt($plain_text, $cipher_algo, $encryption_key, OPENSSL_RAW_DATA, $iv);
+			if ($encrypted_data === false) {
+				return array(false, "Encryption failed.");
+			}
+
+			return array(true, ($iv . $encrypted_data));
+		}
+
+		public static function opensslDecrypt($data, $cipher_algo, $encryption_key) {
+			if (!function_exists('openssl_decrypt') || !function_exists('openssl_get_cipher_methods') ||
+					!function_exists('openssl_cipher_iv_length')) {
+				return array(false, "OpenSSL extension not found.");
+			}
+
+			if (empty($data) || !is_string($data) || empty($encryption_key) || !is_string($encryption_key)) {
+				return array(false, "Encrypted secret or encryption key is not a valid string.");
+			}
+
+			if (!in_array($cipher_algo, openssl_get_cipher_methods(), true)) {
+				return array(false, "Invalid cipher algorithm - " . $cipher_algo);
+			}
+
+			$iv_length = openssl_cipher_iv_length($cipher_algo);
+			if ($iv_length === false) {
+				return array(false, "IV length not found.");
+			}
+
+			if (strlen($data) <= $iv_length) {
+				return array(false, "Data length is insufficient to contain IV.");
+			}
+
+			$iv = substr($data, 0, $iv_length);
+			$encrypted_data = substr($data, $iv_length);
+
+			if ($iv === false || $encrypted_data === false) {
+				return array(false, "IV or encrypted data not found.");
+			}
+
+			$decrypted_data = openssl_decrypt($encrypted_data, $cipher_algo, $encryption_key, OPENSSL_RAW_DATA, $iv);
+
+			if ($decrypted_data === false) {
+				return array(false, "Decryption failed.");
+			}
+
+			return array(true, $decrypted_data);
+		}
+		public static function get_direct_filesystem() {
+			require_once ABSPATH . 'wp-admin/includes/class-wp-filesystem-base.php';
+			require_once ABSPATH . 'wp-admin/includes/class-wp-filesystem-direct.php';
+			return new WP_Filesystem_Direct(new StdClass());
+		}
+
+		public static function unslashIfWPLoaded($str) {
+			if (function_exists('wp_unslash')) {
+				return wp_unslash($str);
+			}
+			return $str;
 		}
 	}
 endif;

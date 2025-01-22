@@ -62,6 +62,10 @@ function sdm_get_download_count_for_all_posts() {
 
     // Check post meta for offset count.
     for ($i = 0; $i < $wpdb->num_rows; $i++) {
+		if( !isset($result[$i]->ID) ){
+			// Skip if no ID.
+			continue;
+		}
         $get_offset = get_post_meta($result[$i]->ID, 'sdm_count_offset', true);
         if ($get_offset && $get_offset != '') {
             $db_count = $db_count + $get_offset;
@@ -655,7 +659,7 @@ function sdm_sanitize_allowed_tags_expanded() {
  * 
  * @return string Download button text.
  */
-function get_dl_button_text($download_id = null){
+function sdm_get_dl_button_text($download_id = null){
 	$default_button_text = __( 'Download Now!', 'simple-download-monitor' );
 	if (empty($download_id)) {
 		return $default_button_text;
@@ -664,6 +668,12 @@ function get_dl_button_text($download_id = null){
 	$custom_button_text = sanitize_text_field(get_post_meta($download_id, 'sdm_download_button_text', true));
 	
 	return !empty($custom_button_text) ? $custom_button_text : $default_button_text;
+}
+
+function sdm_get_standard_download_url_from_id( $download_id ) {
+	$homepage = rtrim( get_bloginfo( 'url' ), '/' ); // Remove the trailing slash (if there is one)
+	$download_url = $homepage . '/?sdm_process_download=1&download_id=' . $download_id;
+	return $download_url;
 }
 
 /**
@@ -677,4 +687,21 @@ function get_sdm_admin_access_permission(){
 	$admin_dashboard_access_permission = isset($main_opts['admin-dashboard-access-permission']) && !empty($main_opts['admin-dashboard-access-permission']) ? sanitize_text_field($main_opts['admin-dashboard-access-permission']) : 'manage_options';
     $admin_dashboard_access_permission = apply_filters("sdm_dashboard_access_role", $admin_dashboard_access_permission);
 	return $admin_dashboard_access_permission;
+}
+
+/*
+ * Check if the current page is an admin page of the SDM plugin.
+ */
+function is_sdm_admin_page() {
+	if( !is_admin() ){
+		//Not an admin page
+		return false;
+	}
+
+	//Check if this is an admin page of the SDM plugin
+	if ( isset( $_GET['post_type'] ) && ( stripos( $_GET['post_type'], 'sdm_downloads' ) !== false ) ) {
+		//This is an admin page (admin menu page) of the SDM plugin
+		return true;
+	}
+	return false;
 }

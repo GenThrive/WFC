@@ -4,14 +4,13 @@
 function handle_sdm_download_via_direct_post() {
 	if ( (isset( $_REQUEST['smd_process_download'] ) && $_REQUEST['smd_process_download'] == '1') || (isset( $_REQUEST['sdm_process_download'] ) && $_REQUEST['sdm_process_download'] == '1') ) {
 		global $wpdb;
-		$download_id    = absint( $_REQUEST['download_id'] );
-		$download_title = get_the_title( $download_id );
-		$download_link  = get_post_meta( $download_id, 'sdm_upload', true );
-
-		//Do some validation checks
+		$download_id = isset( $_REQUEST['download_id'] ) ? absint( $_REQUEST['download_id'] ) : 0;
 		if ( ! $download_id ) {
 			wp_die( __( 'Error! Incorrect download item id.', 'simple-download-monitor' ) );
 		}
+
+		$download_title = get_the_title( $download_id );
+		$download_link = get_post_meta( $download_id, 'sdm_upload', true );		
 		if ( empty( $download_link ) ) {
 			wp_die( printf( __( 'Error! This download item (%s) does not have any download link. Edit this item and specify a downloadable file URL for it.', 'simple-download-monitor' ), $download_id ) );
 		}
@@ -53,7 +52,7 @@ function handle_sdm_download_via_direct_post() {
 			$ipaddress = sdm_get_ip_address();
 		}
 
-				$user_agent = '';
+		$user_agent = '';
 		//Check if do not capture User Agent is enabled.
 		if ( ! isset( $main_option['admin_do_not_capture_user_agent'] ) ) {
 			//Get the user agent data. The get_browser() function doesn't work on many servers. So use the HTTP var.
@@ -62,7 +61,7 @@ function handle_sdm_download_via_direct_post() {
 			}
 		}
 
-				$referrer_url = '';
+		$referrer_url = '';
 		//Check if do not capture Referer URL is enabled.
 		if ( ! isset( $main_option['admin_do_not_capture_referrer_url'] ) ) {
 			//Get the user agent data. The get_browser() function doesn't work on many servers. So use the HTTP var.
@@ -71,7 +70,7 @@ function handle_sdm_download_via_direct_post() {
 			}
 		}
 
-		$date_time       = current_time( 'mysql' );
+		$date_time = current_time( 'mysql' );
 		$visitor_country = ! empty( $ipaddress ) ? sdm_ip_info( $ipaddress, 'country' ) : '';
 
 		$visitor_name = sdm_get_logged_in_user();
@@ -112,7 +111,7 @@ function handle_sdm_download_via_direct_post() {
 		$unique_ips = isset( $main_option['admin_log_unique'] );
 
 		// Get post meta for individual disabling of download logging
-		$get_meta             = get_post_meta( $download_id, 'sdm_item_no_log', true );
+		$get_meta = get_post_meta( $download_id, 'sdm_item_no_log', true );
 		$item_logging_checked = isset( $get_meta ) && $get_meta === 'on' ? 'on' : 'off';
 
 		$dl_logging_needed = true;
@@ -175,45 +174,47 @@ function handle_sdm_download_via_direct_post() {
 		// Allow plugin extensions to hook into download request.
 		do_action( 'sdm_process_download_request', $download_id, $download_link );
 
-		// Should the item be dispatched?
-		$dispatch = apply_filters( 'sdm_dispatch_downloads', get_post_meta( $download_id, 'sdm_item_dispatch', true ) );
+		// Check and process the download for Enhanced File Protection
+		// Note: if the download is for a protected file, the function will handle the download request and then terminate the script execution.
+		SDM_Protected_Download_Request_Handler::process_enhanced_protected_download_request( $download_id, $download_link );
+
+		// Continue with the standard download process.
+
+		// Should the item be dispatched using PHP dispatch?
+		$sdm_item_php_dispatch = get_post_meta( $download_id, 'sdm_item_dispatch', true );
+		
+		// Trigger a filter so other plugins can override the PHP dispatch setting.
+		$php_dispatch = apply_filters( 'sdm_dispatch_downloads', $sdm_item_php_dispatch );
 
 		// Only local file can be dispatched.
-		if ( $dispatch && ( stripos( $download_link, WP_CONTENT_URL ) === 0 ) ) {
+		if ( $php_dispatch && ( stripos( $download_link, WP_CONTENT_URL ) === 0 ) ) {
 			// Get file path
-			$file = path_join( WP_CONTENT_DIR, ltrim( substr( $download_link, strlen( WP_CONTENT_URL ) ), '/' ) );
-			$file = realpath( $file );
+			$file_path = SDM_Utils_File_System_Related::get_uploaded_file_path_from_url($download_link);
 
-			if ( ! is_file( $file ) ) {
+			if ( ! is_file( $file_path ) ) {
 				wp_die( __( 'File not found.', 'simple-download-monitor' ), 404 );
 			}
 
-			$path_parts = pathinfo( $file );
-
-			if ( ( empty( $path_parts['filename'] ) || empty( $path_parts['extension'] ) ) && empty( $main_option['general_allow_hidden_noext_dispatch'] ) ) {
-				// Do not use PHP dispatch for hidden files and/or files without extension.
-				sdm_redirect_to_url( $download_link );
-				exit;
+			$is_hidden_or_noext_file_disallowed = isset( $main_option['general_allow_hidden_noext_dispatch'] ) ? empty( $main_option['general_allow_hidden_noext_dispatch'] ) : true;
+			//Check if hidden or no-extension file download option is allowed.
+			if( $is_hidden_or_noext_file_disallowed ){
+				//Hidden or no-extension file download is NOT allowed. Let's check if this is request for a hidden or no-ext file download.
+				if ( SDM_Utils_File_System_Related::check_is_hidden_or_no_extension_file($file_path) ) {
+					// Found a hidden or no-ext file. Do not use PHP dispatch.
+					sdm_redirect_to_url( $download_link );
+					exit;
+				}
 			}
 
-			$disallowed_ext_opt = empty( $main_option['general_disallowed_file_ext_dispatch'] ) ? simpleDownloadManager::$disallowed_ext_dispatch_def : $main_option['general_disallowed_file_ext_dispatch'];
-
-			$disallowed_ext_arr_raw = explode( ',', strtolower( $disallowed_ext_opt ) );
-
-			$disallowed_ext_arr = array();
-
-			foreach ( $disallowed_ext_arr_raw as $item ) {
-				array_push( $disallowed_ext_arr, sanitize_text_field( $item ) );
-			}
-
-			if ( in_array( strtolower( $path_parts['extension'] ), $disallowed_ext_arr, true ) ) {
+			// Check if the file extension is disallowed.
+			if ( ! SDM_Utils_File_System_Related::check_is_file_extension_allowed($file_path) ) {
 				// Disallowed file extension; Don't use PHP dispatching (instead use the normal redirect).
 				sdm_redirect_to_url( $download_link );
 				exit;
 			}
 
 			// Try to dispatch file (terminates script execution on success)
-			sdm_dispatch_file( $file );
+			sdm_dispatch_file( $file_path );
 		}
 
 		// As a fallback or when dispatching is disabled, redirect to the file
@@ -230,7 +231,6 @@ function handle_sdm_download_via_direct_post() {
  * @return void
  */
 function sdm_dispatch_file( $filename ) {
-
 	if ( headers_sent() ) {
 		trigger_error( __FUNCTION__ . ": Cannot dispatch file $filename, headers already sent." );
 		return;

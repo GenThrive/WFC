@@ -103,8 +103,7 @@ function sdm_create_download_shortcode( $atts ) {
 	}
 	$window_target = empty( $new_window ) ? '_self' : '_blank';
 
-	$homepage             = get_bloginfo( 'url' );
-	$download_url         = $homepage . '/?sdm_process_download=1&download_id=' . $id;
+	$download_url = sdm_get_standard_download_url_from_id($id);
 	$download_button_code = '<a href="' . $download_url . '" class="sdm_download ' . esc_attr($color) . '" title="' . esc_html($item_title) . '" target="' . $window_target . '">' . esc_attr($button_text) . '</a>';
 
 	$main_advanced_opts = get_option( 'sdm_advanced_options' );
@@ -312,24 +311,22 @@ function sdm_handle_category_shortcode( $args ) {
 
 		if ( $fancy == '0' ) {
 
-			// Setup download location
-			$homepage = get_bloginfo( 'url' );
-			if ( empty( $new_window ) ) {
-				$new_window = get_post_meta( $id, 'sdm_item_new_window', true );
-			}
-
-			$window_target = empty( $new_window ) ? '_self' : '_blank';
-
-			// Iterate cpt's
+			// Iterate Download CPTs
 			foreach ( $get_posts as $item ) {
 
 				// Set download location
-				$id           = $item->ID;  // get each cpt ID
-				$download_url = $homepage . '/?sdm_process_download=1&download_id=' . $id;
+				$id = $item->ID;  // get each cpt ID
+				$download_url = sdm_get_standard_download_url_from_id($id);
 
 				// Get each cpt title
 				$item_title = get_the_title( $id );
 				$item_button_text = $button_text;
+
+				if ( empty( $new_window ) ) {
+					$new_window = get_post_meta( $id, 'sdm_item_new_window', true );
+				}
+	
+				$window_target = empty( $new_window ) ? '_self' : '_blank';
 
 				/**
 				 * Get the download button text.
@@ -337,7 +334,7 @@ function sdm_handle_category_shortcode( $args ) {
 				 * Show default button text if both are empty.
 				 */
 				if (empty($item_button_text)) {
-					$item_button_text = get_dl_button_text($id);
+					$item_button_text = sdm_get_dl_button_text($id);
 				}
 				
 				// Setup download button code

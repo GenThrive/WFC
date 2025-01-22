@@ -3,7 +3,7 @@
  * Plugin Name: Simple Download Monitor
  * Plugin URI: https://simple-download-monitor.com/
  * Description: Easily manage downloadable files and monitor downloads of your digital files from your WordPress site.
- * Version: 3.9.24
+ * Version: 3.9.26
  * Author: Tips and Tricks HQ, Ruhul Amin, Josh Lobe
  * Author URI: https://www.tipsandtricks-hq.com/development-center
  * License: GPL2
@@ -14,7 +14,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'WP_SIMPLE_DL_MONITOR_VERSION', '3.9.24' );
+define( 'WP_SIMPLE_DL_MONITOR_VERSION', '3.9.26' );
 define( 'WP_SIMPLE_DL_MONITOR_DIR_NAME', dirname( plugin_basename( __FILE__ ) ) );
 define( 'WP_SIMPLE_DL_MONITOR_URL', plugins_url( '', __FILE__ ) );
 define( 'WP_SIMPLE_DL_MONITOR_PATH', plugin_dir_path( __FILE__ ) );
@@ -28,12 +28,15 @@ $sdm_db_version = '1.4';
 require_once 'includes/sdm-debug.php';
 require_once 'includes/sdm-utility-functions.php';
 require_once 'includes/sdm-utility-functions-admin-side.php';
+require_once 'includes/sdm-utility-file-system-related.php';
 require_once 'includes/sdm-download-request-handler.php';
 require_once 'includes/sdm-user-login-related.php';
 require_once 'includes/sdm-logs-list-table.php';
 require_once 'includes/sdm-latest-downloads.php';
 require_once 'includes/sdm-popular-downloads.php';
 require_once 'includes/sdm-search-shortcode-handler.php';
+require_once 'includes/file-protection/sdm-file-protection-handler.php';
+require_once 'includes/file-protection/sdm-protected-download-request-handler.php';
 require_once 'sdm-post-type-and-taxonomy.php';
 require_once 'sdm-shortcodes.php';
 require_once 'sdm-post-type-content-handler.php';
@@ -297,6 +300,12 @@ class simpleDownloadManager {
 			wp_enqueue_script( 'media-upload' );
 			wp_enqueue_script( 'thickbox' );
 			wp_register_script( 'sdm-upload', WP_SIMPLE_DL_MONITOR_URL . '/js/sdm_admin_scripts.js', array( 'jquery', 'media-upload', 'thickbox' ), WP_SIMPLE_DL_MONITOR_VERSION );
+			if(SDM_File_Protection_Handler::is_file_protection_enabled()){
+				wp_localize_script('sdm-upload', 'sdm_file_protection', array(
+					'sdm_upload_to_protected_dir' => true,
+				));
+			}
+			
 			wp_enqueue_script( 'sdm-upload' );
 
 			// Localize langauge strings used in js file
@@ -390,8 +399,8 @@ class simpleDownloadManager {
 
 		add_settings_field( 'admin_log_unique', __( 'Log Unique IP', 'simple-download-monitor' ), array( $this, 'admin_log_unique' ), 'admin_options_section', 'admin_options' );
 		add_settings_field( 'admin_do_not_capture_ip', __( 'Do Not Capture IP Address', 'simple-download-monitor' ), array( $this, 'admin_do_not_capture_ip' ), 'admin_options_section', 'admin_options' );
-				add_settings_field( 'admin_do_not_capture_user_agent', __( 'Do Not Capture User Agent', 'simple-download-monitor' ), array( $this, 'admin_do_not_capture_user_agent' ), 'admin_options_section', 'admin_options' );
-				add_settings_field( 'admin_do_not_capture_referrer_url', __( 'Do Not Capture Referrer URL', 'simple-download-monitor' ), array( $this, 'admin_do_not_capture_referrer_url' ), 'admin_options_section', 'admin_options' );
+		add_settings_field( 'admin_do_not_capture_user_agent', __( 'Do Not Capture User Agent', 'simple-download-monitor' ), array( $this, 'admin_do_not_capture_user_agent' ), 'admin_options_section', 'admin_options' );
+		add_settings_field( 'admin_do_not_capture_referrer_url', __( 'Do Not Capture Referrer URL', 'simple-download-monitor' ), array( $this, 'admin_do_not_capture_referrer_url' ), 'admin_options_section', 'admin_options' );
 		add_settings_field( 'admin_dont_log_bots', __( 'Do Not Count Downloads from Bots', 'simple-download-monitor' ), array( $this, 'admin_dont_log_bots' ), 'admin_options_section', 'admin_options' );
 		add_settings_field( 'admin_no_logs', __( 'Disable Download Logs', 'simple-download-monitor' ), array( $this, 'admin_no_logs_cb' ), 'admin_options_section', 'admin_options' );
 		add_settings_field( 'admin-dashboard-access-permission', __( 'Admin Dashboard Access Permission', 'simple-download-monitor' ), array( $this, 'admin_dashboard_access_permission' ), 'admin_options_section', 'admin_options');
@@ -408,21 +417,22 @@ class simpleDownloadManager {
 		add_settings_section( 'termscond_options', __( 'Terms and Conditions', 'simple-download-monitor' ), array( $this, 'termscond_options_cb' ), 'termscond_options_section' );
 		add_settings_section( 'adsense_options', __( 'Adsense/Ad Insertion', 'simple-download-monitor' ), array( $this, 'adsense_options_cb' ), 'adsense_options_section' );
 		add_settings_section( 'maps_api_options', __( 'Google Maps API Key', 'simple-download-monitor' ), array( $this, 'maps_api_options_cb' ), 'maps_api_options_section' );
-
+		
 		//Add reCAPTCHA section fields
 		add_settings_field( 'recaptcha_enable', __( 'Enable reCAPTCHA', 'simple-download-monitor' ), array( $this, 'recaptcha_enable_cb' ), 'recaptcha_options_section', 'recaptcha_options' );
 		add_settings_field( 'recaptcha_site_key', __( 'Site Key', 'simple-download-monitor' ), array( $this, 'recaptcha_site_key_cb' ), 'recaptcha_options_section', 'recaptcha_options' );
 		add_settings_field( 'recaptcha_secret_key', __( 'Secret Key', 'simple-download-monitor' ), array( $this, 'recaptcha_secret_key_cb' ), 'recaptcha_options_section', 'recaptcha_options' );
-
+		
 		//Add Terms & Condition section fields
 		add_settings_field( 'termscond_enable', __( 'Enable Terms and Conditions', 'simple-download-monitor' ), array( $this, 'termscond_enable_cb' ), 'termscond_options_section', 'termscond_options' );
 		add_settings_field( 'termscond_url', __( 'Terms Page URL', 'simple-download-monitor' ), array( $this, 'termscond_url_cb' ), 'termscond_options_section', 'termscond_options' );
-
+		
 		//Add Adsense section fields
 		add_settings_field( 'adsense_below_description', __( 'Below Download Description', 'simple-download-monitor' ), array( $this, 'adsense_below_description_cb' ), 'adsense_options_section', 'adsense_options' );
-
+		
 		//Maps API section fields
 		add_settings_field( 'maps_api_key', __( 'API Key', 'simple-download-monitor' ), array( $this, 'maps_api_key_cb' ), 'maps_api_options_section', 'maps_api_options' );
+		
 	}
 
 	public function general_options_cb() {
@@ -917,7 +927,7 @@ function sdm_downloads_columns_content( $column_name, $post_ID ) {
 		$old_thumbnail = get_post_meta( $post_ID, 'sdm_upload_thumbnail', true );
 		//$old_value = isset($old_thumbnail) ? $old_thumbnail : '';
 		if ( $old_thumbnail ) {
-			echo '<p class="sdm_downloads_thumbnail_in_admin_listing"><img src="' . esc_url( $old_thumbnail ) . '" style="width:50px;height:50px;" /></p>';
+			echo '<p class="sdm_downloads_thumbnail_in_admin_listing"><img src="' . esc_url( $old_thumbnail ) . '" style="width:50px;height:50px;object-fit:cover;" /></p>';
 		}
 	}
 	if ( $column_name == 'sdm_downloads_id' ) {

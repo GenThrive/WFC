@@ -425,6 +425,11 @@ class SDM_Admin_Edit_Download {
 		if ( isset( $_POST['sdm_download_button_text'] ) ) {
 			update_post_meta( $post_id, 'sdm_download_button_text', sanitize_text_field( wp_unslash( $_POST['sdm_download_button_text'] ) ) );
 		}
+
+		// Adding a marker so that this Download CPT can identified as a protected download.
+		// The other alternative is to check if the download URL contains 'sdm-downloads' in it.
+		$is_file_protection_enabled = SDM_File_Protection_Handler::is_file_protection_enabled() ? 'yes' : 'no';
+		update_post_meta( $post_id, 'sdm_is_protected_download', $is_file_protection_enabled );
 	}
 }
 

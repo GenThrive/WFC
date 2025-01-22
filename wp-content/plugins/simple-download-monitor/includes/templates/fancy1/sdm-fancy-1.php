@@ -42,7 +42,7 @@ function sdm_generate_fancy1_category_display_output( $get_posts, $args ) {
          * Prioritize category shortcode param over custom button text from edit page.
          */
         if (empty($args_fresh['button_text'])) {
-            $args_fresh['button_text'] = get_dl_button_text($item->ID);
+            $args_fresh['button_text'] = sdm_get_dl_button_text($item->ID);
         }
 
         $output .= sdm_generate_fancy1_display_output(
@@ -111,9 +111,8 @@ function sdm_generate_fancy1_display_output( $args ) {
     $isset_download_thumbnail	 = isset( $item_download_thumbnail ) && ! empty( $item_download_thumbnail ) ? '<img class="sdm_download_thumbnail_image" src="' . esc_url_raw($item_download_thumbnail) . '" alt = "' . esc_html($thumbnail_alt) . '" />' : '';
     $isset_download_thumbnail	 = apply_filters( 'sdm_download_fancy_1_thumbnail', $isset_download_thumbnail, $args ); //Apply filter so it can be customized.
 
-    // Get download button
-    $homepage = get_bloginfo( 'url' );
-    $download_url = $homepage . '/?sdm_process_download=1&download_id=' . $id;
+    // Get download button URL and generate the download button code.
+    $download_url = sdm_get_standard_download_url_from_id($id);
     $download_button_code = '<a href="' . esc_url_raw($download_url) . '" class="sdm_download ' . esc_attr($color) . '" title="' . esc_html($item_title) . '" target="' . esc_attr($window_target) . '">' . esc_attr($button_text) . '</a>';
 
     //Get item file size

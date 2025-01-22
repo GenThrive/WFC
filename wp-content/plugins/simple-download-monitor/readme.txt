@@ -3,8 +3,8 @@ Contributors: Tips and Tricks HQ, Ruhul Amin, josh401, mbrsolution, alexanderfox
 Donate link: https://www.tipsandtricks-hq.com
 Tags: download, downloads, count, counter, tracker
 Requires at least: 5.5
-Tested up to: 6.4
-Stable tag: 3.9.24
+Tested up to: 6.7
+Stable tag: 3.9.26
 License: GPLv2 or later
 
 Easily manage downloadable files and monitor downloads of your digital files from your WordPress site.
@@ -16,8 +16,6 @@ I developed the Simple Download Monitor plugin because I needed a nice way to ma
 This plugin is very useful for managing and tracking your digital file download counts.
 
 You can password protect your downloadable files and documents too (visitors will require a password before downloading the file when you use this option).
-
-There is an option to show an ajax file tree browser so your visitors can browse all your files and download the ones they want.
 
 You can configure downloadable files from your WordPress admin dashboard via an elegant user interface. Then allow your visitors to download the files and this plugin will monitor which files get downloaded how many times.
 
@@ -56,6 +54,7 @@ https://www.youtube.com/watch?v=SjVaanbulRU
 * You can customize the "Download Now" button text of an item to anything you want.
 * Ability to add the download now buttons to your sidebar widget.
 * Create password protected download now buttons. Users will only be able to download the file if they enter the correct password. [View the tutorial](https://www.tipsandtricks-hq.com/create-a-password-protected-download-file-6838)
+* Option to add additional security to your downloadable files with the [Enhanced File Protection Feature](https://simple-download-monitor.com/enhanced-file-protection-securing-your-downloads/).
 * Shortcode to show the download counter of a file. Use it to show off your file download count.
 * Shortcode to show all the downloads from a particular category.
 * Shortcode to embed a file tree browser for your downloadable files. The file browser is ajax based and it shows the files structured by categories.
@@ -72,6 +71,7 @@ https://www.youtube.com/watch?v=SjVaanbulRU
 * Option to specify version number info for the download item so it can be shown to your visitors.
 * Option to show the download published date.
 * Option to restrict downloads to logged-in users only. [View the tutorial](https://simple-download-monitor.com/offering-downloads-to-logged-in-users-members-only/)
+* There is an option to show an ajax file tree browser so your visitors can browse all your files and download the ones they want.
 * Option to ignore download count from bots.
 * Option to add Google reCAPTCHA to your download buttons.
 * Option to add Terms and Condtions to your download buttons.
@@ -157,6 +157,9 @@ If you need extra action hooks or filters for this plugin then let us know.
 
 == Frequently Asked Questions ==
 
+= Where can I find complete documentation for this plugin? =
+You can find the full documentation for this plugin on the [Simple Download Monitor plugin documentation](https://simple-download-monitor.com/download-monitor-tutorials/) page.
+
 = Can this plugin be used to offer free downloads to the users? =
 Yes.
 
@@ -168,6 +171,9 @@ Yes, you can use both local paths and external URLs.
 
 = Can I password protect a downloadable file? = 
 Yes.
+
+= Can I add additional security to protect my downloadable files? = 
+You can add additional security to your downloadable files with the [Enhanced File Protection Feature](https://simple-download-monitor.com/enhanced-file-protection-securing-your-downloads/).
 
 = Can I show the file download counts to my visitors? =
 Yes.
@@ -189,6 +195,22 @@ Yes
 For screenshots please visit the [download monitor plugin page](https://www.tipsandtricks-hq.com/simple-wordpress-download-monitor-plugin)
 
 == Changelog ==
+
+= 3.9.26 =
+- The update for excluding hidden attachment media queries will not occur if the enhanced file protection feature is disabled.
+- When using the 'pre_get_posts' hook, it will now check if another plugin has already modified the query and if so, it will append to it.
+- Removed the trailing slash from the download URL in the download now button shortcode to prevent double slashes in the URL. Thanks to @expforex for pointing this out.
+- Renamed a function to add the 'sdm' keyword to prevent a potential conflict with another plugin.
+- Added an isset check to remove a PHP notice in the download count shortcode.
+- Added sanitization to the row_id variable in the log entry delete function.
+
+= 3.9.25 =
+- New [Enhanced File Protection](https://simple-download-monitor.com/enhanced-file-protection-securing-your-downloads/) feature added.
+- Thumbnails in the Downloads menu's admin interface will no longer appear squished.
+- Added an isset check for the "download_id" variable in the download request handler.
+- Fixed $id variable not defined warning in category shortcode.
+- Thumbnails in the Downloads menu's admin interface will no longer appear squished.
+- Minor CSS improvements to the information box for better readability.
 
 = 3.9.24 =
 - New settings added to allow the admin to specify if other WP User roles can view the plugin's admin dashboard.
@@ -247,6 +269,8 @@ For screenshots please visit the [download monitor plugin page](https://www.tips
 - Added filters for categories and tags to change the slug (or other parameters). Thanks to @cfoellmann.
 - Added a filter to the fancy2 shortcode output so it can be customized.
 - Added a filter to the fancy1 shortcode output so it can be customized.
+
+Full changelog available [at change-log-of-old-versions.txt](https://plugins.svn.wordpress.org/simple-download-monitor/trunk/change-log-of-old-versions.txt)
 
 == Upgrade Notice ==
 
