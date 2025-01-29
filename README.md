@@ -1,4 +1,4 @@
-# Grace Communications Foundation Water Calculator (water-calculator)
+# EcoRise Water Calculator (water-calculator)
 
 This repo contains Cornershop Creative's stock WordPress install. It includes a number of oft-used plugins, our custom-built Crate theme, and a database dump to facilitate getting up and running quickly.
 
